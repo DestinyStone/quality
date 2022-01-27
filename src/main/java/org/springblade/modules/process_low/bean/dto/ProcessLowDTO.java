@@ -1,8 +1,5 @@
 package org.springblade.modules.process_low.bean.dto;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiModelProperty;
@@ -128,7 +125,7 @@ public class ProcessLowDTO {
 	@ApiModelProperty("通知文件ID集合")
 	private String busincessIdFiles;
 
-	@ApiModelProperty("流程状态 0待审批 1审批中 2已审批 3已结案 4自撤回")
+	@ApiModelProperty("流程状态 0待审批 1审批中 2已结案 3退回 4自撤回")
 	private Integer bpmStatus;
 
 	@ApiModelProperty("流程节点 0不良联络书发行 1不良调查 2不良横展 3调查结果确认")

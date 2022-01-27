@@ -107,27 +107,24 @@ public class ProcessLowVO {
 	@ApiModelProperty("通知文件ID集合")
 	private String busincessIdFiles;
 
-	@ApiModelProperty("流程状态 0待审批 1审批中 2已审批 3已结案 4自撤回")
+	@ApiModelProperty("流程状态 0待审批 1审批中 2已结案 3退回 4自撤回")
 	private Integer bpmStatus;
 
 	@ApiModelProperty("流程节点 0不良联络书发行 1不良调查 2不良横展 3调查结果确认")
 	private Integer bpmNode;
 
 	@ApiModelProperty("创建用户")
-	private String createUser;
+	private Long createUser;
+
+	@ApiModelProperty("创建用户名称")
+	private String createUserName;
 
 	@ApiModelProperty("创建时间")
-	private String createTime;
+	private Date createTime;
 
-	@ApiModelProperty("创建部门")
-	private String createDept;
+	@ApiModelProperty("查询key 标题/不良内容/供应商名称")
+	private String searchKey;
 
-	@ApiModelProperty("更新用户")
-	private String updateUser;
-
-	@ApiModelProperty("更新时间")
-	private String updateTime;
-
-	@ApiModelProperty("状态")
-	private String status;
+	@ApiModelProperty("审批状态过滤 -1全部 0自撤回 1已驳回 2进行中 3已办结")
+	private Integer bpmStatusFilter;
 }

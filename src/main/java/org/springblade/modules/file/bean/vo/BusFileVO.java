@@ -2,7 +2,6 @@ package org.springblade.modules.file.bean.vo;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -34,9 +33,16 @@ public class BusFileVO {
 	@ApiModelProperty("创建用户")
 	private Long createUser;
 
+	@ApiModelProperty("创建用户名称")
+	private String createUserName;
+
 	@ApiModelProperty("创建时间")
 	private Date createTime;
 
 	@ApiModelProperty("创建部门")
 	private Long createDept;
+
+	@ApiModelProperty("创建部门名称")
+	private String createDeptName;
+
 }
