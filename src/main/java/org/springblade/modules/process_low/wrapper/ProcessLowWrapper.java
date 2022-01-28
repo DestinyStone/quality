@@ -12,7 +12,7 @@ import org.springblade.modules.system.entity.User;
  * @Date: 2022/1/27 11:40
  * @Description:
  */
-public class ProcessLowWrapper  extends BaseEntityWrapper<ProcessLow, ProcessLowVO> {
+public class ProcessLowWrapper extends BaseEntityWrapper<ProcessLow, ProcessLowVO> {
 
 	public static ProcessLowWrapper build() {
 		return new ProcessLowWrapper();

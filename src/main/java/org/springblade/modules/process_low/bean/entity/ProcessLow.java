@@ -27,7 +27,7 @@ public class ProcessLow {
 	private String title;
 
 	@ApiModelProperty("不良编号")
-	private Long code;
+	private String code;
 
 	@ApiModelProperty("不良分类 0外购件 1内制件 2其他 ")
 	private Integer type;

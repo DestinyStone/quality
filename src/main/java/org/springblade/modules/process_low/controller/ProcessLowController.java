@@ -7,6 +7,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springblade.common.constant.RootMappingConstant;
 import org.springblade.common.enums.ApproveStatusEmun;
+import org.springblade.common.utils.CodeUtil;
 import org.springblade.common.utils.CommonUtil;
 import org.springblade.core.log.exception.ServiceException;
 import org.springblade.core.mp.support.Condition;
@@ -34,6 +35,8 @@ import java.util.Date;
 @Api(value = "工序内不良接口", tags = "工序内不良接口")
 public class ProcessLowController {
 
+	private static final String CODE_FLAG = "PROCESS_LOW";
+
 	@Autowired
 	private ProcessLowService lowService;
 
@@ -54,7 +57,7 @@ public class ProcessLowController {
 	}
 
 	@PostMapping("/save")
-	@ApiOperation("详情")
+	@ApiOperation("新增")
 	public R save(@Valid @RequestBody ProcessLowDTO processLowDTO) {
 		ProcessLow processLow = BeanUtil.copy(processLowDTO, ProcessLow.class);
 		processLow.setCreateUser(CommonUtil.getUserId());
@@ -63,17 +66,18 @@ public class ProcessLowController {
 		processLow.setUpdateUser(CommonUtil.getUserId());
 		processLow.setUpdateTime(new Date());
 		processLow.setBpmStatus(0);
+		processLow.setCode(CodeUtil.getCode(CODE_FLAG));
 		return R.status(lowService.save(processLow));
 	}
 
 	@GetMapping("/delete")
-	@ApiOperation("详情")
+	@ApiOperation("删除")
 	public R delete(@RequestParam("ids") String ids) {
 		return R.data(lowService.removeByIds(CommonUtil.toLongList(ids)));
 	}
 
 	@PostMapping("/update/{id}")
-	@ApiOperation("详情")
+	@ApiOperation("更新")
 	public R update(@PathVariable("id") Long id, @Valid  @RequestBody ProcessLowDTO processLowDTO) {
 		ProcessLow processLow = BeanUtil.copy(processLowDTO, ProcessLow.class);
 		processLow.setId(id);
