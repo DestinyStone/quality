@@ -16,16 +16,14 @@
  */
 package org.springblade.common.utils;
 
-import com.github.xiaoymin.knife4j.core.util.StrUtil;
-import com.qiniu.util.Auth;
+import cn.hutool.core.lang.Snowflake;
+import cn.hutool.core.util.IdUtil;
 import org.springblade.core.secure.BladeUser;
 import org.springblade.core.secure.utils.AuthUtil;
 import org.springblade.core.tool.utils.BeanUtil;
 import org.springblade.core.tool.utils.Func;
-import org.springblade.modules.process_low.bean.vo.ProcessLowVO;
 import org.springframework.lang.Nullable;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -34,6 +32,15 @@ import java.util.List;
  * @Description: 通用工具类， 系统工具的统一维护
  */
 public class CommonUtil {
+
+	private static final Snowflake snowflake = IdUtil.createSnowflake(1, 1);
+
+	/**
+	 * 获取唯一id
+	 */
+	public static Long getCode() {
+		return snowflake.nextId();
+	}
 
 	/**
 	 * 获取当前用户ID
