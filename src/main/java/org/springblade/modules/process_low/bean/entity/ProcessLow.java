@@ -101,6 +101,12 @@ public class ProcessLow {
 	@ApiModelProperty("不良排查及文件名称")
 	private String separateFileName;
 
+	@ApiModelProperty("不良排查及隔离附件文件ID")
+	private Long separateFileDependId;
+
+	@ApiModelProperty("不良排查及文件附件名称")
+	private String separateFileDependName;
+
 	@ApiModelProperty("变化点")
 	private String changeRemark;
 
@@ -133,4 +139,52 @@ public class ProcessLow {
 
 	@ApiModelProperty("状态")
 	private Integer status;
+
+	@ApiModelProperty("不良分析调查原因")
+	private String analyseCause;
+
+	@ApiModelProperty("不良分析调查图片")
+	private Long analyseCauseImgFileId;
+
+	@ApiModelProperty("调查原因类型 0异常处置 1变化点管理 2良品条件设定 3维持管理 4标准作业 5其他")
+	private Integer analyseCauseType;
+
+	@ApiModelProperty("调查发生原因")
+	private String analyseTriggerCause;
+
+	@ApiModelProperty("调查发生对策")
+	private String analyseTriggerStrategy;
+
+	@ApiModelProperty("调查流程原因")
+	private String analyseOutCause;
+
+	@ApiModelProperty("调查流程对策")
+	private String analyseOutStrategy;
+
+	@ApiModelProperty("是否上传标准文件")
+	private Integer isUploadStandardFile;
+
+	@ApiModelProperty("发生对策附件Id")
+	private Long triggerStrategyFileId;
+
+	@ApiModelProperty("发生对策附件名称")
+	private String triggerStrategyFileName;
+
+	@ApiModelProperty("流程对策文件Id")
+	private Long processStrategyFileId;
+
+	@ApiModelProperty("流程对策文件名称")
+	private String processStrategyFileName;
+
+	@ApiModelProperty("放行通知书附件Id")
+	private Long passAdviceFileId;
+
+	@ApiModelProperty("放行通知书附件名称")
+	private String passAdviceFileName;
+
+	@ApiModelProperty("标准文件附件Id")
+	private Long standardFileId;
+
+	@ApiModelProperty("标准文件附件名称")
+	private String standardFileName;
 }

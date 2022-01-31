@@ -22,4 +22,22 @@ public interface BpmProcessService extends IService<BpmProcess> {
 	 * 审批通过
 	 */
 	void pass(Long bpmId);
+
+	/**
+	 * 审批拒绝
+	 */
+	void reject(Long bpmId, String cause);
+
+	/**
+	 * 审批是否已完成
+	 * @param bpmId
+	 * @return false 未结束 true 已结束
+	 */
+	Boolean isProcessEnd(Long bpmId);
+
+	/**
+	 * 删除该任务
+	 * @param busId  业务Id
+	 */
+	void delete(Long busId);
 }

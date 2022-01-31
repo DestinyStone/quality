@@ -6,12 +6,31 @@ package org.springblade.common.enums;
  * @Description:
  */
 public enum  ApproveStatusEmun {
- //1审批中 3已结案 退回 4自撤回
+
+	/**
+	 * 待审批
+	 */
 	AWAIT(0, "待审批"),
-	PROCEED(1, "1审批中"),
+
+	/**
+	 * 审批中
+	 */
+	PROCEED(1, "审批中"),
+
+	/**
+	 * 已结案
+	 */
 	FINISN(2, "已结案"),
+
+	/**
+	 * 退回
+	 */
 	BACK(3, "退回"),
-	SELF_BACK(4, "自测回")
+
+	/**
+	 * 自退回
+	 */
+	SELF_BACK(4, "自退回")
 	;
 
 	private Integer code;

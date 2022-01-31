@@ -1,8 +1,7 @@
 package org.springblade.modules.file.utils;
 
 import lombok.SneakyThrows;
-import org.springblade.core.tool.utils.FileUtil;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springblade.core.log.exception.ServiceException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -54,6 +53,7 @@ public class FileUtils {
 			return getRemotePath(fileName);
 		}catch (Exception e) {
 			e.printStackTrace();
+			throw new ServiceException("文件上传异常");
 		}finally {
 			if (outputStream != null) {
 				outputStream.close();
@@ -63,7 +63,6 @@ public class FileUtils {
 				inputStream.close();
 			}
 		}
-		return "";
 	}
 
 	@Value("${file.upload.server}")

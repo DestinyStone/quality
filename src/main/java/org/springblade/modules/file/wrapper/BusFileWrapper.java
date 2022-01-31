@@ -28,7 +28,7 @@ public class BusFileWrapper extends BaseEntityWrapper<BusFile, BusFileVO> {
 		vo.setCreateUserName(user == null ? "" : user.getName());
 
 		Dept dept = SysCache.getDept(vo.getCreateDept());
-		vo.setCreateDeptName(dept.getDeptName());
+		vo.setCreateDeptName(dept == null ? "" : dept.getDeptName());
 
 		return vo;
 	}

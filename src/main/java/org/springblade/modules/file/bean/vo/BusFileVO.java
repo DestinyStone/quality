@@ -19,7 +19,7 @@ public class BusFileVO {
 
 	@TableId(value = "id", type = IdType.ASSIGN_ID)
 	@ApiModelProperty("主键")
-	private String id;
+	private Long id;
 
 	@ApiModelProperty("文件名称")
 	private String name;

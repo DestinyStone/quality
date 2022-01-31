@@ -3,6 +3,7 @@ package org.springblade.modules.file.controller;
 import io.swagger.annotations.Api;
 import org.springblade.common.constant.RootMappingConstant;
 import org.springblade.common.utils.CommonUtil;
+import org.springblade.core.log.exception.ServiceException;
 import org.springblade.core.tool.api.R;
 import org.springblade.modules.file.bean.entity.BusFile;
 import org.springblade.modules.file.bean.vo.BusFileVO;
@@ -28,6 +29,15 @@ public class FileController {
 
 	@Autowired
 	private BusFileService fileService;
+
+	@GetMapping("/detail")
+	public R<BusFileVO> detail(@RequestParam("id") Long id) {
+		BusFile busFile = fileService.getById(id);
+		if (busFile == null) {
+			throw new ServiceException("文件不存在");
+		}
+		return R.data(BusFileWrapper.build().entityVO(busFile));
+	}
 
 	@PostMapping("/upload")
 	public R<BusFileVO> upload(MultipartFile file) throws IOException {

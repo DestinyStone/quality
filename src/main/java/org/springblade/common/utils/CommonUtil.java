@@ -18,10 +18,12 @@ package org.springblade.common.utils;
 
 import cn.hutool.core.lang.Snowflake;
 import cn.hutool.core.util.IdUtil;
+import org.springblade.common.cache.SysCache;
 import org.springblade.core.secure.BladeUser;
 import org.springblade.core.secure.utils.AuthUtil;
 import org.springblade.core.tool.utils.BeanUtil;
 import org.springblade.core.tool.utils.Func;
+import org.springblade.modules.system.entity.Dept;
 import org.springframework.lang.Nullable;
 
 import java.util.List;
@@ -51,11 +53,37 @@ public class CommonUtil {
 	}
 
 	/**
+	 * 获取当前用户名称
+	 */
+	public static String getUserName() {
+		BladeUser user = AuthUtil.getUser();
+		return user.getUserName();
+	}
+
+	/**
 	 * 获取用户部门
 	 */
 	public static Long getDeptId() {
 		String deptId = AuthUtil.getDeptId();
 		return firstLong(deptId);
+	}
+
+	/**
+	 * 获取部门路径
+	 */
+	public static String getDeptPath() {
+		Long deptId = getDeptId();
+		Dept dept = SysCache.getDept(deptId);
+		return dept == null ? "" : dept.getDeptName();
+	}
+
+	/**
+	 * 获取角色名称
+	 * @return
+	 */
+	public static String getRoleName() {
+		String roleName = AuthUtil.getUserRole();
+		return roleName;
 	}
 
 	/**

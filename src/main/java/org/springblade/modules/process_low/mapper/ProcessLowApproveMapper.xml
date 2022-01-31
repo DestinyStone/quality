@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.springblade.modules.process_low.mapper.ProcessLowApproveMapper">
+
+    <select id="page" resultType="org.springblade.modules.process_low.bean.vo.ProcessLowApproveVO">
+        SELECT
+            low.*,
+            process.bpm_id,
+            process.bpm_status AS process_bpm_status,
+            process.bpm_push_status,
+            process.create_time AS start_time,
+            process.end_time AS end_time
+        FROM
+            bpm_process process
+        LEFT JOIN bus_process_low low
+        ON process.bus_id = low.id
+        <where>
+            and process.access_dept = #{deptId}
+            <if test="vo.searchKey != null and vo.searchKey != ''">
+                and (
+                    low.title like CONCAT("%", #{vo.searchKey}, "%")
+                    or low.code like CONCAT("%", #{vo.searchKey}, "%")
+                )
+            </if>
+            <if test="vo.tagFlag == 0">
+                and process.bpm_status = 2 and (process.bpm_push_status = 0 or process.bpm_push_status = 2)
+            </if>
+            <if test="vo.tagFlag == 1">
+                and (process.bpm_status = 3 or process.bpm_status = 4)
+            </if>
+            <if test="vo.tagFlag == 2">
+                and process.bpm_push_status = 1
+            </if>
+        </where>
+
+    </select>
+</mapper>

@@ -14,8 +14,15 @@ import org.springblade.core.mp.support.Condition;
 import org.springblade.core.mp.support.Query;
 import org.springblade.core.tool.api.R;
 import org.springblade.core.tool.utils.BeanUtil;
+import org.springblade.modules.file.bean.entity.BusFile;
+import org.springblade.modules.file.bean.vo.BusFileVO;
+import org.springblade.modules.file.service.BusFileService;
+import org.springblade.modules.file.wrapper.BusFileWrapper;
+import org.springblade.modules.process.service.BpmProcessService;
+import org.springblade.modules.process_low.bean.dto.ProcessLowCheckDTO;
 import org.springblade.modules.process_low.bean.dto.ProcessLowDTO;
 import org.springblade.modules.process_low.bean.entity.ProcessLow;
+import org.springblade.modules.process_low.bean.vo.ProcessLowQualityVO;
 import org.springblade.modules.process_low.bean.vo.ProcessLowVO;
 import org.springblade.modules.process_low.service.ProcessLowService;
 import org.springblade.modules.process_low.wrapper.ProcessLowWrapper;
@@ -23,7 +30,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @Author: xiaoxia
@@ -40,6 +50,26 @@ public class ProcessLowController {
 	@Autowired
 	private ProcessLowService lowService;
 
+	@Autowired
+	private BusFileService fileService;
+
+	@Autowired
+	private BpmProcessService processService;
+
+	@PostMapping("/edit/check/{id}/{bpmId}")
+	@ApiOperation("提交调查结果")
+	public R editCheck(@PathVariable("id") Long id,
+					   @PathVariable("bpmId") Long bpmId,
+					   @Valid @RequestBody ProcessLowCheckDTO checkDTO) {
+		ProcessLow processLow = BeanUtil.copyProperties(checkDTO, ProcessLow.class);
+		processLow.setId(id);
+		processLow.setBpmStatus(ApproveStatusEmun.FINISN.getCode());
+		Boolean status = lowService.updateById(processLow);
+		processService.pass(bpmId);
+
+		return R.status(status);
+	}
+
 	@GetMapping("/self/back")
 	@ApiOperation("自撤回接口")
 	public R selfBack(@RequestParam("id") Long id) {
@@ -53,6 +83,9 @@ public class ProcessLowController {
 		ProcessLow update = new ProcessLow();
 		update.setId(id);
 		update.setBpmStatus(ApproveStatusEmun.SELF_BACK.getCode());
+
+		// 删除该任务
+		processService.delete(id);
 		return R.status(lowService.updateById(update));
 	}
 
@@ -67,7 +100,7 @@ public class ProcessLowController {
 		processLow.setUpdateTime(new Date());
 		processLow.setBpmStatus(0);
 		processLow.setCode(CodeUtil.getCode(CODE_FLAG));
-		return R.status(lowService.save(processLow));
+		return R.status(lowService.saveAndActiveTask(processLow));
 	}
 
 	@GetMapping("/delete")
@@ -127,7 +160,6 @@ public class ProcessLowController {
 		wrapper.eq(processLowVO.getType() != null, ProcessLow::getType, processLowVO.getType())
 			.eq(processLowVO.getApparatusType() != null, ProcessLow::getApparatusType, processLowVO.getApparatusType())
 			.eq(processLowVO.getTriggerAddress() != null, ProcessLow::getTriggerAddress, processLowVO.getTriggerAddress());
-
 		IPage<ProcessLow> page = lowService.page(Condition.getPage(query), wrapper);
 		return R.data(ProcessLowWrapper.build().pageVO(page));
 	}
@@ -136,6 +168,67 @@ public class ProcessLowController {
 	@ApiOperation("详情")
 	public R<ProcessLowVO> detail(@RequestParam("id") Long id) {
 		ProcessLow processLow = lowService.getById(id);
-		return R.data(ProcessLowWrapper.build().entityVO(processLow));
+		ProcessLowVO processLowVO = ProcessLowWrapper.build().entityVO(processLow);
+
+		ArrayList<Long> fileIds = new ArrayList<>();
+		List<Long> imageReportIds = CommonUtil.toLongList(processLow.getImgReportIds());
+		Long separateFileId = processLow.getSeparateFileId();
+		List<Long> busincessIds = CommonUtil.toLongList(processLow.getBusincessIdFiles());
+
+		fileIds.addAll(imageReportIds);
+		fileIds.addAll(busincessIds);
+		fileIds.add(separateFileId);
+
+		LambdaQueryWrapper<BusFile> fileWrapper = new LambdaQueryWrapper<>();
+		fileWrapper.in(BusFile::getId, fileIds);
+		List<BusFileVO> list = BusFileWrapper.build().listVO(fileService.list(fileWrapper));
+
+		processLowVO.setImgReportList(list.stream().filter(item -> imageReportIds.contains(item.getId())).collect(Collectors.toList()));
+		processLowVO.setImgReportList(new ArrayList<>());
+		processLowVO.setBusincessFiles(new ArrayList<>());
+		for (BusFileVO item : list) {
+			if (item.getId().equals(separateFileId)) {
+				processLowVO.setSeparateFile(item);
+			}
+			if (imageReportIds.contains(item.getId())) {
+				processLowVO.getImgReportList().add(item);
+			}
+			if (busincessIds.contains(item.getId())) {
+				processLowVO.getBusincessFiles().add(item);
+			}
+		}
+
+		return R.data(processLowVO);
 	}
+
+	@GetMapping("/quality")
+	@ApiOperation("统计接口")
+	public R<ProcessLowQualityVO> quality() {
+		LambdaQueryWrapper<ProcessLow> wrapper = new LambdaQueryWrapper<>();
+		List<ProcessLow> list = lowService.list(wrapper);
+
+		ProcessLowQualityVO processLowQualityVO = new ProcessLowQualityVO();
+		processLowQualityVO.setBack(0);
+		processLowQualityVO.setFinish(0);
+		processLowQualityVO.setProcess(0);
+		processLowQualityVO.setSelfBack(0);
+
+		for (ProcessLow processLow : list) {
+			if (processLow.getBpmStatus().equals(ApproveStatusEmun.SELF_BACK.getCode())) {
+				processLowQualityVO.setSelfBack(processLowQualityVO.getSelfBack() + 1);
+			}
+			if (processLow.getBpmStatus().equals(ApproveStatusEmun.BACK.getCode())) {
+				processLowQualityVO.setBack(processLowQualityVO.getBack() + 1);
+			}
+			if (processLow.getBpmStatus().equals(ApproveStatusEmun.AWAIT.getCode()) ||
+				processLow.getBpmStatus().equals(ApproveStatusEmun.PROCEED.getCode())) {
+				processLowQualityVO.setProcess(processLowQualityVO.getProcess() + 1);
+			}
+			if (processLow.getBpmStatus().equals(ApproveStatusEmun.FINISN.getCode())) {
+				processLowQualityVO.setFinish(processLowQualityVO.getFinish() + 1);
+			}
+		}
+		return R.data(processLowQualityVO);
+	}
+
 }

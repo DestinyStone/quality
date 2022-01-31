@@ -9,4 +9,10 @@ import org.springblade.modules.process_low.bean.entity.ProcessLow;
  * @Description:
  */
 public interface ProcessLowService extends IService<ProcessLow> {
+	/**
+	 * 新增并激活审批任务
+	 * @param processLow
+	 * @return
+	 */
+	Boolean saveAndActiveTask(ProcessLow processLow);
 }
