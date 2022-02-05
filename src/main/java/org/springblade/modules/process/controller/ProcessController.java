@@ -1,5 +1,6 @@
 package org.springblade.modules.process.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -8,14 +9,14 @@ import org.springblade.core.log.exception.ServiceException;
 import org.springblade.core.tool.api.R;
 import org.springblade.modules.process.entity.bean.BpmProcess;
 import org.springblade.modules.process.entity.dto.PutOfDTO;
+import org.springblade.modules.process.entity.vo.BpmProcessVO;
 import org.springblade.modules.process.service.BpmProcessService;
+import org.springblade.modules.process.wrapper.BpmProcessWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 /**
  * @Author: DestinyStone
@@ -29,6 +30,16 @@ public class ProcessController {
 
 	@Autowired
 	private BpmProcessService processService;
+
+	@GetMapping("/list")
+	@ApiOperation("列表")
+	public R<List<BpmProcessVO>> list(@RequestParam("busId") String busId) {
+		LambdaQueryWrapper<BpmProcess> wrapper = new LambdaQueryWrapper<>();
+		wrapper.eq(BpmProcess::getBusId, busId)
+			.eq(BpmProcess::getIsCastoff, 0);
+		List<BpmProcess> list = processService.list(wrapper);
+		return R.data(BpmProcessWrapper.build().listVO(list));
+	}
 
 	@PostMapping("/put/of")
 	@ApiOperation("延迟接口")

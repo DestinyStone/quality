@@ -1,5 +1,6 @@
 package org.springblade.common.utils;
 
+import org.springblade.modules.out_buy_low.utils.OutBuyQprApproveUtils;
 import org.springblade.modules.process.core.ProcessContainer;
 import org.springblade.modules.process.service.BpmProcessService;
 import org.springblade.modules.process_low.utils.ProcessLowApproveUtils;
@@ -28,6 +29,11 @@ public class ApproveUtils {
 		 * 外购件不良审批
 		 */
 		OUT_BUY_LOW,
+
+		/**
+		 * 工序内不良外购件审批
+		 */
+		PROCESS_LOW_OUT_BUY
 		;
 	}
 
@@ -38,7 +44,13 @@ public class ApproveUtils {
 		}
 
 		if (ApproveLinkEnum.OUT_BUY_LOW.equals(linkEnum)) {
-			// TODO
+			List<ProcessContainer> processTaskList = OutBuyQprApproveUtils.getProcessTaskList(busId + "");
+			createTask(processTaskList);
+		}
+
+		if (ApproveLinkEnum.PROCESS_LOW_OUT_BUY.equals(linkEnum)) {
+			List<ProcessContainer> processTaskList = ProcessLowApproveUtils.getOutBuyProcessTaskList(busId + "");
+			createTask(processTaskList);
 		}
 	}
 

@@ -1,8 +1,5 @@
 package org.springblade.modules.out_buy_low.bean.dto;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiModelProperty;
@@ -71,8 +68,8 @@ public class OutBuyQprDTO {
 	private String imgReportIds;
 
 	@ApiModelProperty("机型,逗号隔开 0TNGA2.0")
-	@NotBlank(message = "机型不能为空")
-	private String apparatusTypes;
+	@NotNull(message = "机型不能为空")
+	private Integer apparatusType;
 
 	@ApiModelProperty("处理 0返还 1保留 2废弃 3其他")
 	@NotNull(message = "不良品处理不能为空")
@@ -80,4 +77,10 @@ public class OutBuyQprDTO {
 
 	@ApiModelProperty("处理")
 	private String dispost;
+
+	@ApiModelProperty("工序内不良信息标识 0非工序内不良 1工序内不良审批 2工序内不良QPR录入")
+	private Integer processLowFlag;
+
+	@ApiModelProperty("工序内不良Id")
+	private Long processLowId;
 }

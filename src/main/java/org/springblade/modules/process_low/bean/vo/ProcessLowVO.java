@@ -88,6 +88,9 @@ public class ProcessLowVO {
 	@ApiModelProperty("不良测定报告文件名称")
 	private String testReportFileName;
 
+	@ApiModelProperty("不良测定报告文件")
+	private BusFileVO testReportFile;
+
 	@ApiModelProperty("禁止流出描述")
 	private String banOutflowRemark;
 
@@ -114,6 +117,9 @@ public class ProcessLowVO {
 
 	@ApiModelProperty("不良排查及文件附件名称")
 	private String separateFileDependName;
+
+	@ApiModelProperty("不良排查及文件附件")
+	private BusFileVO separateFileDepend;
 
 	@ApiModelProperty("变化点")
 	private String changeRemark;

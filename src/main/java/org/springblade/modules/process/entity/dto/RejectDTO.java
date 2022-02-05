@@ -13,9 +13,9 @@ import javax.validation.constraints.NotNull;
  */
 @Data
 public class RejectDTO {
-	@ApiModelProperty("流程主键")
-	@NotNull(message = "流程主键不能为空")
-	private Long bpmId;
+	@ApiModelProperty("业务主键")
+	@NotNull(message = "业务主键不能为空")
+	private Long busId;
 
 
 	@ApiModelProperty("拒绝原因")

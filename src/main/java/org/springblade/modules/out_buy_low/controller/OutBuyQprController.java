@@ -7,26 +7,27 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springblade.common.constant.RootMappingConstant;
 import org.springblade.common.enums.ApproveStatusEmun;
-import org.springblade.common.utils.CodeUtil;
 import org.springblade.common.utils.CommonUtil;
 import org.springblade.core.mp.support.Condition;
 import org.springblade.core.mp.support.Query;
 import org.springblade.core.tool.api.R;
 import org.springblade.core.tool.utils.BeanUtil;
+import org.springblade.modules.file.bean.entity.BusFile;
+import org.springblade.modules.file.bean.vo.BusFileVO;
+import org.springblade.modules.file.service.BusFileService;
+import org.springblade.modules.file.wrapper.BusFileWrapper;
 import org.springblade.modules.out_buy_low.bean.dto.OutBuyQprDTO;
 import org.springblade.modules.out_buy_low.bean.entity.OutBuyQpr;
+import org.springblade.modules.out_buy_low.bean.vo.OutBuyQprQualityVO;
 import org.springblade.modules.out_buy_low.bean.vo.OutBuyQprVO;
 import org.springblade.modules.out_buy_low.service.OutBuyQprService;
 import org.springblade.modules.out_buy_low.wrapper.OutBuyQprWrapper;
-import org.springblade.modules.process_low.bean.dto.ProcessLowDTO;
-import org.springblade.modules.process_low.bean.entity.ProcessLow;
-import org.springblade.modules.process_low.bean.vo.ProcessLowVO;
-import org.springblade.modules.process_low.wrapper.ProcessLowWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.Date;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @Author: xiaoxia
@@ -43,24 +44,46 @@ public class OutBuyQprController {
 	@Autowired
 	private OutBuyQprService qprService;
 
+	@Autowired
+	private BusFileService fileService;
+
+	@GetMapping("/detail")
+	@ApiOperation("详情")
+	public R<OutBuyQprVO> detail(@RequestParam("id") Long id) {
+		OutBuyQpr outBuyQpr = qprService.getById(id);
+		OutBuyQprVO outBuyQprVO = OutBuyQprWrapper.build().entityVO(outBuyQpr);
+
+		ArrayList<Long> fileIds = new ArrayList<>();
+		List<Long> extendsFileIds = CommonUtil.toLongList(outBuyQpr.getAnalyseExtendsFileIds());
+
+		fileIds.addAll(extendsFileIds);
+		LambdaQueryWrapper<BusFile> fileWrapper = new LambdaQueryWrapper<>();
+		fileWrapper.in(BusFile::getId, fileIds);
+		List<BusFileVO> list = BusFileWrapper.build().listVO(fileService.list(fileWrapper));
+
+		outBuyQprVO.setAnalyseExtendsFileList(new ArrayList<>());
+		for (BusFileVO item : list) {
+			if(extendsFileIds.contains(item.getId())) {
+				outBuyQprVO.getAnalyseExtendsFileList().add(item);
+			}
+		}
+
+		return R.data(outBuyQprVO);
+	}
+
 	@PostMapping("/save")
 	@ApiOperation("新增")
 	public R save(@Valid @RequestBody OutBuyQprDTO qprDTO) {
 		OutBuyQpr qpr = BeanUtil.copy(qprDTO, OutBuyQpr.class);
-		qpr.setCreateUser(CommonUtil.getUserId());
-		qpr.setCreateTime(new Date());
-		qpr.setCreateDept(CommonUtil.getDeptId());
-		qpr.setUpdateUser(CommonUtil.getUserId());
-		qpr.setUpdateTime(new Date());
-		qpr.setBpmStatus(0);
-		qpr.setCode(CodeUtil.getCode(CODE_FLAG));
-		return R.status(qprService.save(qpr));
+		qpr.setType(0);
+		return R.status(qprService.saveAndActiveTask(qpr));
 	}
 
 	@GetMapping("/page")
 	@ApiOperation("分页")
 	public R<IPage<OutBuyQprVO>> page(OutBuyQprVO qprVO, Query query) {
 		LambdaQueryWrapper<OutBuyQpr> wrapper = new LambdaQueryWrapper<>();
+		wrapper.eq(OutBuyQpr::getProcessLowFlag, 0);
 		wrapper.and(StrUtil.isNotBlank(qprVO.getSearchKey()), item -> {
 			item.like(OutBuyQpr::getTitle, qprVO.getSearchKey())
 				.or()
@@ -99,5 +122,36 @@ public class OutBuyQprController {
 
 		IPage<OutBuyQpr> page = qprService.page(Condition.getPage(query), wrapper);
 		return R.data(OutBuyQprWrapper.build().pageVO(page));
+	}
+
+	@GetMapping("/quality")
+	@ApiOperation("统计接口")
+	public R<OutBuyQprQualityVO> quality() {
+		LambdaQueryWrapper<OutBuyQpr> wrapper = new LambdaQueryWrapper<>();
+		wrapper.eq(OutBuyQpr::getProcessLowFlag, 0);
+		List<OutBuyQpr> list = qprService.list(wrapper);
+
+		OutBuyQprQualityVO qprQualityVO = new OutBuyQprQualityVO();
+		qprQualityVO.setBack(0);
+		qprQualityVO.setFinish(0);
+		qprQualityVO.setProcess(0);
+		qprQualityVO.setSelfBack(0);
+
+		for (OutBuyQpr item : list) {
+			if (item.getBpmStatus().equals(ApproveStatusEmun.SELF_BACK.getCode())) {
+				qprQualityVO.setSelfBack(qprQualityVO.getSelfBack() + 1);
+			}
+			if (item.getBpmStatus().equals(ApproveStatusEmun.BACK.getCode())) {
+				qprQualityVO.setBack(qprQualityVO.getBack() + 1);
+			}
+			if (item.getBpmStatus().equals(ApproveStatusEmun.AWAIT.getCode()) ||
+				item.getBpmStatus().equals(ApproveStatusEmun.PROCEED.getCode())) {
+				qprQualityVO.setProcess(qprQualityVO.getProcess() + 1);
+			}
+			if (item.getBpmStatus().equals(ApproveStatusEmun.FINISN.getCode())) {
+				qprQualityVO.setFinish(qprQualityVO.getFinish() + 1);
+			}
+		}
+		return R.data(qprQualityVO);
 	}
 }

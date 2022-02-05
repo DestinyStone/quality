@@ -1,12 +1,14 @@
 package org.springblade.modules.process_low.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.github.xiaoymin.knife4j.core.util.StrUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springblade.common.constant.RootMappingConstant;
 import org.springblade.common.enums.ApproveStatusEmun;
+import org.springblade.common.utils.ApproveUtils;
 import org.springblade.common.utils.CodeUtil;
 import org.springblade.common.utils.CommonUtil;
 import org.springblade.core.log.exception.ServiceException;
@@ -18,6 +20,7 @@ import org.springblade.modules.file.bean.entity.BusFile;
 import org.springblade.modules.file.bean.vo.BusFileVO;
 import org.springblade.modules.file.service.BusFileService;
 import org.springblade.modules.file.wrapper.BusFileWrapper;
+import org.springblade.modules.process.entity.bean.BpmProcess;
 import org.springblade.modules.process.service.BpmProcessService;
 import org.springblade.modules.process_low.bean.dto.ProcessLowCheckDTO;
 import org.springblade.modules.process_low.bean.dto.ProcessLowDTO;
@@ -27,6 +30,7 @@ import org.springblade.modules.process_low.bean.vo.ProcessLowVO;
 import org.springblade.modules.process_low.service.ProcessLowService;
 import org.springblade.modules.process_low.wrapper.ProcessLowWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -56,16 +60,46 @@ public class ProcessLowController {
 	@Autowired
 	private BpmProcessService processService;
 
-	@PostMapping("/edit/check/{id}/{bpmId}")
+	@PostMapping("/re/submit/{id}")
+	@ApiOperation("重新提交")
+	@Transactional
+	public R reSubmit(@PathVariable("id") Long id, @Valid @RequestBody ProcessLowDTO processLowDTO) {
+		ProcessLow processLow = BeanUtil.copy(processLowDTO, ProcessLow.class);
+		processLow.setId(id);
+		processLow.setUpdateUser(CommonUtil.getUserId());
+		processLow.setUpdateTime(new Date());
+		processLow.setBpmStatus(ApproveStatusEmun.AWAIT.getCode());
+
+		Boolean status = lowService.updateById(processLow);
+
+			// 废除之前的审批任务
+		LambdaUpdateWrapper<BpmProcess> wrapper = new LambdaUpdateWrapper<>();
+		wrapper.eq(BpmProcess::getBusId, id)
+			.set(BpmProcess::getIsCastoff, 1);
+		processService.update(wrapper);
+
+		if (new Integer(0).equals(processLow.getType())) {
+			// 开启审批流程
+			ApproveUtils.createTask(processLow.getId() + "", ApproveUtils.ApproveLinkEnum.PROCESS_LOW_OUT_BUY);
+		}else {
+			// 开启 工序内不良 审批
+			ApproveUtils.createTask(processLow.getId() + "", ApproveUtils.ApproveLinkEnum.PROCESS_LOW);
+		}
+
+		return R.data(status);
+	}
+
+	@PostMapping("/edit/check/{id}")
 	@ApiOperation("提交调查结果")
 	public R editCheck(@PathVariable("id") Long id,
-					   @PathVariable("bpmId") Long bpmId,
 					   @Valid @RequestBody ProcessLowCheckDTO checkDTO) {
+		BpmProcess process = processService.getByBusId(id);
+
 		ProcessLow processLow = BeanUtil.copyProperties(checkDTO, ProcessLow.class);
 		processLow.setId(id);
 		processLow.setBpmStatus(ApproveStatusEmun.FINISN.getCode());
 		Boolean status = lowService.updateById(processLow);
-		processService.pass(bpmId);
+		processService.pass(process.getBpmId());
 
 		return R.status(status);
 	}
@@ -173,11 +207,15 @@ public class ProcessLowController {
 		ArrayList<Long> fileIds = new ArrayList<>();
 		List<Long> imageReportIds = CommonUtil.toLongList(processLow.getImgReportIds());
 		Long separateFileId = processLow.getSeparateFileId();
+		Long separateFileDependId = processLow.getSeparateFileDependId();
 		List<Long> busincessIds = CommonUtil.toLongList(processLow.getBusincessIdFiles());
+		Long testReportFileId = processLow.getTestReportFileId();
 
 		fileIds.addAll(imageReportIds);
 		fileIds.addAll(busincessIds);
 		fileIds.add(separateFileId);
+		fileIds.add(testReportFileId);
+		fileIds.add(separateFileDependId);
 
 		LambdaQueryWrapper<BusFile> fileWrapper = new LambdaQueryWrapper<>();
 		fileWrapper.in(BusFile::getId, fileIds);
@@ -195,6 +233,13 @@ public class ProcessLowController {
 			}
 			if (busincessIds.contains(item.getId())) {
 				processLowVO.getBusincessFiles().add(item);
+			}
+			if (item.getId().equals(testReportFileId)) {
+				processLowVO.setTestReportFile(item);
+			}
+
+			if (item.getId().equals(separateFileDependId)) {
+				processLowVO.setSeparateFileDepend(item);
 			}
 		}
 

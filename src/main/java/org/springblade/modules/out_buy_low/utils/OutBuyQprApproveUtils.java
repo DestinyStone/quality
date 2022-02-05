@@ -1,4 +1,4 @@
-package org.springblade.modules.process_low.utils;
+package org.springblade.modules.out_buy_low.utils;
 
 import org.springblade.common.utils.CommonUtil;
 import org.springblade.modules.process.core.ProcessContainer;
@@ -9,12 +9,12 @@ import java.util.List;
 
 /**
  * @Author: DestinyStone
- * @Date: 2022/1/30 12:54
+ * @Date: 2022/2/1 18:13
  * @Description:
  */
-public class ProcessLowApproveUtils {
+public class OutBuyQprApproveUtils {
+	public static List<ProcessContainer> getProcessTaskList(String busId) {
 
-	public static List<ProcessContainer> getOutBuyProcessTaskList(String busId) {
 		// 第一个节点 用户提交
 		ProcessContainer userCommit = new ProcessContainer();
 		userCommit.setBusId(busId);
@@ -24,31 +24,22 @@ public class ProcessLowApproveUtils {
 		userCommit.setFlag("commit");
 		userCommit.setStatus(ApproveNodeStatusEnum.SUCCESS.getCode());
 
-		// 第二个节点 审批 qpr录入
-		ProcessContainer qprSaevApprove = new ProcessContainer();
-		qprSaevApprove.setBusId(busId);
-		qprSaevApprove.setAccessDept(CommonUtil.getDeptId());
-		qprSaevApprove.setRemark("不良联络书发行确认");
-		qprSaevApprove.setSort(1);
-		qprSaevApprove.setFlag("qprSave");
-		qprSaevApprove.setStatus(ApproveNodeStatusEnum.ACTIVE.getCode());
-
 		// 第二个节点 不良联络书发行 审批
 		ProcessContainer qprApprove = new ProcessContainer();
 		qprApprove.setBusId(busId);
 		qprApprove.setAccessDept(CommonUtil.getDeptId());
-		qprApprove.setRemark("不良联络书发行审批");
-		qprApprove.setSort(2);
+		qprApprove.setRemark("不良联络书发行 审批");
+		qprApprove.setSort(1);
 		qprApprove.setFlag("qprApprove");
-		qprApprove.setStatus(ApproveNodeStatusEnum.UN_ACTIVE.getCode());
+		qprApprove.setStatus(ApproveNodeStatusEnum.ACTIVE.getCode());
 
 		// 第三个节点 审批 调查录入
 		ProcessContainer checkApprove = new ProcessContainer();
 		checkApprove.setBusId(busId);
 		checkApprove.setAccessDept(CommonUtil.getDeptId());
 		checkApprove.setRemark("调查结果录入");
-		checkApprove.setSort(3);
 		checkApprove.setFlag("checkSave");
+		checkApprove.setSort(2);
 		checkApprove.setStatus(ApproveNodeStatusEnum.UN_ACTIVE.getCode());
 
 		// 第四个节点 调查结果确认
@@ -56,7 +47,7 @@ public class ProcessLowApproveUtils {
 		resultApprove.setBusId(busId);
 		resultApprove.setAccessDept(CommonUtil.getDeptId());
 		resultApprove.setRemark("调查结果确认");
-		resultApprove.setSort(4);
+		resultApprove.setSort(3);
 		resultApprove.setFlag("checkConfirm");
 		resultApprove.setStatus(ApproveNodeStatusEnum.UN_ACTIVE.getCode());
 
@@ -65,32 +56,10 @@ public class ProcessLowApproveUtils {
 		approve.setBusId(busId);
 		approve.setAccessDept(CommonUtil.getDeptId());
 		approve.setRemark("调查结果审批");
-		approve.setSort(5);
+		approve.setSort(4);
 		approve.setFlag("checkApprove");
 		approve.setStatus(ApproveNodeStatusEnum.UN_ACTIVE.getCode());
 
-		return Arrays.asList(userCommit, qprSaevApprove, qprApprove, checkApprove, resultApprove, approve);
-	}
-
-	public static List<ProcessContainer> getProcessTaskList(String busId) {
-		// 第一个节点 用户提交
-		ProcessContainer userCommit = new ProcessContainer();
-		userCommit.setBusId(busId);
-		userCommit.setAccessDept(null);
-		userCommit.setRemark("用户已提交");
-		userCommit.setSort(0);
-		userCommit.setFlag("commit");
-		userCommit.setStatus(ApproveNodeStatusEnum.SUCCESS.getCode());
-
-		// 第二个节点 审批
-		ProcessContainer approve = new ProcessContainer();
-		approve.setBusId(busId);
-		approve.setAccessDept(CommonUtil.getDeptId());
-		approve.setRemark("工序内不良审批");
-		approve.setSort(1);
-		approve.setFlag("processLowApprove");
-		approve.setStatus(ApproveNodeStatusEnum.ACTIVE.getCode());
-
-		return Arrays.asList(userCommit, approve);
+		return Arrays.asList(userCommit, qprApprove, checkApprove, resultApprove, approve);
 	}
 }

@@ -1,28 +1,20 @@
 package org.springblade.modules.out_buy_low.bean.vo;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-import org.springblade.modules.file.bean.vo.BusFileVO;
 
 import java.util.Date;
-import java.util.List;
-
 
 /**
- * @Author: xiaoxia
- * @Date: 2022/1/28 10:54
- * @Description: 外构件不良QPR
+ * @Author: DestinyStone
+ * @Date: 2022/2/1 16:10
+ * @Description: 外构件不良审批
  */
-
 @Data
-@Api("外构件不良QPR")
-@TableName("bus_out_buy_qpr")
-public class OutBuyQprVO {
-	@TableId(value = "id", type = IdType.ASSIGN_ID)
+@Api("外构件不良审批")
+public class OutBuyQprApproveVO {
+
 	@ApiModelProperty("主键")
 	private Long id;
 
@@ -31,9 +23,6 @@ public class OutBuyQprVO {
 
 	@ApiModelProperty("不良编号")
 	private String code;
-
-	@ApiModelProperty("不良分类")
-	private Integer type;
 
 	@ApiModelProperty("品番号")
 	private String designation;
@@ -66,7 +55,7 @@ public class OutBuyQprVO {
 	private String imgReportIds;
 
 	@ApiModelProperty("机型,逗号隔开 0TNGA2.0")
-	private Integer apparatusType;
+	private String apparatusType;
 
 	@ApiModelProperty("处理 0返还 1保留 2废弃 3其他")
 	private Long dispostType;
@@ -93,6 +82,9 @@ public class OutBuyQprVO {
 	@ApiModelProperty("查询key 标题/不良内容/供应商名称")
 	private String searchKey;
 
+	@ApiModelProperty("标签标识 0待办 1已办 2本部门已超期")
+	private Integer tagFlag;
+
 	@ApiModelProperty("审批状态过滤 -1全部 0自撤回 1已驳回 2进行中 3已办结")
 	private Integer bpmStatusFilter;
 
@@ -102,42 +94,33 @@ public class OutBuyQprVO {
 	@ApiModelProperty("工序内不良Id")
 	private Long processLowId;
 
-	@ApiModelProperty("调查发生原因")
-	private String analyseTriggerCause;
+	@ApiModelProperty("任务主键")
+	private Long bpmId;
 
-	@ApiModelProperty("调查流程原因")
-	private String analyseOutCause;
+	@ApiModelProperty("推进状态 0正常推进 1已超期 2已延期")
+	private Integer bpmPushStatus;
 
-	@ApiModelProperty("调查发生对策")
-	private String analyseTriggerStrategy;
+	@ApiModelProperty("流程状态 0待审批 1审批中 2已结案 3退回 4自撤回")
+	private Integer processBpmStatus;
 
-	@ApiModelProperty("调查流程对策")
-	private String analyseOutStrategy;
+	@ApiModelProperty("操作时间")
+	private Date operatorTime;
 
-	@ApiModelProperty("其他")
-	private String analyseOther;
+	@ApiModelProperty("开始时间")
+	private Date startTime;
 
-	@ApiModelProperty("相关附件Ids")
-	private String analyseExtendsFileIds;
+	@ApiModelProperty("结束时间")
+	private Date endTime;
 
-	@ApiModelProperty("相关附件Ids")
-	private List<BusFileVO> analyseExtendsFileList;
+	@ApiModelProperty("审批节点标识")
+	private String bpmFlag;
 
-	@ApiModelProperty("属性 0单发 1散发 2批量")
-	private Integer fillPropertiesType;
+	@ApiModelProperty("来源类型 0bus_out_buy_qpr 1bpm_process")
+	private Integer resourceType;
 
-	@ApiModelProperty("不良类型 0漏工序 1欠品误品 2异音 3异物 4外观 5测漏NG 6尺寸 7其他")
-	private Integer fillType;
+	@ApiModelProperty("催办消息")
+	private Integer urgeQuality;
 
-	@ApiModelProperty("流出原因分类 0检出力低 2防错失效 3标准作业不足 4异常处置不当 5其他")
-	private Integer fillOutCauseType;
-
-	@ApiModelProperty("发生原因分类 0夹装异常 1加功条件管理不足 2标准作业不足 3异常处置不当 4变化点管理不足 5其他")
-	private Integer fillTriggerCauseType;
-
-	@ApiModelProperty("判断结果 0供应商责任 1责任不明结案 2生管责任 3其他直接结案 4是否其他结案")
-	private Integer fillJudgeResult;
-
-	@ApiModelProperty("描述")
-	private Integer fillRemark;
+	@ApiModelProperty("延迟说明")
+	private String putOfRemark;
 }

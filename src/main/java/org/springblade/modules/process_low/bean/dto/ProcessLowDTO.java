@@ -115,10 +115,10 @@ public class ProcessLowDTO {
 	private String separateFileName;
 
 	@ApiModelProperty("不良排查及隔离附件文件ID")
-	private Long separateDependFileId;
+	private Long separateFileDependId;
 
 	@ApiModelProperty("不良排查及文件附件名称")
-	private String separateDependFileName;
+	private String separateFileDependName;
 
 	@ApiModelProperty("变化点")
 	@NotBlank(message = "变化点不能为空")

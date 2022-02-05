@@ -40,4 +40,11 @@ public interface BpmProcessService extends IService<BpmProcess> {
 	 * @param busId  业务Id
 	 */
 	void delete(Long busId);
+
+	/**
+	 * 根据bugId 获取
+	 * @param id
+	 * @return
+	 */
+	BpmProcess getByBusId(Long id);
 }

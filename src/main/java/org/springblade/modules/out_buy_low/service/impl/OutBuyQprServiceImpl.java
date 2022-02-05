@@ -1,10 +1,16 @@
 package org.springblade.modules.out_buy_low.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.springblade.common.utils.ApproveUtils;
+import org.springblade.common.utils.CodeUtil;
+import org.springblade.common.utils.CommonUtil;
 import org.springblade.modules.out_buy_low.bean.entity.OutBuyQpr;
 import org.springblade.modules.out_buy_low.mapper.OutBuyQprMapper;
 import org.springblade.modules.out_buy_low.service.OutBuyQprService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Date;
 
 /**
  * @Author: xiaoxia
@@ -13,4 +19,38 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class OutBuyQprServiceImpl extends ServiceImpl<OutBuyQprMapper, OutBuyQpr> implements OutBuyQprService {
+
+	private static final String CODE_FLAG = "OUT_BUY_QPR";
+
+	@Override
+	public Boolean saveAndActiveTask(OutBuyQpr qpr) {
+		commonSet(qpr);
+		qpr.setProcessLowFlag(0);
+		boolean status = save(qpr);
+		ApproveUtils.createTask(qpr.getId() + "", ApproveUtils.ApproveLinkEnum.OUT_BUY_LOW);
+		return status;
+	}
+
+	@Override
+	@Transactional
+	public Boolean saveUnActiveTask(OutBuyQpr qpr) {
+		OutBuyQpr outBuyQpr = getById(qpr.getId());
+		if (outBuyQpr != null) {
+			this.removeById(qpr.getId());
+		}
+
+		commonSet(qpr);
+		qpr.setProcessLowFlag(2);
+		return this.save(qpr);
+	}
+
+	public void commonSet(OutBuyQpr qpr) {
+		qpr.setCreateUser(CommonUtil.getUserId());
+		qpr.setCreateTime(new Date());
+		qpr.setCreateDept(CommonUtil.getDeptId());
+		qpr.setUpdateUser(CommonUtil.getUserId());
+		qpr.setUpdateTime(new Date());
+		qpr.setBpmStatus(0);
+		qpr.setCode(CodeUtil.getCode(CODE_FLAG));
+	}
 }

@@ -25,4 +25,7 @@ public class ProcessContainer {
 
 	@ApiModelProperty("状态")
 	private Integer status;
+
+	@ApiModelProperty("标识")
+	private String flag;
 }
