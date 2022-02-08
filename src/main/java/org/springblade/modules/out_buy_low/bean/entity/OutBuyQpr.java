@@ -136,5 +136,5 @@ public class OutBuyQpr {
 	private Integer fillJudgeResult;
 
 	@ApiModelProperty("描述")
-	private Integer fillRemark;
+	private String fillRemark;
 }

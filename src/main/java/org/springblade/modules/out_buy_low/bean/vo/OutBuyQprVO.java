@@ -65,6 +65,9 @@ public class OutBuyQprVO {
 	@ApiModelProperty("不良图示/测试报告")
 	private String imgReportIds;
 
+	@ApiModelProperty("不良图示/测试报告")
+	private List<BusFileVO> imgReportFiles;
+
 	@ApiModelProperty("机型,逗号隔开 0TNGA2.0")
 	private Integer apparatusType;
 
@@ -139,5 +142,5 @@ public class OutBuyQprVO {
 	private Integer fillJudgeResult;
 
 	@ApiModelProperty("描述")
-	private Integer fillRemark;
+	private String fillRemark;
 }

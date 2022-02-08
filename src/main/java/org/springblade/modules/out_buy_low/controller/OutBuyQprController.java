@@ -55,16 +55,29 @@ public class OutBuyQprController {
 
 		ArrayList<Long> fileIds = new ArrayList<>();
 		List<Long> extendsFileIds = CommonUtil.toLongList(outBuyQpr.getAnalyseExtendsFileIds());
+		List<Long> imgReportIds = CommonUtil.toLongList(outBuyQpr.getImgReportIds());
 
 		fileIds.addAll(extendsFileIds);
+		fileIds.addAll(imgReportIds);
+
+		if (fileIds.isEmpty()) {
+			return R.data(outBuyQprVO);
+		}
+
 		LambdaQueryWrapper<BusFile> fileWrapper = new LambdaQueryWrapper<>();
 		fileWrapper.in(BusFile::getId, fileIds);
 		List<BusFileVO> list = BusFileWrapper.build().listVO(fileService.list(fileWrapper));
 
 		outBuyQprVO.setAnalyseExtendsFileList(new ArrayList<>());
+		outBuyQprVO.setImgReportFiles(new ArrayList<>());
+
 		for (BusFileVO item : list) {
 			if(extendsFileIds.contains(item.getId())) {
 				outBuyQprVO.getAnalyseExtendsFileList().add(item);
+			}
+
+			if(imgReportIds.contains(item.getId())) {
+				outBuyQprVO.getImgReportFiles().add(item);
 			}
 		}
 
@@ -74,6 +87,7 @@ public class OutBuyQprController {
 	@PostMapping("/save")
 	@ApiOperation("新增")
 	public R save(@Valid @RequestBody OutBuyQprDTO qprDTO) {
+		qprDTO.validate();
 		OutBuyQpr qpr = BeanUtil.copy(qprDTO, OutBuyQpr.class);
 		qpr.setType(0);
 		return R.status(qprService.saveAndActiveTask(qpr));

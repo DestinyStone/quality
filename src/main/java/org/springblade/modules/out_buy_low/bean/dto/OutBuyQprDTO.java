@@ -1,9 +1,11 @@
 package org.springblade.modules.out_buy_low.bean.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.github.xiaoymin.knife4j.core.util.StrUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import org.springblade.core.log.exception.ServiceException;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -83,4 +85,13 @@ public class OutBuyQprDTO {
 
 	@ApiModelProperty("工序内不良Id")
 	private Long processLowId;
+
+	public void validate() {
+		if (new Long(0).equals(dispostType) || new Long(3).equals(dispostType)) {
+
+			if (StrUtil.isBlank(dispost)) {
+				throw  new ServiceException("请填写不良品处理");
+			}
+		}
+	}
 }

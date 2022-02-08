@@ -31,11 +31,11 @@ public class ProcessLogController {
 	@Autowired
 	private BpmProcessLogService logService;
 
-	@GetMapping("/list/{bpmId}")
+	@GetMapping("/list/{busId}")
 	@ApiOperation("列表")
-	public R<List<BpmProcessLogVO>> list(@PathVariable("bpmId") Long bpmId, BpmProcessUrgeVO processUrgeVO) {
+	public R<List<BpmProcessLogVO>> list(@PathVariable("busId") Long busId, BpmProcessUrgeVO processUrgeVO) {
 		LambdaQueryWrapper<BpmProcessLog> wrapper = new LambdaQueryWrapper<>();
-		wrapper.eq(BpmProcessLog::getBpmId, bpmId);
+		wrapper.eq(BpmProcessLog::getBusId, busId);
 		wrapper.orderByAsc(BpmProcessLog::getOperatorTime);
 		return R.data(BpmProcessLogWrapper.build().listVO(logService.list(wrapper)));
 	}

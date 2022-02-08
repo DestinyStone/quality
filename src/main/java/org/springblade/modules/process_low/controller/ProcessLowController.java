@@ -118,8 +118,14 @@ public class ProcessLowController {
 		update.setId(id);
 		update.setBpmStatus(ApproveStatusEmun.SELF_BACK.getCode());
 
+		// 取消当前激活业务
+		LambdaUpdateWrapper<BpmProcess> processUpdateWrapper = new LambdaUpdateWrapper<>();
+		processUpdateWrapper.eq(BpmProcess::getBusId, id)
+			.eq(BpmProcess::getIsCastoff, 0)
+			.set(BpmProcess::getBpmStatus, 0);
+
 		// 删除该任务
-		processService.delete(id);
+		processService.update(processUpdateWrapper);
 		return R.status(lowService.updateById(update));
 	}
 

@@ -58,6 +58,7 @@ public class ProcessLowApproveController {
 	@ApiOperation("处理qpr录入审批")
 	public R handlerQprSave(@PathVariable("id") Long id,
 							@RequestBody @Valid OutBuyQprDTO qprDTO) {
+		qprDTO.validate();
 		BpmProcess process = processService.getByBusId(id);
 
 		OutBuyQpr qpr = BeanUtil.copy(qprDTO, OutBuyQpr.class);
@@ -65,6 +66,16 @@ public class ProcessLowApproveController {
 		Boolean status = qprService.saveUnActiveTask(qpr);
 
 		processService.pass(process.getBpmId());
+		ProcessLow processLow = new ProcessLow();
+		processLow.setId(id);
+		if (processService.isProcessEnd(process.getBpmId())) {
+			processLow.setBpmStatus(ApproveStatusEmun.FINISN.getCode());
+			lowService.updateById(processLow);
+		}else {
+			processLow.setBpmStatus(ApproveStatusEmun.PROCEED.getCode());
+			lowService.updateById(processLow);
+		}
+
 		return R.status(status);
 
 	}
@@ -81,10 +92,13 @@ public class ProcessLowApproveController {
 			throw new ServiceException("当前审批节点不存在");
 		}
 		processService.pass(process.getBpmId());
+		ProcessLow processLow = new ProcessLow();
+		processLow.setId(id);
 		if (processService.isProcessEnd(process.getBpmId())) {
-			ProcessLow processLow = new ProcessLow();
-			processLow.setId(id);
 			processLow.setBpmStatus(ApproveStatusEmun.FINISN.getCode());
+			lowService.updateById(processLow);
+		}else {
+			processLow.setBpmStatus(ApproveStatusEmun.PROCEED.getCode());
 			lowService.updateById(processLow);
 		}
 		return R.status(true);

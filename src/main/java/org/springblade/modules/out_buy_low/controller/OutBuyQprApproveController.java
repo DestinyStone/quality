@@ -18,6 +18,7 @@ import org.springblade.modules.out_buy_low.service.OutBuyQprApproveService;
 import org.springblade.modules.out_buy_low.service.OutBuyQprService;
 import org.springblade.modules.process.entity.bean.BpmProcess;
 import org.springblade.modules.process.entity.bean.BpmProcessUrge;
+import org.springblade.modules.process.entity.dto.RejectDTO;
 import org.springblade.modules.process.enums.ApproveNodeStatusEnum;
 import org.springblade.modules.process.service.BpmProcessService;
 import org.springblade.modules.process.service.ProcessUrgeService;
@@ -61,7 +62,7 @@ public class OutBuyQprApproveController {
 		qprService.updateById(outBuyQpr);
 
 		BpmProcess process = processService.getByBusId(id);
-		processService.pass(process.getBpmId());
+		pass(id, process.getBpmId());
 		return R.status(true);
 	}
 
@@ -73,7 +74,7 @@ public class OutBuyQprApproveController {
 		qprService.updateById(outBuyQpr);
 
 		BpmProcess process = processService.getByBusId(id);
-		processService.pass(process.getBpmId());
+		pass(id, process.getBpmId());
 		return R.status(true);
 	}
 
@@ -81,13 +82,21 @@ public class OutBuyQprApproveController {
 	@ApiOperation("审批通过")
 	public R pass(@RequestParam("id") Long id) {
 		BpmProcess process = processService.getByBusId(id);
-		processService.pass(process.getBpmId());
-		if (processService.isProcessEnd(process.getBpmId())) {
-			OutBuyQpr buyQpr = new OutBuyQpr();
-			buyQpr.setId(id);
-			buyQpr.setBpmStatus(ApproveStatusEmun.FINISN.getCode());
-			qprService.updateById(buyQpr);
-		}
+
+		pass(id, process.getBpmId());
+		return R.status(true);
+	}
+
+	@PostMapping("/reject")
+	@ApiOperation("审批拒绝")
+	public R reject(@RequestBody @Valid RejectDTO rejectDTO) {
+		BpmProcess process = processService.getByBusId(rejectDTO.getBusId());
+		processService.reject(process.getBpmId(), rejectDTO.getBackCause());
+
+		OutBuyQpr outBuyQpr = new OutBuyQpr();
+		outBuyQpr.setId(new Long(process.getBusId()));
+		outBuyQpr.setBpmStatus(ApproveStatusEmun.BACK.getCode());
+		qprService.updateById(outBuyQpr);
 		return R.status(true);
 	}
 
@@ -124,5 +133,18 @@ public class OutBuyQprApproveController {
 		}
 
 		return R.data(page);
+	}
+
+	private void pass(Long id, Long bpmId) {
+		processService.pass(bpmId);
+		OutBuyQpr outBuyQpr = new OutBuyQpr();
+		outBuyQpr.setId(id);
+		if (processService.isProcessEnd(bpmId)) {
+			outBuyQpr.setBpmStatus(ApproveStatusEmun.FINISN.getCode());
+			qprService.updateById(outBuyQpr);
+		}else {
+			outBuyQpr.setBpmStatus(ApproveStatusEmun.PROCEED.getCode());
+			qprService.updateById(outBuyQpr);
+		}
 	}
 }
