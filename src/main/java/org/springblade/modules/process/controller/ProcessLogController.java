@@ -36,7 +36,7 @@ public class ProcessLogController {
 	public R<List<BpmProcessLogVO>> list(@PathVariable("busId") Long busId, BpmProcessUrgeVO processUrgeVO) {
 		LambdaQueryWrapper<BpmProcessLog> wrapper = new LambdaQueryWrapper<>();
 		wrapper.eq(BpmProcessLog::getBusId, busId);
-		wrapper.orderByAsc(BpmProcessLog::getOperatorTime);
+		wrapper.orderByAsc(BpmProcessLog::getSort);
 		return R.data(BpmProcessLogWrapper.build().listVO(logService.list(wrapper)));
 	}
 

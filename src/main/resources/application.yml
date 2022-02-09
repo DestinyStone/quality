@@ -21,7 +21,7 @@ spring:
     #driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
     url: jdbc:mysql://localhost:3306/quality?useSSL=false&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&transformedBitIsBoolean=true&serverTimezone=GMT%2B8&nullCatalogMeansCurrent=true&allowPublicKeyRetrieval=true
     username: root
-    password: 1314LOVE
+    password: 123456
     druid:
       # MySql、PostgreSQL、SqlServer校验
       validation-query: select 1
@@ -261,6 +261,6 @@ file:
   upload:
     server: "http://localhost:8080"
     root:
-      path: D:\Tomcat\apache-tomcat-8.5.41\webapps\ROOT
+      path: D:\application\tomcat\apache-tomcat-8.5.75\webapps\ROOT
 
 

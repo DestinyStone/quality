@@ -1,6 +1,7 @@
 package org.springblade.modules.out_buy_low.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.github.xiaoymin.knife4j.core.util.StrUtil;
 import io.swagger.annotations.Api;
@@ -8,6 +9,7 @@ import io.swagger.annotations.ApiOperation;
 import org.springblade.common.constant.RootMappingConstant;
 import org.springblade.common.enums.ApproveStatusEmun;
 import org.springblade.common.utils.CommonUtil;
+import org.springblade.core.log.exception.ServiceException;
 import org.springblade.core.mp.support.Condition;
 import org.springblade.core.mp.support.Query;
 import org.springblade.core.tool.api.R;
@@ -22,6 +24,9 @@ import org.springblade.modules.out_buy_low.bean.vo.OutBuyQprQualityVO;
 import org.springblade.modules.out_buy_low.bean.vo.OutBuyQprVO;
 import org.springblade.modules.out_buy_low.service.OutBuyQprService;
 import org.springblade.modules.out_buy_low.wrapper.OutBuyQprWrapper;
+import org.springblade.modules.process.entity.bean.BpmProcess;
+import org.springblade.modules.process.service.BpmProcessService;
+import org.springblade.modules.process_low.bean.entity.ProcessLow;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -46,6 +51,34 @@ public class OutBuyQprController {
 
 	@Autowired
 	private BusFileService fileService;
+
+	@Autowired
+	private BpmProcessService processService;
+
+	@GetMapping("/self/back")
+	@ApiOperation("自撤回接口")
+	public R selfBack(@RequestParam("id") Long id) {
+		OutBuyQpr qpr = qprService.getById(id);
+
+		// 非待审批中状态 抛出异常
+		if (!ApproveStatusEmun.AWAIT.getCode().equals(qpr.getBpmStatus())) {
+			throw new ServiceException("非待审批状态");
+		}
+
+		OutBuyQpr update = new OutBuyQpr();
+		update.setId(id);
+		update.setBpmStatus(ApproveStatusEmun.SELF_BACK.getCode());
+
+		// 取消当前激活业务
+		LambdaUpdateWrapper<BpmProcess> processUpdateWrapper = new LambdaUpdateWrapper<>();
+		processUpdateWrapper.eq(BpmProcess::getBusId, id)
+			.eq(BpmProcess::getIsCastoff, 0)
+			.set(BpmProcess::getBpmStatus, 0);
+
+		// 删除该任务
+		processService.update(processUpdateWrapper);
+		return R.status(qprService.updateById(update));
+	}
 
 	@GetMapping("/detail")
 	@ApiOperation("详情")

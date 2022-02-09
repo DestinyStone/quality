@@ -33,8 +33,8 @@ public class BpmProcessLogVO {
 	@ApiModelProperty("操作角色")
 	private String operatorRole;
 
-	@ApiModelProperty("操作状态 0提交申请 1已确认 2审批通过")
-	private Integer operatorStatus;
+	@ApiModelProperty("操作状态")
+	private String operatorStatus;
 
 	@ApiModelProperty("操作结果")
 	private String operatorResult;
@@ -54,4 +54,6 @@ public class BpmProcessLogVO {
 	@ApiModelProperty("流程id")
 	private Long bpmId;
 
+	@ApiModelProperty("耗时")
+	private String intervalTime;
 }

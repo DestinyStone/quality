@@ -57,6 +57,7 @@ public class BpmProcessServiceImpl extends ServiceImpl<BpmProcessMapper, BpmProc
 				bpmProcess.setEndTime(new Date(createTime.getTime() + OVER_TIME));
 				setCommonOperator(bpmProcess);
 				bpmProcess.setBpmPushStatus(0);
+				logService.convertAndSave(bpmProcess);
 			}
 
 			// 对已激活的任务设置超时时间
@@ -105,6 +106,8 @@ public class BpmProcessServiceImpl extends ServiceImpl<BpmProcessMapper, BpmProc
 		update(nextProcessUpdate);
 
 		// 记录日志
+		process.setBpmStatus(ApproveNodeStatusEnum.SUCCESS.getCode());
+		setCommonOperator(process);
 		logService.convertAndSave(process);
 	}
 
@@ -123,6 +126,9 @@ public class BpmProcessServiceImpl extends ServiceImpl<BpmProcessMapper, BpmProc
 		updateById(currentUpdate);
 
 		// 记录日志
+		process.setBpmStatus(ApproveNodeStatusEnum.BACK.getCode());
+		process.setBackCause(cause);
+		setCommonOperator(process);
 		logService.convertAndSave(process);
 	}
 

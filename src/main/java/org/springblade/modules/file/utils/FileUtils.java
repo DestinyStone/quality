@@ -2,6 +2,7 @@ package org.springblade.modules.file.utils;
 
 import lombok.SneakyThrows;
 import org.springblade.core.log.exception.ServiceException;
+import org.springblade.modules.file.bean.vo.BusFileUploadVO;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -29,7 +30,7 @@ public class FileUtils {
 	 * @return 文件访问路径
 	 */
 	@SneakyThrows
-	public static String upload(File file) {
+	public static BusFileUploadVO upload(File file) {
 		FileInputStream inputStream = new FileInputStream(file);
 		return upload(inputStream);
 	}
@@ -40,17 +41,21 @@ public class FileUtils {
 	 * @return 文件访问路径
 	 */
 	@SneakyThrows
-	public static String upload(InputStream inputStream) {
+	public static BusFileUploadVO upload(InputStream inputStream) {
 		String fileName = getRandomFileName();
 		FileOutputStream outputStream = null;
 		try {
-			outputStream = new FileOutputStream(getOutPath(fileName));
+			String path = getOutPath(fileName);
+			outputStream = new FileOutputStream(path);
 			byte[] bytes = new byte[inputStream.available()];
 			int len = -1;
 			while ((len = inputStream.read(bytes)) != -1) {
 				outputStream.write(bytes, 0, len);
 			}
-			return getRemotePath(fileName);
+			BusFileUploadVO busFileUploadVO = new BusFileUploadVO();
+			busFileUploadVO.setUrl(getRemotePath(fileName));
+			busFileUploadVO.setServerUrl(path);
+			return busFileUploadVO;
 		}catch (Exception e) {
 			e.printStackTrace();
 			throw new ServiceException("文件上传异常");

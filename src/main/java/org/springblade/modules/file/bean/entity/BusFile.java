@@ -29,6 +29,9 @@ public class BusFile {
 	@ApiModelProperty("访问路径")
 	private String url;
 
+	@ApiModelProperty("服务器路径")
+	private String serverUrl;
+
 	@ApiModelProperty("文件大小")
 	private Long size;
 
