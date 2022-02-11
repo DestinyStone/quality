@@ -41,8 +41,7 @@ public class FileUtils {
 	 * @return 文件访问路径
 	 */
 	@SneakyThrows
-	public static BusFileUploadVO upload(InputStream inputStream) {
-		String fileName = getRandomFileName();
+	public static BusFileUploadVO upload(InputStream inputStream, String fileName) {
 		FileOutputStream outputStream = null;
 		try {
 			String path = getOutPath(fileName);
@@ -68,6 +67,17 @@ public class FileUtils {
 				inputStream.close();
 			}
 		}
+	}
+
+	/**
+	 * 上传文件
+	 * @param inputStream
+	 * @return 文件访问路径
+	 */
+	@SneakyThrows
+	public static BusFileUploadVO upload(InputStream inputStream) {
+		String fileName = getRandomFileName();
+		return upload(inputStream, fileName);
 	}
 
 	@Value("${file.upload.server}")
