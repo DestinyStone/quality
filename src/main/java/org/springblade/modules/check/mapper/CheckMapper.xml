@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.springblade.modules.check.mapper.CheckMapper">
+
+    <select id="accessSavePage" resultType="org.springblade.modules.check.bean.vo.AccessSaveCheckVO">
+        select * from (
+            SELECT
+                qpr.id as resource_id,
+                qpr.designation,
+                qpr.name,
+                qpr.duty_dept,
+                qpr.create_time,
+                qpr.create_dept,
+                0 as resource_type
+            FROM bus_out_buy_qpr qpr
+            LEFT JOIN bpm_process process
+            ON process.bus_id = qpr.id
+            where qpr.process_low_flag = 0 and qpr.bpm_status = 2
+            union
+            SELECT
+                low.id as resource_id,
+                low.designation,
+                low.name,
+                low.duty_dept,
+                low.create_time,
+                low.create_dept,
+                1 as resource_type
+            FROM bus_process_low low
+            LEFT JOIN bpm_process process
+            ON process.bus_id = low.id
+            where low.bpm_status = 2
+        ) as temp
+        <where>
+            <if test="vo.searchKey != null and vo.searchKey != ''">
+                and temp.designation like CONCAT('%', #{vo.searchKey}, '%')
+                or temp.name like CONCAT('%', #{vo.searchKey}, '%')
+                or temp.duty_dept like CONCAT('%', #{vo.searchKey}, '%')
+            </if>
+        </where>
+    </select>
+</mapper>
