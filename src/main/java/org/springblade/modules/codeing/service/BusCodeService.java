@@ -1,7 +1,7 @@
-package org.springblade.modules.code.service;
+package org.springblade.modules.codeing.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import org.springblade.modules.code.bean.entity.BusCode;
+import org.springblade.modules.codeing.bean.entity.BusCode;
 
 /**
  * @Author: xiaoxia
@@ -17,4 +17,11 @@ public interface BusCodeService extends IService<BusCode> {
 	 */
 	String getCode(String flag);
 
+	/**
+	 * 分隔
+	 * @param separate
+	 * @param flag
+	 * @return
+	 */
+	BusCode getBySeparate(String separate, String flag);
 }

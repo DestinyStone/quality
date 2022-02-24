@@ -33,7 +33,7 @@
     <!--<select id="getValue" resultType="java.lang.String">
         select
             dict_value
-        from blade_dict_biz where code = #{param1, jdbcType=VARCHAR} and dict_key = #{param2} and dict_key >= 0  rownum 1
+        from blade_dict_biz where codeing = #{param1, jdbcType=VARCHAR} and dict_key = #{param2} and dict_key >= 0  rownum 1
     </select>-->
 
     <select id="getList" resultMap="dictResultMap">

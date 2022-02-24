@@ -4,7 +4,10 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 import org.springblade.modules.check.bean.entity.Check;
 import org.springblade.modules.check.bean.vo.AccessSaveCheckVO;
+import org.springblade.modules.check.bean.vo.CheckVO;
 import org.springblade.modules.out_buy_low.bean.vo.OutBuyQprApproveVO;
+
+import java.util.List;
 
 /**
  * @Author: xiaoxia
@@ -19,4 +22,26 @@ public interface CheckService extends IService<Check> {
 	 * @return
 	 */
 	IPage<AccessSaveCheckVO> accessSavePage(AccessSaveCheckVO approveVO, IPage<AccessSaveCheckVO> page);
+
+	/**
+	 *
+	 * @param checkVO
+	 * @param page
+	 * @return
+	 */
+	IPage<CheckVO> customPage(CheckVO checkVO, IPage<CheckVO> page);
+
+	/**
+	 * 批量新增并激活任务
+	 * @param collect
+	 * @return
+	 */
+	Boolean saveBatchAndActiveTask(List<Check> collect);
+
+	/**
+	 * 新增并激活任务
+	 * @param check
+	 * @return
+	 */
+	Boolean saveAndActiveTask(Check check);
 }

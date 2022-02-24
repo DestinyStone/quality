@@ -5,7 +5,7 @@ package org.springblade.common.enums;
  * @Date: 2022/1/27 20:19
  * @Description:
  */
-public enum  ApproveStatusEmun {
+public enum ApproveStatusEnum {
 
 	/**
 	 * 待审批
@@ -36,14 +36,14 @@ public enum  ApproveStatusEmun {
 	private Integer code;
 	private String message;
 
-	ApproveStatusEmun(Integer code, String message) {
+	ApproveStatusEnum(Integer code, String message) {
 		this.code = code;
 		this.message = message;
 	}
 
-	public static ApproveStatusEmun getByCode(Integer code) {
-		ApproveStatusEmun[] enumConstants = ApproveStatusEmun.class.getEnumConstants();
-		for (ApproveStatusEmun item : enumConstants) {
+	public static ApproveStatusEnum getByCode(Integer code) {
+		ApproveStatusEnum[] enumConstants = ApproveStatusEnum.class.getEnumConstants();
+		for (ApproveStatusEnum item : enumConstants) {
 			if (item.code.equals(code)) {
 				return item;
 			}

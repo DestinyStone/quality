@@ -4,7 +4,7 @@
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions are met:
  *
- *  Redistributions of source code must retain the above copyright notice,
+ *  Redistributions of source codeing must retain the above copyright notice,
  *  this list of conditions and the following disclaimer.
  *  Redistributions in binary form must reproduce the above copyright
  *  notice, this list of conditions and the following disclaimer in the
@@ -19,6 +19,7 @@ package org.springblade;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springblade.common.constant.CommonConstant;
 import org.springblade.core.launch.BladeApplication;
+import org.springblade.modules.file.controller.FileController;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.liquibase.LiquibaseAutoConfiguration;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;

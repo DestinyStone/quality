@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import org.apache.ibatis.annotations.Param;
 import org.springblade.modules.check.bean.entity.Check;
 import org.springblade.modules.check.bean.vo.AccessSaveCheckVO;
+import org.springblade.modules.check.bean.vo.CheckVO;
 import org.springblade.modules.out_buy_low.bean.vo.OutBuyQprApproveVO;
 
 import java.util.List;
@@ -22,4 +23,12 @@ public interface CheckMapper extends BaseMapper<Check> {
 	 * @return
 	 */
 	List<AccessSaveCheckVO> accessSavePage(@Param("vo") AccessSaveCheckVO approveVO, IPage<AccessSaveCheckVO> page);
+
+	/**
+	 * 分页
+	 * @param checkVO
+	 * @param page
+	 * @return
+	 */
+	List<CheckVO> page(CheckVO checkVO, IPage<CheckVO> page);
 }

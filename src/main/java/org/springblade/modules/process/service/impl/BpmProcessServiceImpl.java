@@ -47,6 +47,7 @@ public class BpmProcessServiceImpl extends ServiceImpl<BpmProcessMapper, BpmProc
 			bpmProcess.setBpmSort(item.getSort());
 			bpmProcess.setBusId(item.getBusId());
 			bpmProcess.setBpmFlag(item.getFlag());
+			bpmProcess.setBpmServerFlag(item.getServerFlag());
 			// TODO 允许的部门， 后续需要增进接口
 			bpmProcess.setAccessDept(item.getAccessDept());
 			bpmProcess.setBpmBingId(CommonUtil.getCode() + "");

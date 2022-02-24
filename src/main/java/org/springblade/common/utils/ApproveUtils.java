@@ -1,5 +1,6 @@
 package org.springblade.common.utils;
 
+import org.springblade.modules.check.utils.CheckApproveUtils;
 import org.springblade.modules.out_buy_low.utils.OutBuyQprApproveUtils;
 import org.springblade.modules.process.core.ProcessContainer;
 import org.springblade.modules.process.service.BpmProcessService;
@@ -19,6 +20,28 @@ public class ApproveUtils {
 
 	private static BpmProcessService processService;
 
+	public static enum ServerFlagEnum {
+		/**
+		 * 不良审批
+		 */
+		LOW_APPROVE("lowApprove"),
+
+		/**
+		 * 检查法审批
+		 */
+		CHECK_APPROVE("checkApprove"),
+		;
+		String message;
+
+		ServerFlagEnum(String message) {
+			this.message = message;
+		}
+
+		public String getMessage() {
+			return message;
+		}
+	}
+
 	public static enum ApproveLinkEnum {
 		/**
 		 * 工序内不良审批
@@ -33,23 +56,34 @@ public class ApproveUtils {
 		/**
 		 * 工序内不良外购件审批
 		 */
-		PROCESS_LOW_OUT_BUY
+		PROCESS_LOW_OUT_BUY,
+
+		/**
+		 * 检查法审批
+		 */
+		CHECK,
 		;
 	}
 
 	public static void createTask(String busId, ApproveLinkEnum linkEnum) {
+		List<ProcessContainer> processTaskList = null;
 		if (ApproveLinkEnum.PROCESS_LOW.equals(linkEnum)) {
-			List<ProcessContainer> processTaskList = ProcessLowApproveUtils.getProcessTaskList(busId + "");
-			createTask(processTaskList);
+			processTaskList = ProcessLowApproveUtils.getProcessTaskList(busId + "");
 		}
 
 		if (ApproveLinkEnum.OUT_BUY_LOW.equals(linkEnum)) {
-			List<ProcessContainer> processTaskList = OutBuyQprApproveUtils.getProcessTaskList(busId + "");
-			createTask(processTaskList);
+			processTaskList = OutBuyQprApproveUtils.getProcessTaskList(busId + "");
 		}
 
 		if (ApproveLinkEnum.PROCESS_LOW_OUT_BUY.equals(linkEnum)) {
-			List<ProcessContainer> processTaskList = ProcessLowApproveUtils.getOutBuyProcessTaskList(busId + "");
+			processTaskList = ProcessLowApproveUtils.getOutBuyProcessTaskList(busId + "");
+		}
+
+		if (ApproveLinkEnum.CHECK.equals(linkEnum)) {
+			processTaskList = CheckApproveUtils.getProcessTaskList(busId);
+		}
+
+		if (processTaskList != null) {
 			createTask(processTaskList);
 		}
 	}

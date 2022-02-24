@@ -28,4 +28,7 @@ public class ProcessContainer {
 
 	@ApiModelProperty("标识")
 	private String flag;
+
+	@ApiModelProperty("服务标识")
+	private String serverFlag;
 }

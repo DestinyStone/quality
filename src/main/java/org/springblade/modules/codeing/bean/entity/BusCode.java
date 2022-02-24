@@ -1,4 +1,4 @@
-package org.springblade.modules.code.bean.entity;
+package org.springblade.modules.codeing.bean.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;

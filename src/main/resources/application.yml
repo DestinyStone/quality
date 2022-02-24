@@ -20,7 +20,7 @@ spring:
     #driver-class-name: oracle.jdbc.OracleDriver
     #driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
     #url: jdbc:mysql://localhost:3306/quality?useSSL=false&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&transformedBitIsBoolean=true&serverTimezone=GMT%2B8&nullCatalogMeansCurrent=true&allowPublicKeyRetrieval=true
-    url: jdbc:mysql://111.67.206.244:3306/quality?useSSL=false&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&transformedBitIsBoolean=true&serverTimezone=GMT%2B8&nullCatalogMeansCurrent=true&allowPublicKeyRetrieval=true
+    url: jdbc:mysql://localhost:3306/quality?useSSL=false&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&transformedBitIsBoolean=true&serverTimezone=GMT%2B8&nullCatalogMeansCurrent=true&allowPublicKeyRetrieval=true
     username: root
     password: 123456
     druid:
@@ -51,7 +51,7 @@ spring:
   redis:
     ##redis 单机环境配置
     # host: 127.0.0.1
-    host: 111.67.206.244
+    host: localhost
     port: 6379
     password:
     database: 0
@@ -261,7 +261,7 @@ blade:
 
 file:
   upload:
-    server: "http://localhost:8080"
+    server: "http://localhost:7777"
     root:
        path: D:\application\tomcat\apache-tomcat-8.5.75\webapps\ROOT
 #      path: /usr/local/apache-tomcat-8.5.75/webapps/ROOT

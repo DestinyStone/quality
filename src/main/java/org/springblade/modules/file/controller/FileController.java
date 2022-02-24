@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
@@ -87,12 +88,13 @@ public class FileController {
 		response.setCharacterEncoding(request.getCharacterEncoding());
 		response.setContentType("application/octet-stream");
 		FileInputStream fis = null;
-
+		ServletOutputStream out = null;
 		try {
 			fis = new FileInputStream(file);
 			fileName = URLEncoder.encode(StrUtil.isBlank(fileName) ? file.getName() : fileName, "utf-8");
 			response.setHeader("Content-Disposition", "attachment; filename=" + fileName);
-			IoUtil.copy(fis, response.getOutputStream());
+			out = response.getOutputStream();
+			IoUtil.copy(fis, out);
 			response.flushBuffer();
 		} catch (Exception var14) {
 
@@ -104,6 +106,13 @@ public class FileController {
 						file.deleteOnExit();
 					}
 				} catch (IOException var13) {
+				}
+			}
+			if (out != null) {
+				try {
+					out.close();
+				} catch (IOException e) {
+					e.printStackTrace();
 				}
 			}
 		}

@@ -7,7 +7,7 @@ import com.github.xiaoymin.knife4j.core.util.StrUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springblade.common.constant.RootMappingConstant;
-import org.springblade.common.enums.ApproveStatusEmun;
+import org.springblade.common.enums.ApproveStatusEnum;
 import org.springblade.common.utils.ApproveUtils;
 import org.springblade.common.utils.CodeUtil;
 import org.springblade.common.utils.CommonUtil;
@@ -68,7 +68,7 @@ public class ProcessLowController {
 		processLow.setId(id);
 		processLow.setUpdateUser(CommonUtil.getUserId());
 		processLow.setUpdateTime(new Date());
-		processLow.setBpmStatus(ApproveStatusEmun.AWAIT.getCode());
+		processLow.setBpmStatus(ApproveStatusEnum.AWAIT.getCode());
 
 		Boolean status = lowService.updateById(processLow);
 
@@ -97,7 +97,7 @@ public class ProcessLowController {
 
 		ProcessLow processLow = BeanUtil.copyProperties(checkDTO, ProcessLow.class);
 		processLow.setId(id);
-		processLow.setBpmStatus(ApproveStatusEmun.FINISN.getCode());
+		processLow.setBpmStatus(ApproveStatusEnum.FINISN.getCode());
 		Boolean status = lowService.updateById(processLow);
 		processService.pass(process.getBpmId());
 
@@ -110,13 +110,13 @@ public class ProcessLowController {
 		ProcessLow processLow = lowService.getById(id);
 
 		// 非待审批中状态 抛出异常
-		if (!ApproveStatusEmun.AWAIT.getCode().equals(processLow.getBpmStatus())) {
+		if (!ApproveStatusEnum.AWAIT.getCode().equals(processLow.getBpmStatus())) {
 			throw new ServiceException("非待审批状态");
 		}
 
 		ProcessLow update = new ProcessLow();
 		update.setId(id);
-		update.setBpmStatus(ApproveStatusEmun.SELF_BACK.getCode());
+		update.setBpmStatus(ApproveStatusEnum.SELF_BACK.getCode());
 
 		// 取消当前激活业务
 		LambdaUpdateWrapper<BpmProcess> processUpdateWrapper = new LambdaUpdateWrapper<>();
@@ -166,34 +166,34 @@ public class ProcessLowController {
 		wrapper.and(StrUtil.isNotBlank(processLowVO.getSearchKey()), item -> {
 			item.like(ProcessLow::getTitle, processLowVO.getSearchKey())
 				.or()
-				.like(ProcessLow::getContent, processLowVO.getContent())
+				.like(ProcessLow::getContent, processLowVO.getSearchKey())
 				.or()
-				.like(ProcessLow::getDutyDept, processLowVO.getDutyDept());
+				.like(ProcessLow::getDutyDept, processLowVO.getSearchKey());
 		});
 
 		if (!new Integer(-1).equals(processLowVO.getBpmStatusFilter())) {
 			// 自测回
 			if (new Integer(0).equals(processLowVO.getBpmStatusFilter())) {
-				wrapper.eq(ProcessLow::getBpmStatus, ApproveStatusEmun.SELF_BACK.getCode());
+				wrapper.eq(ProcessLow::getBpmStatus, ApproveStatusEnum.SELF_BACK.getCode());
 			}
 
 			// 已驳回
 			if (new Integer(1).equals(processLowVO.getBpmStatusFilter())) {
-				wrapper.eq(ProcessLow::getBpmStatus, ApproveStatusEmun.BACK.getCode());
+				wrapper.eq(ProcessLow::getBpmStatus, ApproveStatusEnum.BACK.getCode());
 			}
 
 			// 进行中
 			if (new Integer(2).equals(processLowVO.getBpmStatusFilter())) {
 				wrapper.and(item -> {
-					item.eq(ProcessLow::getBpmStatus, ApproveStatusEmun.AWAIT.getCode())
+					item.eq(ProcessLow::getBpmStatus, ApproveStatusEnum.AWAIT.getCode())
 						.or()
-						.eq(ProcessLow::getBpmStatus, ApproveStatusEmun.PROCEED.getCode());
+						.eq(ProcessLow::getBpmStatus, ApproveStatusEnum.PROCEED.getCode());
 				});
 			}
 
 			// 已办结
 			if (new Integer(3).equals(processLowVO.getBpmStatusFilter())) {
-				wrapper.eq(ProcessLow::getBpmStatus, ApproveStatusEmun.FINISN.getCode());
+				wrapper.eq(ProcessLow::getBpmStatus, ApproveStatusEnum.FINISN.getCode());
 			}
 		}
 
@@ -265,17 +265,17 @@ public class ProcessLowController {
 		processLowQualityVO.setSelfBack(0);
 
 		for (ProcessLow processLow : list) {
-			if (processLow.getBpmStatus().equals(ApproveStatusEmun.SELF_BACK.getCode())) {
+			if (processLow.getBpmStatus().equals(ApproveStatusEnum.SELF_BACK.getCode())) {
 				processLowQualityVO.setSelfBack(processLowQualityVO.getSelfBack() + 1);
 			}
-			if (processLow.getBpmStatus().equals(ApproveStatusEmun.BACK.getCode())) {
+			if (processLow.getBpmStatus().equals(ApproveStatusEnum.BACK.getCode())) {
 				processLowQualityVO.setBack(processLowQualityVO.getBack() + 1);
 			}
-			if (processLow.getBpmStatus().equals(ApproveStatusEmun.AWAIT.getCode()) ||
-				processLow.getBpmStatus().equals(ApproveStatusEmun.PROCEED.getCode())) {
+			if (processLow.getBpmStatus().equals(ApproveStatusEnum.AWAIT.getCode()) ||
+				processLow.getBpmStatus().equals(ApproveStatusEnum.PROCEED.getCode())) {
 				processLowQualityVO.setProcess(processLowQualityVO.getProcess() + 1);
 			}
-			if (processLow.getBpmStatus().equals(ApproveStatusEmun.FINISN.getCode())) {
+			if (processLow.getBpmStatus().equals(ApproveStatusEnum.FINISN.getCode())) {
 				processLowQualityVO.setFinish(processLowQualityVO.getFinish() + 1);
 			}
 		}

@@ -6,7 +6,8 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springblade.common.constant.RootMappingConstant;
-import org.springblade.common.enums.ApproveStatusEmun;
+import org.springblade.common.enums.ApproveStatusEnum;
+import org.springblade.common.utils.ApproveUtils;
 import org.springblade.common.utils.CommonUtil;
 import org.springblade.core.log.exception.ServiceException;
 import org.springblade.core.mp.support.Condition;
@@ -69,10 +70,10 @@ public class ProcessLowApproveController {
 		ProcessLow processLow = new ProcessLow();
 		processLow.setId(id);
 		if (processService.isProcessEnd(process.getBpmId())) {
-			processLow.setBpmStatus(ApproveStatusEmun.FINISN.getCode());
+			processLow.setBpmStatus(ApproveStatusEnum.FINISN.getCode());
 			lowService.updateById(processLow);
 		}else {
-			processLow.setBpmStatus(ApproveStatusEmun.PROCEED.getCode());
+			processLow.setBpmStatus(ApproveStatusEnum.PROCEED.getCode());
 			lowService.updateById(processLow);
 		}
 
@@ -95,10 +96,10 @@ public class ProcessLowApproveController {
 		ProcessLow processLow = new ProcessLow();
 		processLow.setId(id);
 		if (processService.isProcessEnd(process.getBpmId())) {
-			processLow.setBpmStatus(ApproveStatusEmun.FINISN.getCode());
+			processLow.setBpmStatus(ApproveStatusEnum.FINISN.getCode());
 			lowService.updateById(processLow);
 		}else {
-			processLow.setBpmStatus(ApproveStatusEmun.PROCEED.getCode());
+			processLow.setBpmStatus(ApproveStatusEnum.PROCEED.getCode());
 			lowService.updateById(processLow);
 		}
 		return R.status(true);
@@ -112,7 +113,7 @@ public class ProcessLowApproveController {
 
 		ProcessLow processLow = new ProcessLow();
 		processLow.setId(new Long(process.getBusId()));
-		processLow.setBpmStatus(ApproveStatusEmun.BACK.getCode());
+		processLow.setBpmStatus(ApproveStatusEnum.BACK.getCode());
 		lowService.updateById(processLow);
 		return R.status(true);
 	}
@@ -139,7 +140,8 @@ public class ProcessLowApproveController {
 	@ApiOperation("统计")
 	public R<ProcessLowApproveQualityVO> quality() {
 		LambdaQueryWrapper<BpmProcess> wrapper = new LambdaQueryWrapper<>();
-		wrapper.eq(BpmProcess::getAccessDept, CommonUtil.getDeptId());
+		wrapper.eq(BpmProcess::getAccessDept, CommonUtil.getDeptId())
+			.eq(BpmProcess::getBpmServerFlag, ApproveUtils.ServerFlagEnum.LOW_APPROVE.getMessage());
 
 		List<BpmProcess> list = processService.list(wrapper);
 

@@ -38,4 +38,33 @@
             </if>
         </where>
     </select>
+    <select id="page" resultType="org.springblade.modules.check.bean.vo.CheckVO">
+        SELECT
+            bus_check.id,
+            bus_check.code,
+            low.designation,
+            low.NAME,
+            low.duty_dept,
+            bus_check.bpm_node,
+            bus_check.bpm_status,
+            bus_check.create_time
+        FROM bus_check
+        LEFT JOIN bus_process_low low
+        ON bus_check.resource_id = low.id
+        WHERE bus_check.resource_type = 1
+        UNION
+        SELECT
+            bus_check.id,
+            bus_check.code,
+            qpr.designation,
+            qpr.NAME,
+            qpr.duty_dept,
+            bus_check.bpm_node,
+            bus_check.bpm_status,
+            bus_check.create_time
+        FROM bus_check
+        LEFT JOIN bus_out_buy_qpr qpr
+        ON bus_check.resource_id = qpr.id
+        WHERE bus_check.resource_type = 0
+    </select>
 </mapper>

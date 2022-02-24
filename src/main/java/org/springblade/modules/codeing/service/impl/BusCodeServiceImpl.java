@@ -1,12 +1,10 @@
-package org.springblade.modules.code.service.impl;
+package org.springblade.modules.codeing.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import io.swagger.models.auth.In;
-import org.springblade.common.utils.CommonUtil;
-import org.springblade.modules.code.bean.entity.BusCode;
-import org.springblade.modules.code.mapper.BusCodeMapper;
-import org.springblade.modules.code.service.BusCodeService;
+import org.springblade.modules.codeing.bean.entity.BusCode;
+import org.springblade.modules.codeing.mapper.BusCodeMapper;
+import org.springblade.modules.codeing.service.BusCodeService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -48,6 +46,14 @@ public class BusCodeServiceImpl extends ServiceImpl<BusCodeMapper, BusCode> impl
 		update.setUpdateTime(new Date());
 		baseMapper.updateById(update);
 		return update.getCode() + "";
+	}
+
+	@Override
+	public BusCode getBySeparate(String separate, String flag) {
+		LambdaQueryWrapper<BusCode> wrapper = new LambdaQueryWrapper<>();
+		wrapper.eq(BusCode::getSeparate, separate)
+			.eq(BusCode::getFlag, flag);
+		return getOne(wrapper);
 	}
 
 }

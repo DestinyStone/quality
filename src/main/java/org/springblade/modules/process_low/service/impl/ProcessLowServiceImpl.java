@@ -1,5 +1,6 @@
 package org.springblade.modules.process_low.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springblade.common.utils.ApproveUtils;
 import org.springblade.modules.out_buy_low.mapper.OutBuyQprMapper;
@@ -8,6 +9,8 @@ import org.springblade.modules.process_low.mapper.ProcessLowMapper;
 import org.springblade.modules.process_low.service.ProcessLowService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 /**
  * @Author: xiaoxia
@@ -42,5 +45,12 @@ public class ProcessLowServiceImpl extends ServiceImpl<ProcessLowMapper, Process
 
 
 		return status;
+	}
+
+	@Override
+	public List<ProcessLow> getByIds(List<Long> qprIds) {
+		LambdaQueryWrapper<ProcessLow> wrapper = new LambdaQueryWrapper<>();
+		wrapper.in(ProcessLow::getId, qprIds);
+		return list(wrapper);
 	}
 }

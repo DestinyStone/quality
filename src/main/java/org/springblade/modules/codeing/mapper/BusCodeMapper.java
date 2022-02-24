@@ -1,7 +1,7 @@
-package org.springblade.modules.code.mapper;
+package org.springblade.modules.codeing.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import org.springblade.modules.code.bean.entity.BusCode;
+import org.springblade.modules.codeing.bean.entity.BusCode;
 
 /**
  * @Author: xiaoxia

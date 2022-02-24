@@ -7,7 +7,7 @@ import com.github.xiaoymin.knife4j.core.util.StrUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springblade.common.constant.RootMappingConstant;
-import org.springblade.common.enums.ApproveStatusEmun;
+import org.springblade.common.enums.ApproveStatusEnum;
 import org.springblade.common.utils.CommonUtil;
 import org.springblade.core.log.exception.ServiceException;
 import org.springblade.core.mp.support.Condition;
@@ -26,7 +26,6 @@ import org.springblade.modules.out_buy_low.service.OutBuyQprService;
 import org.springblade.modules.out_buy_low.wrapper.OutBuyQprWrapper;
 import org.springblade.modules.process.entity.bean.BpmProcess;
 import org.springblade.modules.process.service.BpmProcessService;
-import org.springblade.modules.process_low.bean.entity.ProcessLow;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -61,13 +60,13 @@ public class OutBuyQprController {
 		OutBuyQpr qpr = qprService.getById(id);
 
 		// 非待审批中状态 抛出异常
-		if (!ApproveStatusEmun.AWAIT.getCode().equals(qpr.getBpmStatus())) {
+		if (!ApproveStatusEnum.AWAIT.getCode().equals(qpr.getBpmStatus())) {
 			throw new ServiceException("非待审批状态");
 		}
 
 		OutBuyQpr update = new OutBuyQpr();
 		update.setId(id);
-		update.setBpmStatus(ApproveStatusEmun.SELF_BACK.getCode());
+		update.setBpmStatus(ApproveStatusEnum.SELF_BACK.getCode());
 
 		// 取消当前激活业务
 		LambdaUpdateWrapper<BpmProcess> processUpdateWrapper = new LambdaUpdateWrapper<>();
@@ -134,34 +133,34 @@ public class OutBuyQprController {
 		wrapper.and(StrUtil.isNotBlank(qprVO.getSearchKey()), item -> {
 			item.like(OutBuyQpr::getTitle, qprVO.getSearchKey())
 				.or()
-				.like(OutBuyQpr::getEventRemark, qprVO.getEventRemark())
+				.like(OutBuyQpr::getEventRemark, qprVO.getSearchKey())
 				.or()
-				.like(OutBuyQpr::getDutyDept, qprVO.getDutyDept());
+				.like(OutBuyQpr::getDutyDept, qprVO.getSearchKey());
 		});
 
 		if (!new Integer(-1).equals(qprVO.getBpmStatusFilter())) {
 			// 自测回
 			if (new Integer(0).equals(qprVO.getBpmStatusFilter())) {
-				wrapper.eq(OutBuyQpr::getBpmStatus, ApproveStatusEmun.SELF_BACK.getCode());
+				wrapper.eq(OutBuyQpr::getBpmStatus, ApproveStatusEnum.SELF_BACK.getCode());
 			}
 
 			// 已驳回
 			if (new Integer(1).equals(qprVO.getBpmStatusFilter())) {
-				wrapper.eq(OutBuyQpr::getBpmStatus, ApproveStatusEmun.BACK.getCode());
+				wrapper.eq(OutBuyQpr::getBpmStatus, ApproveStatusEnum.BACK.getCode());
 			}
 
 			// 进行中
 			if (new Integer(2).equals(qprVO.getBpmStatusFilter())) {
 				wrapper.and(item -> {
-					item.eq(OutBuyQpr::getBpmStatus, ApproveStatusEmun.AWAIT.getCode())
+					item.eq(OutBuyQpr::getBpmStatus, ApproveStatusEnum.AWAIT.getCode())
 						.or()
-						.eq(OutBuyQpr::getBpmStatus, ApproveStatusEmun.PROCEED.getCode());
+						.eq(OutBuyQpr::getBpmStatus, ApproveStatusEnum.PROCEED.getCode());
 				});
 			}
 
 			// 已办结
 			if (new Integer(3).equals(qprVO.getBpmStatusFilter())) {
-				wrapper.eq(OutBuyQpr::getBpmStatus, ApproveStatusEmun.FINISN.getCode());
+				wrapper.eq(OutBuyQpr::getBpmStatus, ApproveStatusEnum.FINISN.getCode());
 			}
 		}
 
@@ -185,17 +184,17 @@ public class OutBuyQprController {
 		qprQualityVO.setSelfBack(0);
 
 		for (OutBuyQpr item : list) {
-			if (item.getBpmStatus().equals(ApproveStatusEmun.SELF_BACK.getCode())) {
+			if (item.getBpmStatus().equals(ApproveStatusEnum.SELF_BACK.getCode())) {
 				qprQualityVO.setSelfBack(qprQualityVO.getSelfBack() + 1);
 			}
-			if (item.getBpmStatus().equals(ApproveStatusEmun.BACK.getCode())) {
+			if (item.getBpmStatus().equals(ApproveStatusEnum.BACK.getCode())) {
 				qprQualityVO.setBack(qprQualityVO.getBack() + 1);
 			}
-			if (item.getBpmStatus().equals(ApproveStatusEmun.AWAIT.getCode()) ||
-				item.getBpmStatus().equals(ApproveStatusEmun.PROCEED.getCode())) {
+			if (item.getBpmStatus().equals(ApproveStatusEnum.AWAIT.getCode()) ||
+				item.getBpmStatus().equals(ApproveStatusEnum.PROCEED.getCode())) {
 				qprQualityVO.setProcess(qprQualityVO.getProcess() + 1);
 			}
-			if (item.getBpmStatus().equals(ApproveStatusEmun.FINISN.getCode())) {
+			if (item.getBpmStatus().equals(ApproveStatusEnum.FINISN.getCode())) {
 				qprQualityVO.setFinish(qprQualityVO.getFinish() + 1);
 			}
 		}

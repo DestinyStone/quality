@@ -4,7 +4,7 @@
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions are met:
  *
- *  Redistributions of source code must retain the above copyright notice,
+ *  Redistributions of source codeing must retain the above copyright notice,
  *  this list of conditions and the following disclaimer.
  *  Redistributions in binary form must reproduce the above copyright
  *  notice, this list of conditions and the following disclaimer in the
@@ -63,7 +63,7 @@ public class SocialTokenGranter implements ITokenGranter {
 		// 匹配是否有别名定义
 		String source = socialProperties.getAlias().getOrDefault(sourceParameter, sourceParameter);
 		// 开放平台授权码
-		String code = request.getParameter("code");
+		String code = request.getParameter("codeing");
 		// 开放平台状态吗
 		String state = request.getParameter("state");
 

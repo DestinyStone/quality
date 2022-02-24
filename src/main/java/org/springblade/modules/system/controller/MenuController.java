@@ -4,7 +4,7 @@
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions are met:
  *
- *  Redistributions of source code must retain the above copyright notice,
+ *  Redistributions of source codeing must retain the above copyright notice,
  *  this list of conditions and the following disclaimer.
  *  Redistributions in binary form must reproduce the above copyright
  *  notice, this list of conditions and the following disclaimer in the
@@ -80,7 +80,7 @@ public class MenuController extends BladeController {
 	 */
 	@GetMapping("/list")
 	@ApiImplicitParams({
-		@ApiImplicitParam(name = "code", value = "菜单编号", paramType = "query", dataType = "string"),
+		@ApiImplicitParam(name = "codeing", value = "菜单编号", paramType = "query", dataType = "string"),
 		@ApiImplicitParam(name = "name", value = "菜单名称", paramType = "query", dataType = "string")
 	})
 	@PreAuth(RoleConstant.HAS_ROLE_ADMINISTRATOR)
@@ -96,7 +96,7 @@ public class MenuController extends BladeController {
 	 */
 	@GetMapping("/lazy-list")
 	@ApiImplicitParams({
-		@ApiImplicitParam(name = "code", value = "菜单编号", paramType = "query", dataType = "string"),
+		@ApiImplicitParam(name = "codeing", value = "菜单编号", paramType = "query", dataType = "string"),
 		@ApiImplicitParam(name = "name", value = "菜单名称", paramType = "query", dataType = "string")
 	})
 	@PreAuth(RoleConstant.HAS_ROLE_ADMINISTRATOR)
@@ -112,7 +112,7 @@ public class MenuController extends BladeController {
 	 */
 	@GetMapping("/menu-list")
 	@ApiImplicitParams({
-		@ApiImplicitParam(name = "code", value = "菜单编号", paramType = "query", dataType = "string"),
+		@ApiImplicitParam(name = "codeing", value = "菜单编号", paramType = "query", dataType = "string"),
 		@ApiImplicitParam(name = "name", value = "菜单名称", paramType = "query", dataType = "string")
 	})
 	@PreAuth(RoleConstant.HAS_ROLE_ADMINISTRATOR)
@@ -128,7 +128,7 @@ public class MenuController extends BladeController {
 	 */
 	@GetMapping("/lazy-menu-list")
 	@ApiImplicitParams({
-		@ApiImplicitParam(name = "code", value = "菜单编号", paramType = "query", dataType = "string"),
+		@ApiImplicitParam(name = "codeing", value = "菜单编号", paramType = "query", dataType = "string"),
 		@ApiImplicitParam(name = "name", value = "菜单名称", paramType = "query", dataType = "string")
 	})
 	@PreAuth(RoleConstant.HAS_ROLE_ADMINISTRATOR)

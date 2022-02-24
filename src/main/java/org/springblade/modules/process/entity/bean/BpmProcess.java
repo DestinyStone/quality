@@ -39,6 +39,9 @@ public class BpmProcess {
 	@ApiModelProperty("标识")
 	private String bpmFlag;
 
+	@ApiModelProperty("审批服务标识")
+	private String bpmServerFlag;
+
 	@ApiModelProperty("业务Id")
 	private String busId;
 

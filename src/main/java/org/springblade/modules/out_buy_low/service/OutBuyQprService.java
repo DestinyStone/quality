@@ -3,6 +3,9 @@ package org.springblade.modules.out_buy_low.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import org.springblade.modules.out_buy_low.bean.entity.OutBuyQpr;
 
+import java.util.Collection;
+import java.util.List;
+
 /**
  * @Author: xiaoxia
  * @Date: 2022/1/28 10:03
@@ -20,4 +23,11 @@ public interface OutBuyQprService extends IService<OutBuyQpr> {
 	 * 新增， 不激活任务
 	 */
 	Boolean saveUnActiveTask(OutBuyQpr qpr);
+
+	/**
+	 * ids 查询
+	 * @param qprIds
+	 * @return
+	 */
+	List<OutBuyQpr> getByIds(List<Long> qprIds);
 }

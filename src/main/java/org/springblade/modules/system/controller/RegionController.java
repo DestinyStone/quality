@@ -4,7 +4,7 @@
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions are met:
  *
- *  Redistributions of source code must retain the above copyright notice,
+ *  Redistributions of source codeing must retain the above copyright notice,
  *  this list of conditions and the following disclaimer.
  *  Redistributions in binary form must reproduce the above copyright
  *  notice, this list of conditions and the following disclaimer in the
@@ -87,7 +87,7 @@ public class RegionController extends BladeController {
 	 */
 	@GetMapping("/lazy-list")
 	@ApiImplicitParams({
-		@ApiImplicitParam(name = "code", value = "区划编号", paramType = "query", dataType = "string"),
+		@ApiImplicitParam(name = "codeing", value = "区划编号", paramType = "query", dataType = "string"),
 		@ApiImplicitParam(name = "name", value = "区划名称", paramType = "query", dataType = "string")
 	})
 	@ApiOperationSupport(order = 3)
@@ -102,7 +102,7 @@ public class RegionController extends BladeController {
 	 */
 	@GetMapping("/lazy-tree")
 	@ApiImplicitParams({
-		@ApiImplicitParam(name = "code", value = "区划编号", paramType = "query", dataType = "string"),
+		@ApiImplicitParam(name = "codeing", value = "区划编号", paramType = "query", dataType = "string"),
 		@ApiImplicitParam(name = "name", value = "区划名称", paramType = "query", dataType = "string")
 	})
 	@ApiOperationSupport(order = 4)

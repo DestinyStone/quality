@@ -1,6 +1,6 @@
 package org.springblade.common.utils;
 
-import org.springblade.modules.code.service.BusCodeService;
+import org.springblade.modules.codeing.service.BusCodeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

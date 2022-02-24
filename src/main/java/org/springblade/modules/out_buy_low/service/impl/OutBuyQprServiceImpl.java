@@ -1,5 +1,6 @@
 package org.springblade.modules.out_buy_low.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springblade.common.utils.ApproveUtils;
 import org.springblade.common.utils.CodeUtil;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * @Author: xiaoxia
@@ -42,6 +44,13 @@ public class OutBuyQprServiceImpl extends ServiceImpl<OutBuyQprMapper, OutBuyQpr
 		commonSet(qpr);
 		qpr.setProcessLowFlag(2);
 		return this.save(qpr);
+	}
+
+	@Override
+	public List<OutBuyQpr> getByIds(List<Long> qprIds) {
+		LambdaQueryWrapper<OutBuyQpr> wrapper = new LambdaQueryWrapper<>();
+		wrapper.in(OutBuyQpr::getId, qprIds);
+		return list(wrapper);
 	}
 
 	public void commonSet(OutBuyQpr qpr) {

@@ -4,7 +4,7 @@
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions are met:
  *
- *  Redistributions of source code must retain the above copyright notice,
+ *  Redistributions of source codeing must retain the above copyright notice,
  *  this list of conditions and the following disclaimer.
  *  Redistributions in binary form must reproduce the above copyright
  *  notice, this list of conditions and the following disclaimer in the
@@ -35,7 +35,7 @@ public class RegionCache {
 	public static final int TOWN_LEVEL = 4;
 	public static final int VILLAGE_LEVEL = 5;
 
-	private static final String REGION_CODE = "region:code:";
+	private static final String REGION_CODE = "region:codeing:";
 
 	private static final IRegionService regionService;
 

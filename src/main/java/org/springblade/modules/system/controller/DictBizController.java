@@ -4,7 +4,7 @@
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions are met:
  *
- *  Redistributions of source code must retain the above copyright notice,
+ *  Redistributions of source codeing must retain the above copyright notice,
  *  this list of conditions and the following disclaimer.
  *  Redistributions in binary form must reproduce the above copyright
  *  notice, this list of conditions and the following disclaimer in the
@@ -70,7 +70,7 @@ public class DictBizController extends BladeController {
 	 */
 	@GetMapping("/list")
 	@ApiImplicitParams({
-		@ApiImplicitParam(name = "code", value = "字典编号", paramType = "query", dataType = "string"),
+		@ApiImplicitParam(name = "codeing", value = "字典编号", paramType = "query", dataType = "string"),
 		@ApiImplicitParam(name = "dictValue", value = "字典名称", paramType = "query", dataType = "string")
 	})
 	@ApiOperationSupport(order = 2)
@@ -85,7 +85,7 @@ public class DictBizController extends BladeController {
 	 */
 	@GetMapping("/parent-list")
 	@ApiImplicitParams({
-		@ApiImplicitParam(name = "code", value = "字典编号", paramType = "query", dataType = "string"),
+		@ApiImplicitParam(name = "codeing", value = "字典编号", paramType = "query", dataType = "string"),
 		@ApiImplicitParam(name = "dictValue", value = "字典名称", paramType = "query", dataType = "string")
 	})
 	@ApiOperationSupport(order = 3)
@@ -99,7 +99,7 @@ public class DictBizController extends BladeController {
 	 */
 	@GetMapping("/child-list")
 	@ApiImplicitParams({
-		@ApiImplicitParam(name = "code", value = "字典编号", paramType = "query", dataType = "string"),
+		@ApiImplicitParam(name = "codeing", value = "字典编号", paramType = "query", dataType = "string"),
 		@ApiImplicitParam(name = "dictValue", value = "字典名称", paramType = "query", dataType = "string"),
 		@ApiImplicitParam(name = "parentId", value = "字典名称", paramType = "query", dataType = "string")
 	})

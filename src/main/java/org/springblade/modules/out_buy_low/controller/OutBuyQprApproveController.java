@@ -5,7 +5,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springblade.common.constant.RootMappingConstant;
-import org.springblade.common.enums.ApproveStatusEmun;
+import org.springblade.common.enums.ApproveStatusEnum;
 import org.springblade.common.utils.CommonUtil;
 import org.springblade.core.mp.support.Condition;
 import org.springblade.core.mp.support.Query;
@@ -95,7 +95,7 @@ public class OutBuyQprApproveController {
 
 		OutBuyQpr outBuyQpr = new OutBuyQpr();
 		outBuyQpr.setId(new Long(process.getBusId()));
-		outBuyQpr.setBpmStatus(ApproveStatusEmun.BACK.getCode());
+		outBuyQpr.setBpmStatus(ApproveStatusEnum.BACK.getCode());
 		qprService.updateById(outBuyQpr);
 		return R.status(true);
 	}
@@ -140,10 +140,10 @@ public class OutBuyQprApproveController {
 		OutBuyQpr outBuyQpr = new OutBuyQpr();
 		outBuyQpr.setId(id);
 		if (processService.isProcessEnd(bpmId)) {
-			outBuyQpr.setBpmStatus(ApproveStatusEmun.FINISN.getCode());
+			outBuyQpr.setBpmStatus(ApproveStatusEnum.FINISN.getCode());
 			qprService.updateById(outBuyQpr);
 		}else {
-			outBuyQpr.setBpmStatus(ApproveStatusEmun.PROCEED.getCode());
+			outBuyQpr.setBpmStatus(ApproveStatusEnum.PROCEED.getCode());
 			qprService.updateById(outBuyQpr);
 		}
 	}
