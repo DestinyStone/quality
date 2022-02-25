@@ -1,6 +1,5 @@
 package org.springblade.modules.file.controller;
 
-import cn.hutool.core.exceptions.ExceptionUtil;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.StrUtil;
 import com.github.xiaoymin.knife4j.annotations.ApiOperationSupport;
@@ -17,7 +16,6 @@ import org.springblade.modules.file.service.BusFileService;
 import org.springblade.modules.file.utils.FileUtils;
 import org.springblade.modules.file.wrapper.BusFileWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -78,6 +76,9 @@ public class FileController {
 			throw new ServiceException("文件不存在");
 		}
 		File file = new File(busFile.getServerUrl());
+		if (file.length() == 0L) {
+			throw new ServiceException("文件访问失败");
+		}
 		downloadFile(request, response, file, busFile.getName(), false);
 	}
 
