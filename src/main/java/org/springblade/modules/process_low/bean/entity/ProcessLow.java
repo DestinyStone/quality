@@ -187,4 +187,7 @@ public class ProcessLow {
 
 	@ApiModelProperty("标准文件附件名称")
 	private String standardFileName;
+
+	@ApiModelProperty("是否允许新增检查法")
+	private Integer isAccessCheck;
 }

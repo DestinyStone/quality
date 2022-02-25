@@ -16,7 +16,7 @@ import java.util.Date;
 public class AccountCodeUtil {
 	private static BusCodeService codeService;
 	private static final String FLAG = "ACCOUNT";
-	private static final String DEFAULT_PREFIX = "96";
+	private static final String DEFAULT_PREFIX = "65";
 	private static final Long START_CODE = 1L;
 	private static final Integer PREFIX_COUNT = 9;
 
@@ -45,7 +45,7 @@ public class AccountCodeUtil {
 	}
 
 	private static String convertCode(String prefix, Long code) {
-		String name = (char)Integer.parseInt("97") + "";
+		String name = (char)Integer.parseInt(prefix) + "";
 		return name + code;
 	}
 

@@ -20,8 +20,8 @@ spring:
     #driver-class-name: oracle.jdbc.OracleDriver
     #driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
     #url: jdbc:mysql://localhost:3306/quality?useSSL=false&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&transformedBitIsBoolean=true&serverTimezone=GMT%2B8&nullCatalogMeansCurrent=true&allowPublicKeyRetrieval=true
-    url: jdbc:mysql://localhost:3306/quality?useSSL=false&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&transformedBitIsBoolean=true&serverTimezone=GMT%2B8&nullCatalogMeansCurrent=true&allowPublicKeyRetrieval=true
-    username: root
+    url: jdbc:mysql://8.134.217.56:3306/quality?useSSL=false&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&transformedBitIsBoolean=true&serverTimezone=GMT%2B8&nullCatalogMeansCurrent=true&allowPublicKeyRetrieval=true
+    username: sakura
     password: 123456
     druid:
       # MySql、PostgreSQL、SqlServer校验
@@ -51,9 +51,9 @@ spring:
   redis:
     ##redis 单机环境配置
     # host: 127.0.0.1
-    host: localhost
+    host: 8.134.217.56
     port: 6379
-    password:
+    password: 123456
     database: 0
     ssl: false
 
@@ -61,8 +61,8 @@ spring:
 mybatis-plus:
   mapper-locations: classpath:org/springblade/**/mapper/*Mapper.xml,classpath:/META-INF/modeler-mybatis-mappings/*.xml
   #实体扫描，多个package用逗号或者分号分隔
-  typeAliasesPackage: org.springblade.**.entity
-  #typeEnumsPackage: org.springblade.dashboard.entity.enums
+  typeAliasesPackage: org.springblade.**.bean
+  #typeEnumsPackage: org.springblade.dashboard.bean.enums
   global-config:
     # 关闭MP3.0自带的banner
     banner: false

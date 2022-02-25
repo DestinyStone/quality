@@ -122,6 +122,7 @@ public class OutBuyQprController {
 		qprDTO.validate();
 		OutBuyQpr qpr = BeanUtil.copy(qprDTO, OutBuyQpr.class);
 		qpr.setType(0);
+		qpr.setIsAccessCheck(1);
 		return R.status(qprService.saveAndActiveTask(qpr));
 	}
 

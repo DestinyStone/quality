@@ -29,6 +29,9 @@ public class CheckAccountVO {
 	@ApiModelProperty("供应商名称")
 	private String dutyDept;
 
+	@ApiModelProperty("审批状态")
+	private Integer bpmStatus;
+
 	@ApiModelProperty("供应商承认excel文件id")
 	private Long providerExcelFileId;
 

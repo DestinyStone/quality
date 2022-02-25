@@ -15,7 +15,7 @@
             FROM bus_out_buy_qpr qpr
             LEFT JOIN bpm_process process
             ON process.bus_id = qpr.id
-            where qpr.process_low_flag = 0 and qpr.bpm_status = 2
+            where qpr.process_low_flag = 0 and qpr.bpm_status = 2 and qpr.is_access_check = 1
             union
             SELECT
                 low.id as resource_id,
@@ -28,7 +28,7 @@
             FROM bus_process_low low
             LEFT JOIN bpm_process process
             ON process.bus_id = low.id
-            where low.bpm_status = 2
+            where low.bpm_status = 2 and low.is_access_check = 1
         ) as temp
         <where>
             <if test="vo.searchKey != null and vo.searchKey != ''">

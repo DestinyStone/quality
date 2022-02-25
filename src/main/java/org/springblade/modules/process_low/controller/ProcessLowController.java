@@ -140,6 +140,7 @@ public class ProcessLowController {
 		processLow.setUpdateTime(new Date());
 		processLow.setBpmStatus(0);
 		processLow.setCode(CodeUtil.getCode(CODE_FLAG));
+		processLow.setIsAccessCheck(1);
 		return R.status(lowService.saveAndActiveTask(processLow));
 	}
 

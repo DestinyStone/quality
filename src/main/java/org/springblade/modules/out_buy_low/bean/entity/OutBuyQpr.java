@@ -137,4 +137,7 @@ public class OutBuyQpr {
 
 	@ApiModelProperty("描述")
 	private String fillRemark;
+
+	@ApiModelProperty("是否允许新增检查法")
+	private Integer isAccessCheck;
 }

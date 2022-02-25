@@ -5,7 +5,6 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.xiaoymin.knife4j.core.util.StrUtil;
-import com.qcloud.cos.event.DeliveryMode;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springblade.common.constant.RootMappingConstant;
@@ -16,9 +15,7 @@ import org.springblade.common.utils.CommonUtil;
 import org.springblade.core.log.exception.ServiceException;
 import org.springblade.core.mp.support.Condition;
 import org.springblade.core.mp.support.Query;
-import org.springblade.core.secure.utils.AuthUtil;
 import org.springblade.core.tool.api.R;
-import org.springblade.core.tool.utils.BeanUtil;
 import org.springblade.modules.account.util.AccountUtils;
 import org.springblade.modules.check.bean.dto.CheckDTO;
 import org.springblade.modules.check.bean.dto.CheckResourceDTO;
@@ -32,18 +29,16 @@ import org.springblade.modules.file.bean.vo.BusFileVO;
 import org.springblade.modules.file.service.BusFileService;
 import org.springblade.modules.file.wrapper.BusFileWrapper;
 import org.springblade.modules.out_buy_low.bean.entity.OutBuyQpr;
-import org.springblade.modules.out_buy_low.bean.vo.OutBuyQprApproveVO;
 import org.springblade.modules.out_buy_low.service.OutBuyQprService;
 import org.springblade.modules.process.entity.bean.BpmProcess;
 import org.springblade.modules.process.service.BpmProcessService;
 import org.springblade.modules.process_low.bean.entity.ProcessLow;
-import org.springblade.modules.process_low.bean.vo.ProcessLowQualityVO;
 import org.springblade.modules.process_low.service.ProcessLowService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import javax.validation.constraints.NotEmpty;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -220,6 +215,7 @@ public class CheckController {
 
 	@PostMapping("/save")
 	@ApiOperation("新增")
+	@Transactional
 	public R save(@Valid @RequestBody CheckDTO checkDTO) {
 
 		List<CheckResourceDTO> resourceList = checkDTO.getResourceList();
@@ -235,6 +231,11 @@ public class CheckController {
 				return encumbrance;
 			}).collect(Collectors.toList());
 			encumbranceList.addAll(collect);
+
+			LambdaUpdateWrapper<OutBuyQpr> wrapper = new LambdaUpdateWrapper<>();
+			wrapper.in(OutBuyQpr::getId, qprIds)
+				.set(OutBuyQpr::getIsAccessCheck, 0);
+			qprService.update(wrapper);
 		}
 
 		List<Long> lowIds = resourceList.stream().filter(item -> item.getResourceType().equals(1)).map(CheckResourceDTO::getResourceId).collect(Collectors.toList());
@@ -248,6 +249,11 @@ public class CheckController {
 				return encumbrance;
 			}).collect(Collectors.toList());
 			encumbranceList.addAll(collect);
+
+			LambdaUpdateWrapper<ProcessLow> wrapper = new LambdaUpdateWrapper<>();
+			wrapper.in(ProcessLow::getId, lowIds)
+				.set(ProcessLow::getIsAccessCheck, 0);
+			lowService.update(wrapper);
 		}
 
 		Map<Long, CheckResourceDTO.Encumbrance> encumbranceMap = encumbranceList.stream().collect(Collectors.toMap(CheckResourceDTO.Encumbrance::getResourceId, Function.identity()));

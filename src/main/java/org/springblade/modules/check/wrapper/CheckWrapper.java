@@ -6,9 +6,7 @@ import org.springblade.core.mp.support.BaseEntityWrapper;
 import org.springblade.modules.check.bean.entity.Check;
 import org.springblade.modules.check.bean.vo.CheckDetailVO;
 import org.springblade.modules.system.entity.Dept;
-import org.springblade.modules.work.entity.bean.Message;
-import org.springblade.modules.work.entity.vo.MessageVO;
-import sun.net.www.protocol.http.AuthCache;
+
 
 /**
  * @Author: xiaoxia
