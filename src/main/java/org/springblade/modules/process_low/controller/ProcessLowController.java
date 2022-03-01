@@ -27,6 +27,7 @@ import org.springblade.modules.process_low.bean.dto.ProcessLowDTO;
 import org.springblade.modules.process_low.bean.entity.ProcessLow;
 import org.springblade.modules.process_low.bean.vo.ProcessLowQualityVO;
 import org.springblade.modules.process_low.bean.vo.ProcessLowVO;
+import org.springblade.modules.process_low.enums.LowBpmNodeEnum;
 import org.springblade.modules.process_low.service.ProcessLowService;
 import org.springblade.modules.process_low.wrapper.ProcessLowWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -117,6 +118,7 @@ public class ProcessLowController {
 		ProcessLow update = new ProcessLow();
 		update.setId(id);
 		update.setBpmStatus(ApproveStatusEnum.SELF_BACK.getCode());
+		update.setBpmNode(-1);
 
 		// 取消当前激活业务
 		LambdaUpdateWrapper<BpmProcess> processUpdateWrapper = new LambdaUpdateWrapper<>();
@@ -139,6 +141,12 @@ public class ProcessLowController {
 		processLow.setUpdateUser(CommonUtil.getUserId());
 		processLow.setUpdateTime(new Date());
 		processLow.setBpmStatus(0);
+		if (processLow.getType().equals(0)) {
+			processLow.setBpmNode(LowBpmNodeEnum.QPR_SAVE.getCode());
+		}else {
+			processLow.setBpmNode(LowBpmNodeEnum.CHECK_SAVE.getCode());
+		}
+
 		processLow.setCode(CodeUtil.getCode(CODE_FLAG));
 		processLow.setIsAccessCheck(1);
 		return R.status(lowService.saveAndActiveTask(processLow));

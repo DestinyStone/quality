@@ -22,6 +22,9 @@ import org.springblade.modules.process.entity.dto.RejectDTO;
 import org.springblade.modules.process.enums.ApproveNodeStatusEnum;
 import org.springblade.modules.process.service.BpmProcessService;
 import org.springblade.modules.process.service.ProcessUrgeService;
+import org.springblade.modules.process_low.bean.entity.ProcessLow;
+import org.springblade.modules.process_low.enums.LowBpmNodeEnum;
+import org.springblade.modules.process_low.service.ProcessLowService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -54,12 +57,22 @@ public class OutBuyQprApproveController {
 	@Autowired
 	private ProcessUrgeService urgeService;
 
+	@Autowired
+	private ProcessLowService lowService;
+
 	@PostMapping("/handler/check/confirm/{id}")
 	@ApiOperation("处理调查结果确认流程")
 	public R fill(@PathVariable("id") Long id, @Valid @RequestBody OutBuyQprFillDTO fillDTO) {
 		OutBuyQpr outBuyQpr = CommonUtil.copy(fillDTO, OutBuyQpr.class);
 		outBuyQpr.setId(id);
+		outBuyQpr.setBpmNode(LowBpmNodeEnum.CHECK_APPROVE.getCode());
 		qprService.updateById(outBuyQpr);
+
+		// 同步更新不良
+		ProcessLow processLow = new ProcessLow();
+		processLow.setId(id);
+		processLow.setBpmNode(LowBpmNodeEnum.CHECK_APPROVE.getCode());
+		lowService.updateById(processLow);
 
 		BpmProcess process = processService.getByBusId(id);
 		pass(id, process.getBpmId());
@@ -71,7 +84,14 @@ public class OutBuyQprApproveController {
 	public R handlerCheckSave(@PathVariable("id") Long id, @Valid @RequestBody QprCheckSaveDTO saveDTO) {
 		OutBuyQpr outBuyQpr = CommonUtil.copy(saveDTO, OutBuyQpr.class);
 		outBuyQpr.setId(id);
+		outBuyQpr.setBpmNode(LowBpmNodeEnum.CHECK_CONFIRM.getCode());
 		qprService.updateById(outBuyQpr);
+
+		// 同步更新不良
+		ProcessLow processLow = new ProcessLow();
+		processLow.setId(id);
+		processLow.setBpmNode(LowBpmNodeEnum.CHECK_CONFIRM.getCode());
+		lowService.updateById(processLow);
 
 		BpmProcess process = processService.getByBusId(id);
 		pass(id, process.getBpmId());
@@ -82,7 +102,12 @@ public class OutBuyQprApproveController {
 	@ApiOperation("审批通过")
 	public R pass(@RequestParam("id") Long id) {
 		BpmProcess process = processService.getByBusId(id);
+		OutBuyQpr before = qprService.getById(id);
 
+		OutBuyQpr update = new OutBuyQpr();
+		update.setId(id);
+		update.setBpmNode(before.getBpmNode() + 1);
+		qprService.updateById(update);
 		pass(id, process.getBpmId());
 		return R.status(true);
 	}
@@ -96,6 +121,7 @@ public class OutBuyQprApproveController {
 		OutBuyQpr outBuyQpr = new OutBuyQpr();
 		outBuyQpr.setId(new Long(process.getBusId()));
 		outBuyQpr.setBpmStatus(ApproveStatusEnum.BACK.getCode());
+		outBuyQpr.setBpmNode(-1);
 		qprService.updateById(outBuyQpr);
 		return R.status(true);
 	}

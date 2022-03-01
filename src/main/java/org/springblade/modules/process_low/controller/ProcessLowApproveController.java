@@ -24,6 +24,7 @@ import org.springblade.modules.process.service.BpmProcessService;
 import org.springblade.modules.process_low.bean.entity.ProcessLow;
 import org.springblade.modules.process_low.bean.vo.ProcessLowApproveQualityVO;
 import org.springblade.modules.process_low.bean.vo.ProcessLowApproveVO;
+import org.springblade.modules.process_low.enums.LowBpmNodeEnum;
 import org.springblade.modules.process_low.service.ProcessLowApproveService;
 import org.springblade.modules.process_low.service.ProcessLowService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,6 +70,7 @@ public class ProcessLowApproveController {
 		processService.pass(process.getBpmId());
 		ProcessLow processLow = new ProcessLow();
 		processLow.setId(id);
+		processLow.setBpmNode(LowBpmNodeEnum.QPR_APPROVE.getCode());
 		if (processService.isProcessEnd(process.getBpmId())) {
 			processLow.setBpmStatus(ApproveStatusEnum.FINISN.getCode());
 			lowService.updateById(processLow);
@@ -93,8 +95,10 @@ public class ProcessLowApproveController {
 			throw new ServiceException("当前审批节点不存在");
 		}
 		processService.pass(process.getBpmId());
+		ProcessLow before = lowService.getById(id);
 		ProcessLow processLow = new ProcessLow();
 		processLow.setId(id);
+		processLow.setBpmNode(before.getBpmNode() + 1);
 		if (processService.isProcessEnd(process.getBpmId())) {
 			processLow.setBpmStatus(ApproveStatusEnum.FINISN.getCode());
 			lowService.updateById(processLow);
@@ -114,6 +118,7 @@ public class ProcessLowApproveController {
 		ProcessLow processLow = new ProcessLow();
 		processLow.setId(new Long(process.getBusId()));
 		processLow.setBpmStatus(ApproveStatusEnum.BACK.getCode());
+		processLow.setBpmNode(-1);
 		lowService.updateById(processLow);
 		return R.status(true);
 	}

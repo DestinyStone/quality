@@ -26,6 +26,7 @@ import org.springblade.modules.out_buy_low.service.OutBuyQprService;
 import org.springblade.modules.out_buy_low.wrapper.OutBuyQprWrapper;
 import org.springblade.modules.process.entity.bean.BpmProcess;
 import org.springblade.modules.process.service.BpmProcessService;
+import org.springblade.modules.process_low.enums.LowBpmNodeEnum;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -67,7 +68,7 @@ public class OutBuyQprController {
 		OutBuyQpr update = new OutBuyQpr();
 		update.setId(id);
 		update.setBpmStatus(ApproveStatusEnum.SELF_BACK.getCode());
-
+		update.setBpmNode(-1);
 		// 取消当前激活业务
 		LambdaUpdateWrapper<BpmProcess> processUpdateWrapper = new LambdaUpdateWrapper<>();
 		processUpdateWrapper.eq(BpmProcess::getBusId, id)
@@ -123,6 +124,7 @@ public class OutBuyQprController {
 		OutBuyQpr qpr = BeanUtil.copy(qprDTO, OutBuyQpr.class);
 		qpr.setType(0);
 		qpr.setIsAccessCheck(1);
+		qpr.setBpmNode(LowBpmNodeEnum.QPR_APPROVE.getCode());
 		return R.status(qprService.saveAndActiveTask(qpr));
 	}
 

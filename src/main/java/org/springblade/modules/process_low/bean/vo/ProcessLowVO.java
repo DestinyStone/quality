@@ -136,7 +136,7 @@ public class ProcessLowVO {
 	@ApiModelProperty("流程状态 0待审批 1审批中 2已结案 3退回 4自撤回")
 	private Integer bpmStatus;
 
-	@ApiModelProperty("流程节点 0不良联络书发行 1不良调查 2不良横展 3调查结果确认")
+	@ApiModelProperty("当前业务环节 0不良联络书发行确认 1不良联络书发行审批 2不良调查 3调查结果确认  4调查结果审批")
 	private Integer bpmNode;
 
 	@ApiModelProperty("创建用户")
