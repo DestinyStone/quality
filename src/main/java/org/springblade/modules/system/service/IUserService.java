@@ -206,4 +206,9 @@ public interface IUserService extends BaseService<User> {
 	 * @return
 	 */
 	UserVO platformDetail(User user);
+
+	/**
+	 * 根据供应商ID 查询
+	 */
+	List<User> getByProviderId(String providerId);
 }

@@ -36,7 +36,7 @@ public class ProcessLowApproveUtils {
 		qprSaevApprove.setServerFlag(ApproveUtils.ServerFlagEnum.LOW_APPROVE.getMessage());
 		qprSaevApprove.setStatus(ApproveNodeStatusEnum.ACTIVE.getCode());
 
-		// 第二个节点 不良联络书发行 审批
+		// 第二个节点 不良联络书发行审批
 		ProcessContainer qprApprove = new ProcessContainer();
 		qprApprove.setBusId(busId);
 		qprApprove.setAccessDept(CommonUtil.getDeptId());

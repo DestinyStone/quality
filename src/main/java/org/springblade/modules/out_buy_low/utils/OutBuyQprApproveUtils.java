@@ -26,11 +26,11 @@ public class OutBuyQprApproveUtils {
 		userCommit.setServerFlag(ApproveUtils.ServerFlagEnum.LOW_APPROVE.getMessage());
 		userCommit.setStatus(ApproveNodeStatusEnum.SUCCESS.getCode());
 
-		// 第二个节点 不良联络书发行 审批
+		// 第二个节点 不良联络书发行审批
 		ProcessContainer qprApprove = new ProcessContainer();
 		qprApprove.setBusId(busId);
 		qprApprove.setAccessDept(CommonUtil.getDeptId());
-		qprApprove.setRemark("不良联络书发行 审批");
+		qprApprove.setRemark("不良联络书发行审批");
 		qprApprove.setSort(1);
 		qprApprove.setFlag("qprApprove");
 		qprApprove.setServerFlag(ApproveUtils.ServerFlagEnum.LOW_APPROVE.getMessage());

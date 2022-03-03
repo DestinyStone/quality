@@ -22,6 +22,7 @@
                 process.access_dept,
                 process.operator_time,
                 process.bpm_flag,
+                process.bpm_remark,
                 process.put_of_remark,
                 0 as resource_type
             FROM bus_out_buy_qpr qpr
@@ -47,6 +48,7 @@
                 process.access_dept,
                 process.operator_time,
                 process.bpm_flag,
+                process.bpm_remark,
                 process.put_of_remark,
                 1 as resource_type
             FROM bus_process_low low

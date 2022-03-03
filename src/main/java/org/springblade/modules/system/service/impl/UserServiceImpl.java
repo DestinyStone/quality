@@ -426,4 +426,11 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
 		return userVO;
 	}
 
+	@Override
+	public List<User> getByProviderId(String providerId) {
+		LambdaQueryWrapper<User> wrapper = new LambdaQueryWrapper<>();
+		wrapper.like(User::getRoleId, providerId);
+		return list(wrapper);
+	}
+
 }

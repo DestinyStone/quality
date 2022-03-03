@@ -100,6 +100,9 @@ public class OutBuyQprApproveVO {
 	@ApiModelProperty("推进状态 0正常推进 1已超期 2已延期")
 	private Integer bpmPushStatus;
 
+	@ApiModelProperty("审批节点描述")
+	private String bpmRemark;
+
 	@ApiModelProperty("流程状态 0待审批 1审批中 2已结案 3退回 4自撤回")
 	private Integer processBpmStatus;
 

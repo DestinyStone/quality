@@ -1,4 +1,4 @@
-package org.springblade.modules.check.bean.dto;
+package org.springblade.modules.out_buy_low.bean.dto;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -11,7 +11,7 @@ import javax.validation.constraints.NotNull;
  * @Description:
  */
 @Data
-public class CheckResourceDTO {
+public class ResourceDTO {
 
 	@ApiModelProperty("来源id")
 	@NotNull(message = "来源id不能为空")
@@ -30,6 +30,9 @@ public class CheckResourceDTO {
 		@ApiModelProperty("来源id")
 		private Long resourceId;
 
+		@ApiModelProperty("来源类型 0qpr 1low")
+		private Integer resourceType;
+
 		@ApiModelProperty("品番号")
 		private String designation;
 
@@ -38,5 +41,7 @@ public class CheckResourceDTO {
 
 		@ApiModelProperty("供应商名称")
 		private String dutyDept;
+
 	}
+
 }

@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.springblade.common.cache.RoleCache;
 import org.springblade.common.constant.RootMappingConstant;
 import org.springblade.common.enums.ApproveStatusEnum;
 import org.springblade.common.utils.CommonUtil;
@@ -25,6 +26,7 @@ import org.springblade.modules.process.service.ProcessUrgeService;
 import org.springblade.modules.process_low.bean.entity.ProcessLow;
 import org.springblade.modules.process_low.enums.LowBpmNodeEnum;
 import org.springblade.modules.process_low.service.ProcessLowService;
+import org.springblade.modules.system.entity.Role;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -156,6 +158,11 @@ public class OutBuyQprApproveController {
 		for (OutBuyQprApproveVO record : records) {
 			List<BpmProcessUrge> urgeByBpmId = group.getOrDefault(record.getBpmId(), defaultObject);
 			record.setUrgeQuality(urgeByBpmId.size());
+
+			Role role = RoleCache.getRole(Long.parseLong(record.getDutyDept()));
+			if (role != null) {
+				record.setDutyDept(role.getRoleName());
+			}
 		}
 
 		return R.data(page);

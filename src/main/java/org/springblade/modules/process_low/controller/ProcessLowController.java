@@ -50,7 +50,7 @@ import java.util.stream.Collectors;
 @Api(value = "工序内不良接口", tags = "工序内不良接口")
 public class ProcessLowController {
 
-	private static final String CODE_FLAG = "PROCESS_LOW";
+	private static final String CODE_FLAG = "LOW";
 
 	@Autowired
 	private ProcessLowService lowService;
@@ -70,6 +70,11 @@ public class ProcessLowController {
 		processLow.setUpdateUser(CommonUtil.getUserId());
 		processLow.setUpdateTime(new Date());
 		processLow.setBpmStatus(ApproveStatusEnum.AWAIT.getCode());
+		if (processLow.getType().equals(0)) {
+			processLow.setBpmNode(LowBpmNodeEnum.QPR_SAVE.getCode());
+		}else {
+			processLow.setBpmNode(LowBpmNodeEnum.CHECK_SAVE.getCode());
+		}
 
 		Boolean status = lowService.updateById(processLow);
 

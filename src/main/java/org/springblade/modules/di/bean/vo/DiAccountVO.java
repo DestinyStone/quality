@@ -14,7 +14,14 @@ import java.util.Date;
 @Data
 @Api("di数据台账 视图类")
 public class DiAccountVO {
+	@ApiModelProperty("主键")
 	private Long id;
+
+	@ApiModelProperty("来源Id")
+	private Long resourceId;
+
+	@ApiModelProperty("来源类型 0qpr 1low")
+	private Integer resourceType;
 
 	@ApiModelProperty("品番号")
 	private String designation;

@@ -8,6 +8,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springblade.common.constant.RootMappingConstant;
 import org.springblade.common.enums.ApproveStatusEnum;
+import org.springblade.common.utils.ApproveUtils;
 import org.springblade.common.utils.CommonUtil;
 import org.springblade.core.log.exception.ServiceException;
 import org.springblade.core.mp.support.Condition;
@@ -28,10 +29,12 @@ import org.springblade.modules.process.entity.bean.BpmProcess;
 import org.springblade.modules.process.service.BpmProcessService;
 import org.springblade.modules.process_low.enums.LowBpmNodeEnum;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -44,7 +47,7 @@ import java.util.List;
 @Api(value = "工序内不良接口", tags = "工序内不良接口")
 public class OutBuyQprController {
 
-	private static final String CODE_FLAG = "OUT_BUY_QPR";
+	private static final String CODE_FLAG = "LOW";
 
 	@Autowired
 	private OutBuyQprService qprService;
@@ -54,6 +57,31 @@ public class OutBuyQprController {
 
 	@Autowired
 	private BpmProcessService processService;
+
+	@PostMapping("/re/submit/{id}")
+	@ApiOperation("重新提交")
+	@Transactional
+	public R reSubmit(@PathVariable("id") Long id, @Valid @RequestBody OutBuyQprDTO qprDTO) {
+		OutBuyQpr outBuyQpr = BeanUtil.copy(qprDTO, OutBuyQpr.class);
+		outBuyQpr.setId(id);
+		outBuyQpr.setUpdateUser(CommonUtil.getUserId());
+		outBuyQpr.setUpdateTime(new Date());
+		outBuyQpr.setBpmStatus(ApproveStatusEnum.AWAIT.getCode());
+		outBuyQpr.setBpmNode(LowBpmNodeEnum.QPR_APPROVE.getCode());
+		Boolean status = qprService.updateById(outBuyQpr);
+
+		// 废除之前的审批任务
+		LambdaUpdateWrapper<BpmProcess> wrapper = new LambdaUpdateWrapper<>();
+		wrapper.eq(BpmProcess::getBusId, id)
+			.set(BpmProcess::getIsCastoff, 1);
+		processService.update(wrapper);
+
+		// 开启审批
+		ApproveUtils.createTask(id + "", ApproveUtils.ApproveLinkEnum.OUT_BUY_LOW);
+
+
+		return R.data(status);
+	}
 
 	@GetMapping("/self/back")
 	@ApiOperation("自撤回接口")

@@ -1,17 +1,14 @@
 package org.springblade.modules.check.bean.dto;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-import org.springframework.beans.factory.annotation.Value;
+import org.springblade.modules.out_buy_low.bean.dto.ResourceDTO;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -26,8 +23,7 @@ public class CheckDTO {
 	@ApiModelProperty("来源")
 	@NotEmpty(message = "来源不能为空")
 	@Valid
-	private List<CheckResourceDTO> resourceList;
-
+	private List<ResourceDTO> resourceList;
 
 	@ApiModelProperty("种类 0新规格 1工变 2设变 3写误订正 4只变更检查法方法")
 	@NotNull(message = "种类不能为空")

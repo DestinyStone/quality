@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.xiaoymin.knife4j.core.util.StrUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.springblade.common.cache.RoleCache;
 import org.springblade.common.constant.RootMappingConstant;
 import org.springblade.common.enums.ApproveStatusEnum;
 import org.springblade.common.utils.ApproveUtils;
@@ -18,7 +19,6 @@ import org.springblade.core.mp.support.Query;
 import org.springblade.core.tool.api.R;
 import org.springblade.modules.account.util.AccountUtils;
 import org.springblade.modules.check.bean.dto.CheckDTO;
-import org.springblade.modules.check.bean.dto.CheckResourceDTO;
 import org.springblade.modules.check.bean.dto.CheckUpdateDTO;
 import org.springblade.modules.check.bean.entity.Check;
 import org.springblade.modules.check.bean.vo.*;
@@ -28,19 +28,21 @@ import org.springblade.modules.file.bean.entity.BusFile;
 import org.springblade.modules.file.bean.vo.BusFileVO;
 import org.springblade.modules.file.service.BusFileService;
 import org.springblade.modules.file.wrapper.BusFileWrapper;
+import org.springblade.modules.out_buy_low.bean.dto.ResourceDTO;
 import org.springblade.modules.out_buy_low.bean.entity.OutBuyQpr;
 import org.springblade.modules.out_buy_low.service.OutBuyQprService;
+import org.springblade.modules.out_buy_low.utils.ResourceConvertUtil;
 import org.springblade.modules.process.entity.bean.BpmProcess;
 import org.springblade.modules.process.service.BpmProcessService;
 import org.springblade.modules.process_low.bean.entity.ProcessLow;
 import org.springblade.modules.process_low.service.ProcessLowService;
+import org.springblade.modules.system.entity.Role;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -93,7 +95,12 @@ public class CheckController {
 
 		IPage<CheckAccountVO> voPage = new Page<>(page.getCurrent(), page.getSize(), page.getTotal());
 		voPage.setRecords(page.getRecords().stream().map(item -> {
-			return CommonUtil.copy(item, CheckAccountVO.class);
+			CheckAccountVO copy = CommonUtil.copy(item, CheckAccountVO.class);
+			Role role = RoleCache.getRole(Long.parseLong(copy.getDutyDept()));
+			if (role != null) {
+				copy.setDutyDept(role.getRoleName());
+			}
+			return copy;
 		}).collect(Collectors.toList()));
 
 		return R.data(voPage);
@@ -218,45 +225,24 @@ public class CheckController {
 	@Transactional
 	public R save(@Valid @RequestBody CheckDTO checkDTO) {
 
-		List<CheckResourceDTO> resourceList = checkDTO.getResourceList();
-		List<CheckResourceDTO.Encumbrance> encumbranceList = new ArrayList<>();
-		List<Long> qprIds = resourceList.stream().filter(item -> item.getResourceType().equals(0)).map(CheckResourceDTO::getResourceId).collect(Collectors.toList());
-		if (!qprIds.isEmpty()) {
-			List<CheckResourceDTO.Encumbrance> collect = qprService.getByIds(qprIds).stream().map(item -> {
-				CheckResourceDTO.Encumbrance encumbrance = new CheckResourceDTO.Encumbrance();
-				encumbrance.setResourceId(item.getId());
-				encumbrance.setDesignation(item.getDesignation());
-				encumbrance.setName(item.getName());
-				encumbrance.setDutyDept(item.getDutyDept());
-				return encumbrance;
-			}).collect(Collectors.toList());
-			encumbranceList.addAll(collect);
+		List<ResourceDTO.Encumbrance> resourceList = ResourceConvertUtil.convert(checkDTO.getResourceList());
+		Map<Long, ResourceDTO.Encumbrance> encumbranceMap = ResourceConvertUtil.convertMap(resourceList);
 
+		List<Long> qprIds = ResourceConvertUtil.getQprIds(checkDTO.getResourceList());
+		if (!qprIds.isEmpty()) {
 			LambdaUpdateWrapper<OutBuyQpr> wrapper = new LambdaUpdateWrapper<>();
 			wrapper.in(OutBuyQpr::getId, qprIds)
 				.set(OutBuyQpr::getIsAccessCheck, 0);
 			qprService.update(wrapper);
 		}
 
-		List<Long> lowIds = resourceList.stream().filter(item -> item.getResourceType().equals(1)).map(CheckResourceDTO::getResourceId).collect(Collectors.toList());
+		List<Long> lowIds = ResourceConvertUtil.getLowIds(checkDTO.getResourceList());
 		if (!lowIds.isEmpty()) {
-			List<CheckResourceDTO.Encumbrance> collect = lowService.getByIds(lowIds).stream().map(item -> {
-				CheckResourceDTO.Encumbrance encumbrance = new CheckResourceDTO.Encumbrance();
-				encumbrance.setResourceId(item.getId());
-				encumbrance.setDesignation(item.getDesignation());
-				encumbrance.setName(item.getName());
-				encumbrance.setDutyDept(item.getDutyDept());
-				return encumbrance;
-			}).collect(Collectors.toList());
-			encumbranceList.addAll(collect);
-
 			LambdaUpdateWrapper<ProcessLow> wrapper = new LambdaUpdateWrapper<>();
 			wrapper.in(ProcessLow::getId, lowIds)
 				.set(ProcessLow::getIsAccessCheck, 0);
 			lowService.update(wrapper);
 		}
-
-		Map<Long, CheckResourceDTO.Encumbrance> encumbranceMap = encumbranceList.stream().collect(Collectors.toMap(CheckResourceDTO.Encumbrance::getResourceId, Function.identity()));
 
 
 		List<Check> collect = resourceList.stream().map(item -> {
@@ -264,12 +250,11 @@ public class CheckController {
 			copy.setCode(CodeUtil.getCode(FLAG));
 			copy.setResourceId(item.getResourceId());
 
-			CheckResourceDTO.Encumbrance encumbrance = encumbranceMap.getOrDefault(item.getResourceId(),  new CheckResourceDTO.Encumbrance());
+			ResourceDTO.Encumbrance encumbrance = encumbranceMap.getOrDefault(item.getResourceId(),  new ResourceDTO.Encumbrance());
 			copy.setName(encumbrance.getName());
 			copy.setDesignation(encumbrance.getDesignation());
 			copy.setDutyDept(encumbrance.getDutyDept());
-
-			copy.setResourceType(item.getResourceType());
+			copy.setResourceType(encumbrance.getResourceType());
 			copy.setBpmNode(0);
 			copy.setIsAccessAccount(0);
 			copy.setBpmStatus(ApproveStatusEnum.AWAIT.getCode());
@@ -289,6 +274,12 @@ public class CheckController {
 	public R<IPage<AccessSaveCheckVO>> page(AccessSaveCheckVO approveVO, Query query) {
 		approveVO.setDeptId(CommonUtil.getDeptId());
 		IPage<AccessSaveCheckVO> page = checkService.accessSavePage(approveVO, Condition.getPage(query));
+		for (AccessSaveCheckVO record : page.getRecords()) {
+			Role role = RoleCache.getRole(Long.parseLong(record.getDutyDept()));
+			if (role != null) {
+				record.setDutyDept(role.getRoleName());
+			}
+		}
 		return R.data(page);
 	}
 
@@ -333,7 +324,12 @@ public class CheckController {
 
 		IPage<CheckVO> voPage = new Page<>(page.getCurrent(), page.getSize(), page.getTotal());
 		voPage.setRecords(page.getRecords().stream().map(item -> {
-			return CommonUtil.copy(item, CheckVO.class);
+			CheckVO copy = CommonUtil.copy(item, CheckVO.class);
+			Role role = RoleCache.getRole(Long.parseLong(copy.getDutyDept()));
+			if (role != null) {
+				copy.setDutyDept(role.getRoleName());
+			}
+			return copy;
 		}).collect(Collectors.toList()));
 
 		return R.data(voPage);
