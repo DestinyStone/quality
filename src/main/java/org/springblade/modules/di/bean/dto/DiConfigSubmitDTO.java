@@ -43,7 +43,7 @@ public class DiConfigSubmitDTO {
 	private Integer status;
 
 	public void validate() {
-		if (cycleType.contains("2") && cycleTime == null) {
+		if (cycleType.contains("1") && cycleTime == null) {
 			throw new ServiceException("请输入上报周期特定时间");
 		}
 

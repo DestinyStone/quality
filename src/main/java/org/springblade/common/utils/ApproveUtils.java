@@ -1,6 +1,7 @@
 package org.springblade.common.utils;
 
 import org.springblade.modules.check.utils.CheckApproveUtils;
+import org.springblade.modules.di.utils.DiApproveUtils;
 import org.springblade.modules.out_buy_low.utils.OutBuyQprApproveUtils;
 import org.springblade.modules.process.core.ProcessContainer;
 import org.springblade.modules.process.service.BpmProcessService;
@@ -30,6 +31,12 @@ public class ApproveUtils {
 		 * 检查法审批
 		 */
 		CHECK_APPROVE("checkApprove"),
+
+		/**
+		 * DI 审批
+		 */
+		DI_APPROVE("diApprove"),
+
 		;
 		String message;
 
@@ -62,6 +69,16 @@ public class ApproveUtils {
 		 * 检查法审批
 		 */
 		CHECK,
+
+		/**
+		 * di 审批
+		 */
+		DI,
+
+		/**
+		 * di 无需提交审批
+		 */
+		DI_UN_REPORT
 		;
 	}
 
@@ -81,6 +98,14 @@ public class ApproveUtils {
 
 		if (ApproveLinkEnum.CHECK.equals(linkEnum)) {
 			processTaskList = CheckApproveUtils.getProcessTaskList(busId);
+		}
+
+		if (ApproveLinkEnum.DI.equals(linkEnum)) {
+			processTaskList = DiApproveUtils.getProcessTaskList(busId);
+		}
+
+		if (ApproveLinkEnum.DI_UN_REPORT.equals(linkEnum)) {
+			processTaskList = DiApproveUtils.getUnReportProcessTaskList(busId);
 		}
 
 		if (processTaskList != null) {

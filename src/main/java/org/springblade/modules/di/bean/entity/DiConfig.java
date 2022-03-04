@@ -1,5 +1,7 @@
 package org.springblade.modules.di.bean.entity;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiModelProperty;
@@ -17,6 +19,8 @@ import java.util.Date;
 @TableName("bus_di_config")
 public class DiConfig {
 
+	@TableId(value = "id", type = IdType.ASSIGN_ID)
+	@ApiModelProperty("主键")
 	private Long id;
 
 	@ApiModelProperty("来源id")

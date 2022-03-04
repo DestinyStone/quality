@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.springblade.modules.di.mapper.DiReportApproveMapper">
+    <select id="page" resultType="org.springblade.modules.di.bean.vo.DiReportApproveVO">
+        SELECT
+        report.id,
+        report.business_type,
+        report.code,
+        report.name,
+        report.designation,
+        report.duty_dept,
+        report.bpm_status,
+        process.bpm_id,
+        process.bpm_push_status,
+        process.bpm_status AS process_bpm_status,
+        process.create_time AS start_time,
+        process.bpm_flag,
+        process.end_time
+        FROM bus_di_report report
+        LEFT JOIN bpm_process process
+        ON process.bus_id = report.id
+        <where>
+            <if test="vo.searchKey != null and vo.searchKey != ''">
+                and (
+                report.name like CONCAT("%", #{vo.searchKey}, "%")
+                or report.designation like CONCAT("%", #{vo.searchKey}, "%")
+                )
+            </if>
+            <if test="vo.tagFlag == 0">
+                and process.bpm_status = 2 and process.access_dept = #{deptId}
+            </if>
+
+            <if test="vo.tagFlag == 1">
+                and (process.bpm_status = 3 or process.bpm_status = 4) and process.access_dept = #{deptId}
+            </if>
+            <if test="vo.tagFlag == 2">
+                and process.bpm_push_status = 1 and report.report_user = #{deptId}
+            </if>
+        </where>
+    </select>
+</mapper>

@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springblade.modules.di.bean.entity.DiConfig;
 import org.springblade.modules.di.mapper.DiConfigMapper;
 import org.springblade.modules.di.service.DiConfigService;
+import org.springblade.modules.di.service.DiReportService;
 import org.springblade.modules.system.entity.User;
 import org.springblade.modules.system.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +24,9 @@ public class DiConfigServiceImpl extends ServiceImpl<DiConfigMapper, DiConfig> i
 	@Autowired
 	private IUserService userService;
 
+	@Autowired
+	private DiReportService reportService;
+
 	@Override
 	public synchronized Boolean submit(List<DiConfig> collect) {
 		for (DiConfig diConfig : collect) {
@@ -33,6 +37,10 @@ public class DiConfigServiceImpl extends ServiceImpl<DiConfigMapper, DiConfig> i
 			}else {
 				diConfig.setId(one.getId());
 				updateById(diConfig);
+			}
+			// 如果存在立即触发
+			if (diConfig.getCycleType().contains("2")) {
+				trigger(diConfig);
 			}
 
 		}
@@ -47,8 +55,7 @@ public class DiConfigServiceImpl extends ServiceImpl<DiConfigMapper, DiConfig> i
 		if (userList.isEmpty()) {
 			return false;
 		}
-		// TODO 创建任务
-		return null;
+		return reportService.active(diConfig, userList);
 	}
 
 
