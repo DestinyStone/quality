@@ -20,6 +20,7 @@
         LEFT JOIN bpm_process process
         ON process.bus_id = report.id
         <where>
+            and process.is_castoff = 0
             <if test="vo.searchKey != null and vo.searchKey != ''">
                 and (
                 report.name like CONCAT("%", #{vo.searchKey}, "%")

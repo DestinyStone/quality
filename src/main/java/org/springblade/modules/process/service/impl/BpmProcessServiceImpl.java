@@ -98,6 +98,7 @@ public class BpmProcessServiceImpl extends ServiceImpl<BpmProcessMapper, BpmProc
 		Date createTime = new Date();
 		LambdaUpdateWrapper<BpmProcess> nextProcessUpdate = new LambdaUpdateWrapper<>();
 		nextProcessUpdate.eq(BpmProcess::getBusId, process.getBusId())
+			.ne(BpmProcess::getBpmStatus, 0)
 			.eq(BpmProcess::getBpmSort, process.getBpmSort() + 1)
 			.eq(BpmProcess::getIsCastoff, 0)
 			.set(BpmProcess::getBpmStatus, ApproveNodeStatusEnum.ACTIVE.getCode())

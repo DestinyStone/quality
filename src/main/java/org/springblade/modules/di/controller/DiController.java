@@ -67,6 +67,20 @@ public class DiController {
 	@Autowired
 	private BpmProcessService processService;
 
+	@GetMapping("/version/page")
+	@ApiOperation("Di数据版本")
+	public R<IPage<DiReportVO>> versionPage(@RequestParam("resourceId") Long resourceId,
+										  @RequestParam("resourceType") Integer resourceType,
+										  Query query) {
+		// 确定di配置
+		DiConfig diConfig = diConfigService.getOne(resourceId, resourceType);
+		LambdaQueryWrapper<DiReport> wrapper = new LambdaQueryWrapper<>();
+		wrapper.eq(DiReport::getBpmStatus, ApproveStatusEnum.FINISN.getCode())
+			.eq(DiReport::getDiConfigId, diConfig.getId())
+			.orderByDesc(DiReport::getReportTime);
+		return R.data(DiReportWrapper.build().pageVO(reportService.page(Condition.getPage(query), wrapper)));
+	}
+
 	@GetMapping("/account/page")
 	@ApiOperation("分页")
 	public R<IPage<DiAccountVO>> accountPage(DiAccountVO vo, Query query) {
@@ -144,6 +158,25 @@ public class DiController {
 		return R.data(DiReportWrapper.build().pageVO(reportService.page(Condition.getPage(query), wrapper)));
 	}
 
+	@PostMapping("/re/report/{id}")
+	@ApiOperation("重新上报")
+	public R reReport(@PathVariable("id") Long id, @RequestBody @Valid DiReportSubmitDTO submitDTO) {
+		DiReport report = reportService.getById(id);
+		if (new Integer(1).equals(report.getStatus()) && !ApproveStatusEnum.BACK.getCode().equals(report.getBpmStatus())) {
+			throw new ServiceException("已上报, 不可重复上报");
+		}
+		reportService.report(id, submitDTO);
+
+		// 废除之前的审批任务
+		LambdaUpdateWrapper<BpmProcess> wrapper = new LambdaUpdateWrapper<>();
+		wrapper.eq(BpmProcess::getBusId, id)
+			.set(BpmProcess::getIsCastoff, 1);
+		processService.update(wrapper);
+
+		diApproveService.create(id);
+		return R.status(true);
+	}
+
 	@PostMapping("/report/{id}")
 	@ApiOperation("上报")
 	public R report(@PathVariable("id") Long id, @RequestBody @Valid DiReportSubmitDTO submitDTO) {
@@ -151,18 +184,9 @@ public class DiController {
 		if (new Integer(1).equals(report.getStatus())) {
 			throw new ServiceException("已上报, 不可重复上报");
 		}
-		DiReport diReport = new DiReport();
-		diReport.setId(id);
-		diReport.setStatus(1);
-		diReport.setBusinessType(0);
-		diReport.setBpmStatus(ApproveStatusEnum.AWAIT.getCode());
-		diReport.setReportTime(new Date());
-		diReport.setDataExcelFileId(submitDTO.getDataExcelFileId());
-		diReport.setDataExcelFileName(submitDTO.getDataExcelFileName());
-		diReport.setDataSignateFileId(submitDTO.getDataSignateFileId());
-		diReport.setDataSignateFileName(submitDTO.getDataSignateFileName());
-		reportService.updateById(diReport);
-		diApproveService.create(diReport.getId());
+
+		reportService.report(id, submitDTO);
+		diApproveService.create(id);
 		return R.status(true);
 	}
 
@@ -258,6 +282,7 @@ public class DiController {
 					.like(DiReport::getDesignation, reportVO.getSearchKey()).or()
 					.like(DiReport::getDutyDept, reportVO.getDutyDept());
 			});
+		wrapper.orderByDesc(DiReport::getReportTime);
 		return wrapper;
 	}
 }

@@ -1,7 +1,9 @@
 package org.springblade.modules.di.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.springblade.common.enums.ApproveStatusEnum;
 import org.springblade.common.utils.CodeUtil;
+import org.springblade.modules.di.bean.dto.DiReportSubmitDTO;
 import org.springblade.modules.di.bean.entity.DiConfig;
 import org.springblade.modules.di.bean.entity.DiReport;
 import org.springblade.modules.di.mapper.DiReportMapper;
@@ -33,6 +35,21 @@ public class DiReportServiceImpl extends ServiceImpl<DiReportMapper, DiReport> i
 			return common;
 		}).collect(Collectors.toList());
 		return saveBatch(collect);
+	}
+
+	@Override
+	public Boolean report(Long id, DiReportSubmitDTO submitDTO) {
+		DiReport diReport = new DiReport();
+		diReport.setId(id);
+		diReport.setStatus(1);
+		diReport.setBusinessType(0);
+		diReport.setBpmStatus(ApproveStatusEnum.AWAIT.getCode());
+		diReport.setReportTime(new Date());
+		diReport.setDataExcelFileId(submitDTO.getDataExcelFileId());
+		diReport.setDataExcelFileName(submitDTO.getDataExcelFileName());
+		diReport.setDataSignateFileId(submitDTO.getDataSignateFileId());
+		diReport.setDataSignateFileName(submitDTO.getDataSignateFileName());
+		return updateById(diReport);
 	}
 
 	private DiReport getCommon(DiConfig diConfig, Long userId) {

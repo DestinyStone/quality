@@ -72,6 +72,7 @@ public class CheckController {
 	@Autowired
 	private BpmProcessService processService;
 
+
 	@GetMapping("/account/version/page/{id}")
 	@ApiOperation("分页")
 	public R<IPage<CheckAccountVersionVO>> accountVersionPage(@PathVariable("id") Long id,  Query query) {
