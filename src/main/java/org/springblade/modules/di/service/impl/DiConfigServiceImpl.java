@@ -47,7 +47,7 @@ public class DiConfigServiceImpl extends ServiceImpl<DiConfigMapper, DiConfig> i
 				DiConfigCache.evict(one.getId());
 			}
 			// 如果存在立即触发
-			if (diConfig.getCycleType().contains("2")) {
+			if (diConfig.getCycleType().contains("2") && diConfig.getStatus() == 1) {
 				trigger(diConfig);
 			}
 
@@ -87,11 +87,15 @@ public class DiConfigServiceImpl extends ServiceImpl<DiConfigMapper, DiConfig> i
 
 	@Override
 	public Boolean updateEnableStatus(Long id, Integer status) {
-		DiConfig diConfig = new DiConfig();
+		DiConfig diConfig = getById(id);
 		diConfig.setId(id);
 		diConfig.setStatus(status);
 		diConfig.setUpdateTime(new Date());
 		Boolean updateStatus = updateById(diConfig);
+		if (status == 1) {
+			trigger(diConfig);
+		}
+
 		DiConfigCache.evict(id);
 		return updateStatus;
 	}

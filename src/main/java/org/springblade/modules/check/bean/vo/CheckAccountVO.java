@@ -58,4 +58,7 @@ public class CheckAccountVO {
 
 	@ApiModelProperty("查询key")
 	private String searchKey;
+
+	@ApiModelProperty("更新时间")
+	private Date updateTime;
 }

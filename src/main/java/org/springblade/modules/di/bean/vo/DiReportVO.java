@@ -69,6 +69,9 @@ public class DiReportVO {
 	@ApiModelProperty("上报时间")
 	private Date reportTime;
 
+	@ApiModelProperty("更新时间")
+	private Date updateTime;
+
 	private String searchKey;
 
 	private Integer tag;
