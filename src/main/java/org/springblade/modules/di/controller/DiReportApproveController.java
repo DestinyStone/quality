@@ -173,6 +173,8 @@ public class DiReportApproveController {
 		if (processService.isProcessEnd(bpmId)) {
 			report.setBpmStatus(ApproveStatusEnum.FINISN.getCode());
 			reportService.updateById(report);
+
+			reportService.updateConfig(id);
 		}
 	}
 }

@@ -37,4 +37,16 @@ public class DiAccountVO {
 
 	@ApiModelProperty("查询key")
 	private String searchKey;
+
+	@ApiModelProperty("状态")
+	private Integer status;
+
+	@ApiModelProperty("最后版本文件id")
+	private Long lastFileId;
+
+	@ApiModelProperty("最后版本文件名")
+	private String lastFileName;
+
+	@ApiModelProperty("更新时间")
+	private Date updateTime;
 }

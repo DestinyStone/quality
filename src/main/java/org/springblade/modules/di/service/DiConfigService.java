@@ -26,4 +26,25 @@ public interface DiConfigService extends IService<DiConfig> {
 	Boolean trigger(DiConfig diConfig);
 
 	DiConfig getOne(Long resourceId, Integer resourceType);
+
+	/**
+	 * 更新配置信息
+	 * @param diConfigId
+	 * @param dataExcelFileId
+	 * @param dataExcelFileName
+	 */
+	void updateNewVersion(Long diConfigId, Long dataExcelFileId, String dataExcelFileName);
+
+	/**
+	 * 修改状态
+	 * @param id
+	 * @param status
+	 * @return
+	 */
+	Boolean updateEnableStatus(Long id, Integer status);
+
+	/**
+	 * 触发全部任务
+	 */
+	void triggerAll();
 }

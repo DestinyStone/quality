@@ -29,4 +29,10 @@ public interface DiReportService extends IService<DiReport> {
 	 * @return
 	 */
 	Boolean report(Long id, DiReportSubmitDTO submitDTO);
+
+	/**
+	 * 更新配置信息
+	 * @param id
+	 */
+	void updateConfig(Long id);
 }

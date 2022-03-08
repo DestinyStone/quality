@@ -7,6 +7,7 @@ import org.springblade.modules.di.bean.dto.DiReportSubmitDTO;
 import org.springblade.modules.di.bean.entity.DiConfig;
 import org.springblade.modules.di.bean.entity.DiReport;
 import org.springblade.modules.di.mapper.DiReportMapper;
+import org.springblade.modules.di.service.DiConfigService;
 import org.springblade.modules.di.service.DiReportService;
 import org.springblade.modules.system.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +27,9 @@ public class DiReportServiceImpl extends ServiceImpl<DiReportMapper, DiReport> i
 
 	@Autowired
 	private static final String CODE_FLAG = "DI_REPORT_CODE_FLAG";
+
+	@Autowired
+	private DiConfigService configService;
 
 	@Override
 	public Boolean active(DiConfig diConfig, List<User> userList) {
@@ -49,7 +53,17 @@ public class DiReportServiceImpl extends ServiceImpl<DiReportMapper, DiReport> i
 		diReport.setDataExcelFileName(submitDTO.getDataExcelFileName());
 		diReport.setDataSignateFileId(submitDTO.getDataSignateFileId());
 		diReport.setDataSignateFileName(submitDTO.getDataSignateFileName());
-		return updateById(diReport);
+
+		Boolean status = updateById(diReport);
+		return status;
+	}
+
+	@Override
+	public void updateConfig(Long id) {
+		DiReport current = getById(id);
+		if (current.getBusinessType() == 0) {
+			configService.updateNewVersion(current.getDiConfigId(), current.getDataExcelFileId(), current.getDataExcelFileName());
+		}
 	}
 
 	private DiReport getCommon(DiConfig diConfig, Long userId) {

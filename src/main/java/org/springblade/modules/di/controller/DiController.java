@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.springblade.common.cache.DiConfigCache;
 import org.springblade.common.cache.RoleCache;
 import org.springblade.common.constant.RootMappingConstant;
 import org.springblade.common.enums.ApproveStatusEnum;
@@ -74,6 +75,9 @@ public class DiController {
 										  Query query) {
 		// 确定di配置
 		DiConfig diConfig = diConfigService.getOne(resourceId, resourceType);
+		if (diConfig == null) {
+			return R.data(Condition.getPage(query));
+		}
 		LambdaQueryWrapper<DiReport> wrapper = new LambdaQueryWrapper<>();
 		wrapper.eq(DiReport::getBpmStatus, ApproveStatusEnum.FINISN.getCode())
 			.eq(DiReport::getDiConfigId, diConfig.getId())
@@ -90,6 +94,16 @@ public class DiController {
 			if (role != null) {
 				record.setDutyDept(role.getRoleName());
 			}
+			DiConfig diConfig = DiConfigCache.getById(record.getResourceId(), record.getResourceType());
+			if (diConfig != null) {
+				record.setStatus(diConfig.getStatus());
+				record.setLastFileId(diConfig.getLastFileId());
+				record.setLastFileName(diConfig.getLastFileName());
+				record.setUpdateTime(diConfig.getUpdateTime());
+			}else {
+				record.setStatus(0);
+			}
+
 		}
 		return R.data(page);
 	}
@@ -148,6 +162,18 @@ public class DiController {
 			wrapper.eq(DiReport::getBpmStatus, ApproveStatusEnum.FINISN.getCode());
 		}
 		return R.data(DiReportWrapper.build().pageVO(reportService.page(Condition.getPage(query), wrapper)));
+	}
+
+	@GetMapping("/enable")
+	@ApiOperation("启用禁用")
+	public R enable(@RequestParam("resourceId") Long resourceId,
+					@RequestParam("resourceType") Integer resourceType,
+					@RequestParam("status") Integer status) {
+		DiConfig config = diConfigService.getOne(resourceId, resourceType);
+		if (config == null) {
+			throw new ServiceException("请先配置上报周期");
+		}
+		return R.status(diConfigService.updateEnableStatus(config.getId(), status));
 	}
 
 	@GetMapping("/await/report/page")
