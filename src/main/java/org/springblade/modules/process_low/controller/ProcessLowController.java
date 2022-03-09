@@ -20,6 +20,8 @@ import org.springblade.modules.file.bean.entity.BusFile;
 import org.springblade.modules.file.bean.vo.BusFileVO;
 import org.springblade.modules.file.service.BusFileService;
 import org.springblade.modules.file.wrapper.BusFileWrapper;
+import org.springblade.modules.out_buy_low.bean.entity.OutBuyQpr;
+import org.springblade.modules.out_buy_low.service.OutBuyQprService;
 import org.springblade.modules.process.entity.bean.BpmProcess;
 import org.springblade.modules.process.service.BpmProcessService;
 import org.springblade.modules.process_low.bean.dto.ProcessLowCheckDTO;
@@ -38,6 +40,8 @@ import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -56,10 +60,48 @@ public class ProcessLowController {
 	private ProcessLowService lowService;
 
 	@Autowired
+	private OutBuyQprService qprService;
+
+	@Autowired
 	private BusFileService fileService;
 
 	@Autowired
 	private BpmProcessService processService;
+
+	@GetMapping("/account/page")
+	@ApiOperation("分页")
+	public R<IPage<ProcessLowVO>> accountPage(ProcessLowVO processLowVO, Query query) {
+		R<IPage<ProcessLowVO>> page = page(processLowVO, query);
+		List<ProcessLowVO> records = page.getData().getRecords();
+		List<Long> ids = records.stream().map(ProcessLowVO::getId).collect(Collectors.toList());
+		List<Long> fileIds = records.stream().flatMap(item -> {
+			return CommonUtil.toLongList(item.getImgReportIds()).stream();
+		}).collect(Collectors.toList());
+		Map<Long, BusFileVO> fileMap = fileService.getByIds(fileIds).stream().collect(Collectors.toMap(BusFileVO::getId, Function.identity()));
+
+		Map<Long, OutBuyQpr> qprMap = qprService.getByIds(ids).stream().collect(Collectors.toMap(OutBuyQpr::getId, Function.identity()));
+		for (ProcessLowVO record : records) {
+			OutBuyQpr outBuyQpr = qprMap.get(record.getId());
+			if (outBuyQpr == null) {
+				continue;
+			}
+
+			if (StrUtil.isNotBlank(record.getImgReportIds())) {
+				record.setImgReportList(new ArrayList<>());
+				for (Long fileId : CommonUtil.toLongList(record.getImgReportIds())) {
+					record.getImgReportList().add(fileMap.getOrDefault(fileId, new BusFileVO()));
+				}
+			}
+
+			record.setAnalyseTriggerCause(outBuyQpr.getAnalyseTriggerCause());
+			record.setAnalyseOutCause(outBuyQpr.getAnalyseOutCause());
+			record.setAnalyseTriggerStrategy(outBuyQpr.getAnalyseTriggerStrategy());
+			record.setAnalyseOutStrategy(outBuyQpr.getAnalyseOutStrategy());
+		}
+
+
+		return page;
+	}
 
 	@PostMapping("/re/submit/{id}")
 	@ApiOperation("重新提交")

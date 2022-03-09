@@ -201,4 +201,10 @@ public class ProcessLowVO {
 
 	@ApiModelProperty("标准文件附件名称")
 	private String standardFileName;
+
+	@ApiModelProperty("调查结果日期")
+	private Date checkReplyTime;
+
+	@ApiModelProperty("结案日期")
+	private Date completeTime;
 }

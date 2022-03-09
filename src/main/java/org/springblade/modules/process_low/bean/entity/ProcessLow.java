@@ -190,4 +190,10 @@ public class ProcessLow {
 
 	@ApiModelProperty("是否允许新增检查法")
 	private Integer isAccessCheck;
+
+	@ApiModelProperty("调查结果日期")
+	private Date checkReplyTime;
+
+	@ApiModelProperty("结案日期")
+	private Date completeTime;
 }
