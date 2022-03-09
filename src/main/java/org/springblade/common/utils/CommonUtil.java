@@ -26,6 +26,8 @@ import org.springblade.core.tool.utils.Func;
 import org.springblade.modules.system.entity.Dept;
 import org.springframework.lang.Nullable;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -36,6 +38,14 @@ import java.util.List;
 public class CommonUtil {
 
 	private static final Snowflake snowflake = IdUtil.createSnowflake(1, 1);
+	private static final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+	public static String dateParseString(Date date) {
+		if (date == null) {
+			return "";
+		}
+		return format.format(date);
+	}
 
 	/**
 	 * 获取唯一id

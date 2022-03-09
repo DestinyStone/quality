@@ -101,6 +101,7 @@ public class ProcessLowApproveController {
 		processLow.setBpmNode(before.getBpmNode() + 1);
 		if (processService.isProcessEnd(process.getBpmId())) {
 			processLow.setBpmStatus(ApproveStatusEnum.FINISN.getCode());
+			processLow.setBpmStatus(ApproveStatusEnum.FINISN.getCode());
 			lowService.updateById(processLow);
 		}else {
 			processLow.setBpmStatus(ApproveStatusEnum.PROCEED.getCode());

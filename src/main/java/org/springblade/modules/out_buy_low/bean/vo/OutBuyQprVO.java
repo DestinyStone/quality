@@ -143,4 +143,10 @@ public class OutBuyQprVO {
 
 	@ApiModelProperty("描述")
 	private String fillRemark;
+
+	@ApiModelProperty("调查结果日期")
+	private Date checkReplyTime;
+
+	@ApiModelProperty("结案日期")
+	private Date completeTime;
 }

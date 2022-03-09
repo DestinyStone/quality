@@ -24,6 +24,7 @@ import org.springblade.modules.out_buy_low.bean.entity.OutBuyQpr;
 import org.springblade.modules.out_buy_low.bean.vo.OutBuyQprQualityVO;
 import org.springblade.modules.out_buy_low.bean.vo.OutBuyQprVO;
 import org.springblade.modules.out_buy_low.service.OutBuyQprService;
+import org.springblade.modules.out_buy_low.utils.OutBuyQprExcelUtil;
 import org.springblade.modules.out_buy_low.wrapper.OutBuyQprWrapper;
 import org.springblade.modules.process.entity.bean.BpmProcess;
 import org.springblade.modules.process.service.BpmProcessService;
@@ -32,10 +33,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * @Author: xiaoxia
@@ -57,6 +59,39 @@ public class OutBuyQprController {
 
 	@Autowired
 	private BpmProcessService processService;
+
+	@GetMapping("/account/export")
+	@ApiOperation("分页")
+	public void export(OutBuyQprVO vo, Query query, HttpServletResponse response) {
+		R<IPage<OutBuyQprVO>> page = accountPage(vo, query);
+		OutBuyQprExcelUtil.export(page.getData().getRecords(), response);
+	}
+
+	@GetMapping("/account/page")
+	@ApiOperation("分页")
+	public R<IPage<OutBuyQprVO>> accountPage(OutBuyQprVO vo, Query query) {
+		R<IPage<OutBuyQprVO>> page = page(vo, query);
+		List<OutBuyQprVO> records = page.getData().getRecords();
+
+		if (records.isEmpty()) {
+			return page;
+		}
+
+		List<Long> fileIds =  records.isEmpty() ? new ArrayList<>() :records.stream().flatMap(item -> {
+			return CommonUtil.toLongList(item.getImgReportIds()).stream();
+		}).collect(Collectors.toList());
+		Map<Long, BusFileVO> fileMap = fileIds.isEmpty() ? new HashMap<>() : fileService.getByIds(fileIds).stream().collect(Collectors.toMap(BusFileVO::getId, Function.identity()));
+
+		for (OutBuyQprVO record : records) {
+			if (StrUtil.isNotBlank(record.getImgReportIds())) {
+				record.setImgReportFiles(new ArrayList<>());
+				for (Long fileId : CommonUtil.toLongList(record.getImgReportIds())) {
+					record.getImgReportFiles().add(fileMap.getOrDefault(fileId, new BusFileVO()));
+				}
+			}
+		}
+		return page;
+	}
 
 	@PostMapping("/re/submit/{id}")
 	@ApiOperation("重新提交")

@@ -14,6 +14,7 @@ import org.springblade.common.utils.CommonUtil;
 import org.springblade.core.log.exception.ServiceException;
 import org.springblade.core.mp.support.Condition;
 import org.springblade.core.mp.support.Query;
+import org.springblade.core.secure.utils.AuthUtil;
 import org.springblade.core.tool.api.R;
 import org.springblade.core.tool.utils.BeanUtil;
 import org.springblade.modules.file.bean.entity.BusFile;
@@ -24,23 +25,24 @@ import org.springblade.modules.out_buy_low.bean.entity.OutBuyQpr;
 import org.springblade.modules.out_buy_low.service.OutBuyQprService;
 import org.springblade.modules.process.entity.bean.BpmProcess;
 import org.springblade.modules.process.service.BpmProcessService;
+import org.springblade.modules.process_low.bean.dto.ProcessLowAdviceUploadDTO;
 import org.springblade.modules.process_low.bean.dto.ProcessLowCheckDTO;
 import org.springblade.modules.process_low.bean.dto.ProcessLowDTO;
+import org.springblade.modules.process_low.bean.dto.ProcessLowStandardUploadDTO;
 import org.springblade.modules.process_low.bean.entity.ProcessLow;
 import org.springblade.modules.process_low.bean.vo.ProcessLowQualityVO;
 import org.springblade.modules.process_low.bean.vo.ProcessLowVO;
 import org.springblade.modules.process_low.enums.LowBpmNodeEnum;
 import org.springblade.modules.process_low.service.ProcessLowService;
+import org.springblade.modules.process_low.utils.ProcessLowExcelUtil;
 import org.springblade.modules.process_low.wrapper.ProcessLowWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -68,22 +70,82 @@ public class ProcessLowController {
 	@Autowired
 	private BpmProcessService processService;
 
+	@PostMapping("/account/upload/advice/{id}")
+	public R uploadAdvice(@PathVariable("id") Long id, @Valid @RequestBody ProcessLowAdviceUploadDTO uploadDTO) {
+		ProcessLow processLow = lowService.getById(id);
+		if (ApproveStatusEnum.FINISN.getCode().equals(processLow.getBpmStatus())) {
+			throw new ServiceException("已结案 禁止提交");
+		}
+		ProcessLow upload = new ProcessLow();
+		upload.setId(id);
+		upload.setUpdateUser(AuthUtil.getUserId());
+		upload.setUpdateTime(new Date());
+
+		if (!new Integer("1").equals(processLow.getIsBusinessFile())) {
+			throw new ServiceException("禁止上传业务通知书");
+		}
+
+		if (uploadDTO.getBusinessAdviceFileId() != null) {
+			upload.setBusinessAdviceFileId(uploadDTO.getBusinessAdviceFileId());
+			upload.setBusinessAdviceFileName(uploadDTO.getBusinessAdviceFileName());
+			upload.setPassAdviceFileId(uploadDTO.getPassAdviceFileId());
+			upload.setPassAdviceFileName(uploadDTO.getPassAdviceFileName());
+		}
+
+		if (uploadDTO.getPassAdviceFileId() != null) {
+			upload.setPassAdviceFileId(uploadDTO.getPassAdviceFileId());
+			upload.setPassAdviceFileName(uploadDTO.getPassAdviceFileName());
+		}
+
+		return R.data(lowService.updateById(upload));
+	}
+
+	@PostMapping("/account/upload/standard/{id}")
+	public R uploadStandard(@PathVariable("id") Long id, @Valid @RequestBody ProcessLowStandardUploadDTO uploadDTO) {
+		ProcessLow processLow = lowService.getById(id);
+		if (ApproveStatusEnum.FINISN.getCode().equals(processLow.getBpmStatus())) {
+			throw new ServiceException("已结案 禁止提交");
+		}
+		ProcessLow upload = new ProcessLow();
+		upload.setId(id);
+		upload.setUpdateUser(AuthUtil.getUserId());
+		upload.setUpdateTime(new Date());
+
+		if (!new Integer("1").equals(processLow.getIsUploadStandardFile())) {
+			throw new ServiceException("禁止上传标准类通知书");
+		}
+		upload.setStandardFileId(uploadDTO.getStandardFileId());
+		upload.setStandardFileName(uploadDTO.getStandardFileName());
+		return R.data(lowService.updateById(upload));
+	}
+
+	@GetMapping("/account/export")
+	@ApiOperation("分页")
+	public void export(ProcessLowVO processLowVO, Query query, HttpServletResponse response) {
+		R<IPage<ProcessLowVO>> page = accountPage(processLowVO, query);
+		ProcessLowExcelUtil.export(page.getData().getRecords(), response);
+	}
+
 	@GetMapping("/account/page")
 	@ApiOperation("分页")
 	public R<IPage<ProcessLowVO>> accountPage(ProcessLowVO processLowVO, Query query) {
 		R<IPage<ProcessLowVO>> page = page(processLowVO, query);
 		List<ProcessLowVO> records = page.getData().getRecords();
-		List<Long> ids = records.stream().map(ProcessLowVO::getId).collect(Collectors.toList());
-		List<Long> fileIds = records.stream().flatMap(item -> {
+
+		List<Long> ids = records.isEmpty() ? new ArrayList<>() : records.stream().map(ProcessLowVO::getId).collect(Collectors.toList());
+		List<Long> fileIds =  records.isEmpty() ? new ArrayList<>() :records.stream().flatMap(item -> {
 			return CommonUtil.toLongList(item.getImgReportIds()).stream();
 		}).collect(Collectors.toList());
-		Map<Long, BusFileVO> fileMap = fileService.getByIds(fileIds).stream().collect(Collectors.toMap(BusFileVO::getId, Function.identity()));
+		Map<Long, BusFileVO> fileMap = fileIds.isEmpty() ? new HashMap<>() : fileService.getByIds(fileIds).stream().collect(Collectors.toMap(BusFileVO::getId, Function.identity()));
 
-		Map<Long, OutBuyQpr> qprMap = qprService.getByIds(ids).stream().collect(Collectors.toMap(OutBuyQpr::getId, Function.identity()));
+		Map<Long, OutBuyQpr> qprMap = ids.isEmpty() ? new HashMap<>() : qprService.getByIds(ids).stream().collect(Collectors.toMap(OutBuyQpr::getId, Function.identity()));
 		for (ProcessLowVO record : records) {
 			OutBuyQpr outBuyQpr = qprMap.get(record.getId());
-			if (outBuyQpr == null) {
-				continue;
+			if (outBuyQpr != null) {
+				record.setAnalyseTriggerCause(outBuyQpr.getAnalyseTriggerCause());
+				record.setAnalyseOutCause(outBuyQpr.getAnalyseOutCause());
+				record.setAnalyseTriggerStrategy(outBuyQpr.getAnalyseTriggerStrategy());
+				record.setAnalyseOutStrategy(outBuyQpr.getAnalyseOutStrategy());
 			}
 
 			if (StrUtil.isNotBlank(record.getImgReportIds())) {
@@ -92,11 +154,6 @@ public class ProcessLowController {
 					record.getImgReportList().add(fileMap.getOrDefault(fileId, new BusFileVO()));
 				}
 			}
-
-			record.setAnalyseTriggerCause(outBuyQpr.getAnalyseTriggerCause());
-			record.setAnalyseOutCause(outBuyQpr.getAnalyseOutCause());
-			record.setAnalyseTriggerStrategy(outBuyQpr.getAnalyseTriggerStrategy());
-			record.setAnalyseOutStrategy(outBuyQpr.getAnalyseOutStrategy());
 		}
 
 
@@ -146,8 +203,17 @@ public class ProcessLowController {
 		ProcessLow processLow = BeanUtil.copyProperties(checkDTO, ProcessLow.class);
 		processLow.setId(id);
 		processLow.setBpmStatus(ApproveStatusEnum.FINISN.getCode());
+		processLow.setCheckReplyTime(new Date());
 		Boolean status = lowService.updateById(processLow);
 		processService.pass(process.getBpmId());
+		if (processService.isProcessEnd(process.getBpmId())) {
+			processLow.setBpmStatus(ApproveStatusEnum.FINISN.getCode());
+			processLow.setCompleteTime(new Date());
+			lowService.updateById(processLow);
+		}else {
+			processLow.setBpmStatus(ApproveStatusEnum.PROCEED.getCode());
+			lowService.updateById(processLow);
+		}
 
 		return R.status(status);
 	}

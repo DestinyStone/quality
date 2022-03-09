@@ -68,12 +68,14 @@ public class OutBuyQprApproveController {
 		OutBuyQpr outBuyQpr = CommonUtil.copy(fillDTO, OutBuyQpr.class);
 		outBuyQpr.setId(id);
 		outBuyQpr.setBpmNode(LowBpmNodeEnum.CHECK_APPROVE.getCode());
+		outBuyQpr.setCheckReplyTime(new Date());
 		qprService.updateById(outBuyQpr);
 
 		// 同步更新不良
 		ProcessLow processLow = new ProcessLow();
 		processLow.setId(id);
 		processLow.setBpmNode(LowBpmNodeEnum.CHECK_APPROVE.getCode());
+		processLow.setCheckReplyTime(new Date());
 		lowService.updateById(processLow);
 
 		BpmProcess process = processService.getByBusId(id);
@@ -173,6 +175,7 @@ public class OutBuyQprApproveController {
 		OutBuyQpr outBuyQpr = new OutBuyQpr();
 		outBuyQpr.setId(id);
 		if (processService.isProcessEnd(bpmId)) {
+			outBuyQpr.setCompleteTime(new Date());
 			outBuyQpr.setBpmStatus(ApproveStatusEnum.FINISN.getCode());
 			qprService.updateById(outBuyQpr);
 		}else {

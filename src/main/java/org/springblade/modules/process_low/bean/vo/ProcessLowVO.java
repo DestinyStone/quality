@@ -207,4 +207,10 @@ public class ProcessLowVO {
 
 	@ApiModelProperty("结案日期")
 	private Date completeTime;
+
+	@ApiModelProperty("业务通知书文件ID")
+	private Long businessAdviceFileId;
+
+	@ApiModelProperty("业务通知书文件名称")
+	private String businessAdviceFileName;
 }
