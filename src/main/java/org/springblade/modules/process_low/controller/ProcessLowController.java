@@ -322,8 +322,10 @@ public class ProcessLowController {
 
 		wrapper.eq(processLowVO.getType() != null, ProcessLow::getType, processLowVO.getType())
 			.eq(processLowVO.getApparatusType() != null, ProcessLow::getApparatusType, processLowVO.getApparatusType())
-			.eq(processLowVO.getTriggerAddress() != null, ProcessLow::getTriggerAddress, processLowVO.getTriggerAddress())
-			.in(ProcessLow::getCreateDept, CommonUtil.getDeptIds());
+			.eq(processLowVO.getTriggerAddress() != null, ProcessLow::getTriggerAddress, processLowVO.getTriggerAddress());
+		if (!CommonUtil.isAdmin()) {
+			wrapper.in(ProcessLow::getCreateDept, CommonUtil.getDeptIds());
+		}
 		IPage<ProcessLow> page = lowService.page(Condition.getPage(query), wrapper);
 		return R.data(ProcessLowWrapper.build().pageVO(page));
 	}
@@ -380,7 +382,9 @@ public class ProcessLowController {
 	@ApiOperation("统计接口")
 	public R<ProcessLowQualityVO> quality() {
 		LambdaQueryWrapper<ProcessLow> wrapper = new LambdaQueryWrapper<>();
-		wrapper.in(ProcessLow::getCreateDept, CommonUtil.getDeptIds());
+		if (!CommonUtil.isAdmin()) {
+			wrapper.in(ProcessLow::getCreateDept, CommonUtil.getDeptIds());
+		}
 		List<ProcessLow> list = lowService.list(wrapper);
 
 		ProcessLowQualityVO processLowQualityVO = new ProcessLowQualityVO();
