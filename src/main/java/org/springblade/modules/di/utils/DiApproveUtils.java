@@ -29,7 +29,7 @@ public class DiApproveUtils {
 		// 第二个节点 担当 审批
 		ProcessContainer downLoadResourceApprove = new ProcessContainer();
 		downLoadResourceApprove.setBusId(busId);
-		downLoadResourceApprove.setAccessDept(CommonUtil.getDeptId());
+		downLoadResourceApprove.setAccessDept(CommonUtil.getDeptId() + "");
 		downLoadResourceApprove.setRemark("担当审批");
 		downLoadResourceApprove.setSort(1);
 		downLoadResourceApprove.setFlag("unReportProcess");
@@ -53,7 +53,7 @@ public class DiApproveUtils {
 		// 第二个节点 担当 审批
 		ProcessContainer downLoadResourceApprove = new ProcessContainer();
 		downLoadResourceApprove.setBusId(busId);
-		downLoadResourceApprove.setAccessDept(CommonUtil.getDeptId());
+		downLoadResourceApprove.setAccessDept(CommonUtil.getDeptId() + "");
 		downLoadResourceApprove.setRemark("担当审批");
 		downLoadResourceApprove.setSort(1);
 		downLoadResourceApprove.setFlag("takeApprove");
@@ -63,7 +63,7 @@ public class DiApproveUtils {
 		// 第三个节点 领导审批
 		ProcessContainer bossProcess = new ProcessContainer();
 		bossProcess.setBusId(busId);
-		bossProcess.setAccessDept(CommonUtil.getDeptId());
+		bossProcess.setAccessDept(CommonUtil.getDeptId() + "");
 		bossProcess.setRemark("领导审批");
 		bossProcess.setFlag("boosProcess");
 		bossProcess.setSort(2);

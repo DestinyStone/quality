@@ -22,7 +22,7 @@ import java.util.List;
 @Service
 public class OutBuyQprServiceImpl extends ServiceImpl<OutBuyQprMapper, OutBuyQpr> implements OutBuyQprService {
 
-	private static final String CODE_FLAG = "OUT_BUY_QPR";
+	private static final String CODE_FLAG = "LOW";
 
 	@Override
 	public Boolean saveAndActiveTask(OutBuyQpr qpr) {

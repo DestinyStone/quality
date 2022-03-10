@@ -12,9 +12,8 @@ public interface OutBuyQprApproveService {
 	/**
 	 * 自定义分页
 	 * @param approveVO
-	 * @param deptId
 	 * @param page
 	 * @return
 	 */
-	IPage<OutBuyQprApproveVO> page(OutBuyQprApproveVO approveVO, Long deptId, IPage<OutBuyQprApproveVO> page);
+	IPage<OutBuyQprApproveVO> page(OutBuyQprApproveVO approveVO, IPage<OutBuyQprApproveVO> page);
 }

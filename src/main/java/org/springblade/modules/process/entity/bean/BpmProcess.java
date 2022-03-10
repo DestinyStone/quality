@@ -75,8 +75,11 @@ public class BpmProcess {
 	@ApiModelProperty("操作角色名称")
 	private String operatorRoleName;
 
-	@ApiModelProperty("允许操作部门")
-	private Long accessDept;
+	@ApiModelProperty("允许操作部门 0匹配任何部门")
+	private String accessDept;
+
+	@ApiModelProperty("允许操作的角色 0匹配任何角色")
+	private String accessRole;
 
 	@ApiModelProperty("退回原因")
 	private String backCause;

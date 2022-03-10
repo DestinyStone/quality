@@ -28,7 +28,7 @@ public class ProcessLowWrapper extends BaseEntityWrapper<ProcessLow, ProcessLowV
 		vo.setCreateUserName(user == null ? "" : user.getName());
 		Role role = RoleCache.getRole(Long.parseLong(vo.getDutyDept()));
 		if (role != null) {
-			vo.setDutyDept(role.getRoleName());
+			vo.setDutyDeptName(role.getRoleName());
 		}
 		return vo;
 	}

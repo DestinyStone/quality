@@ -31,10 +31,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -84,7 +81,7 @@ public class OutBuyQprApproveController {
 	}
 
 	@PostMapping("/handler/check/save/{id}")
-	@ApiOperation("处理qpr录入审批")
+	@ApiOperation("处理调查结果录入审批")
 	public R handlerCheckSave(@PathVariable("id") Long id, @Valid @RequestBody QprCheckSaveDTO saveDTO) {
 		OutBuyQpr outBuyQpr = CommonUtil.copy(saveDTO, OutBuyQpr.class);
 		outBuyQpr.setId(id);
@@ -107,12 +104,18 @@ public class OutBuyQprApproveController {
 	public R pass(@RequestParam("id") Long id) {
 		BpmProcess process = processService.getByBusId(id);
 		OutBuyQpr before = qprService.getById(id);
-
 		OutBuyQpr update = new OutBuyQpr();
 		update.setId(id);
 		update.setBpmNode(before.getBpmNode() + 1);
 		qprService.updateById(update);
-		pass(id, process.getBpmId());
+		if (process.getBpmFlag().equals("qprApprove")) {
+			HashMap<String, String> map = new HashMap<>();
+			map.put("providerId", before.getDutyDept());
+			pass(id, process.getBpmId(), map);
+		}else {
+			pass(id, process.getBpmId());
+		}
+
 		return R.status(true);
 	}
 
@@ -145,7 +148,9 @@ public class OutBuyQprApproveController {
 		if (approveVO.getTagFlag() == null) {
 			approveVO.setTagFlag(0);
 		}
-		IPage<OutBuyQprApproveVO> page = outBuyQprApproveService.page(approveVO, CommonUtil.getDeptId(), Condition.getPage(query));
+		approveVO.setDeptId(CommonUtil.getDeptId());
+		approveVO.setRoleId(CommonUtil.getRoleId());
+		IPage<OutBuyQprApproveVO> page = outBuyQprApproveService.page(approveVO, Condition.getPage(query));
 
 		List<OutBuyQprApproveVO> records = page.getRecords();
 		if(records.isEmpty()) {
@@ -163,15 +168,15 @@ public class OutBuyQprApproveController {
 
 			Role role = RoleCache.getRole(Long.parseLong(record.getDutyDept()));
 			if (role != null) {
-				record.setDutyDept(role.getRoleName());
+				record.setDutyDeptName(role.getRoleName());
 			}
 		}
 
 		return R.data(page);
 	}
 
-	private void pass(Long id, Long bpmId) {
-		processService.pass(bpmId);
+	private void pass(Long id, Long bpmId, Map<String, String> map) {
+		processService.pass(bpmId, map);
 		OutBuyQpr outBuyQpr = new OutBuyQpr();
 		outBuyQpr.setId(id);
 		if (processService.isProcessEnd(bpmId)) {
@@ -182,5 +187,9 @@ public class OutBuyQprApproveController {
 			outBuyQpr.setBpmStatus(ApproveStatusEnum.PROCEED.getCode());
 			qprService.updateById(outBuyQpr);
 		}
+	}
+
+	private void pass(Long id, Long bpmId) {
+		pass(id, bpmId, new HashMap<>());
 	}
 }

@@ -254,6 +254,7 @@ public class ProcessLowController {
 		processLow.setUpdateUser(CommonUtil.getUserId());
 		processLow.setUpdateTime(new Date());
 		processLow.setBpmStatus(0);
+		processLow.setIsHideApprove(0);
 		if (processLow.getType().equals(0)) {
 			processLow.setBpmNode(LowBpmNodeEnum.QPR_SAVE.getCode());
 		}else {
@@ -321,7 +322,8 @@ public class ProcessLowController {
 
 		wrapper.eq(processLowVO.getType() != null, ProcessLow::getType, processLowVO.getType())
 			.eq(processLowVO.getApparatusType() != null, ProcessLow::getApparatusType, processLowVO.getApparatusType())
-			.eq(processLowVO.getTriggerAddress() != null, ProcessLow::getTriggerAddress, processLowVO.getTriggerAddress());
+			.eq(processLowVO.getTriggerAddress() != null, ProcessLow::getTriggerAddress, processLowVO.getTriggerAddress())
+			.in(ProcessLow::getCreateDept, CommonUtil.getDeptIds());
 		IPage<ProcessLow> page = lowService.page(Condition.getPage(query), wrapper);
 		return R.data(ProcessLowWrapper.build().pageVO(page));
 	}
@@ -378,6 +380,7 @@ public class ProcessLowController {
 	@ApiOperation("统计接口")
 	public R<ProcessLowQualityVO> quality() {
 		LambdaQueryWrapper<ProcessLow> wrapper = new LambdaQueryWrapper<>();
+		wrapper.in(ProcessLow::getCreateDept, CommonUtil.getDeptIds());
 		List<ProcessLow> list = lowService.list(wrapper);
 
 		ProcessLowQualityVO processLowQualityVO = new ProcessLowQualityVO();

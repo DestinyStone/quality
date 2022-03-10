@@ -56,6 +56,14 @@ public class ProcessLowApproveController {
 	@Autowired
 	private OutBuyQprService qprService;
 
+	@PostMapping("/handler/qpr/reject")
+	@ApiOperation("处理qpr录入审批")
+	public R handlerQprReject(@RequestBody @Valid RejectDTO rejectDTO) {
+		lowService.handlerQprReject(rejectDTO);
+
+		return R.data(true);
+	}
+
 	@PostMapping("/handler/qpr/save/{id}")
 	@ApiOperation("处理qpr录入审批")
 	public R handlerQprSave(@PathVariable("id") Long id,
@@ -65,12 +73,15 @@ public class ProcessLowApproveController {
 
 		OutBuyQpr qpr = BeanUtil.copy(qprDTO, OutBuyQpr.class);
 		qpr.setId(id);
+		qpr.setBpmStatus(ApproveStatusEnum.PROCEED.getCode());
+		qpr.setBpmNode(LowBpmNodeEnum.QPR_SAVE.getCode());
 		Boolean status = qprService.saveUnActiveTask(qpr);
 
 		processService.pass(process.getBpmId());
 		ProcessLow processLow = new ProcessLow();
 		processLow.setId(id);
 		processLow.setBpmNode(LowBpmNodeEnum.QPR_APPROVE.getCode());
+		processLow.setIsHideApprove(1);
 		if (processService.isProcessEnd(process.getBpmId())) {
 			processLow.setBpmStatus(ApproveStatusEnum.FINISN.getCode());
 			lowService.updateById(processLow);
@@ -146,8 +157,14 @@ public class ProcessLowApproveController {
 	@ApiOperation("统计")
 	public R<ProcessLowApproveQualityVO> quality() {
 		LambdaQueryWrapper<BpmProcess> wrapper = new LambdaQueryWrapper<>();
-		wrapper.eq(BpmProcess::getAccessDept, CommonUtil.getDeptId())
-			.eq(BpmProcess::getBpmServerFlag, ApproveUtils.ServerFlagEnum.LOW_APPROVE.getMessage());
+		wrapper.and(item -> {
+			item.eq(BpmProcess::getAccessDept, CommonUtil.getDeptId())
+				.or()
+				.eq(BpmProcess::getAccessDept, 0);
+		}).and(item -> {
+			item.eq(BpmProcess::getAccessRole, CommonUtil.getRoleId())
+			.or().eq(BpmProcess::getAccessRole, 0);
+		}).eq(BpmProcess::getBpmServerFlag, ApproveUtils.ServerFlagEnum.LOW_APPROVE.getMessage());
 
 		List<BpmProcess> list = processService.list(wrapper);
 

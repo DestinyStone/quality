@@ -45,6 +45,9 @@ public class OutBuyQprApproveVO {
 	@ApiModelProperty("供应商名称")
 	private String dutyDept;
 
+	@ApiModelProperty("责任部门/厂家名称")
+	private String dutyDeptName;
+
 	@ApiModelProperty("时间概要")
 	private String eventRemark;
 
@@ -126,4 +129,8 @@ public class OutBuyQprApproveVO {
 
 	@ApiModelProperty("延迟说明")
 	private String putOfRemark;
+
+	private Long deptId;
+
+	private Long roleId;
 }

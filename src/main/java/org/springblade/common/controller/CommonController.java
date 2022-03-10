@@ -3,6 +3,7 @@ package org.springblade.common.controller;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.github.xiaoymin.knife4j.core.util.StrUtil;
 import io.swagger.annotations.Api;
+import org.springblade.common.constant.ParamConstant;
 import org.springblade.common.constant.RootMappingConstant;
 import org.springblade.modules.system.entity.Role;
 import org.springblade.modules.system.service.IParamService;
@@ -35,7 +36,7 @@ public class CommonController {
 
 	@GetMapping("/provider/list")
 	public Map<String, String> getAllProvider() {
-		String privateId = paramService.getValue("providerId");
+		String privateId = paramService.getValue(ParamConstant.PROVIDER_ID);
 		if (StrUtil.isBlank(privateId)) {
 			return new HashMap<>();
 		}

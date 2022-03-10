@@ -15,9 +15,8 @@ public interface OutBuyQprApproveMapper {
 	/**
 	 * 自定义分页查询
 	 * @param processLowVO
-	 * @param deptId
 	 * @param page
 	 * @return
 	 */
-	List<OutBuyQprApproveVO> page(@Param("vo") OutBuyQprApproveVO processLowVO, @Param("deptId") Long deptId, IPage<OutBuyQprApproveVO> page);
+	List<OutBuyQprApproveVO> page(@Param("vo") OutBuyQprApproveVO processLowVO, IPage<OutBuyQprApproveVO> page);
 }

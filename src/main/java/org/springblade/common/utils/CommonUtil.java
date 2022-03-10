@@ -25,10 +25,10 @@ import org.springblade.core.tool.utils.BeanUtil;
 import org.springblade.core.tool.utils.Func;
 import org.springblade.modules.system.entity.Dept;
 import org.springframework.lang.Nullable;
+import org.springframework.util.PropertyPlaceholderHelper;
 
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * @Author: xiaoxia
@@ -39,6 +39,21 @@ public class CommonUtil {
 
 	private static final Snowflake snowflake = IdUtil.createSnowflake(1, 1);
 	private static final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+	private static PropertyPlaceholderHelper helper = new PropertyPlaceholderHelper("${", "}",":", false);
+
+	public static String placeHolderReplace(String value, Map<String, String> map) {
+		if (map == null || map.keySet().isEmpty()) {
+			return value;
+		}
+		Properties properties = new Properties();
+		Iterator<Map.Entry<String, String>> iterator = map.entrySet().iterator();
+		while (iterator.hasNext()) {
+			Map.Entry<String, String> next = iterator.next();
+			properties.setProperty(next.getKey(), next.getValue());
+		}
+
+		return helper.replacePlaceholders(value, properties);
+	}
 
 	public static String dateParseString(Date date) {
 		if (date == null) {
@@ -71,11 +86,24 @@ public class CommonUtil {
 	}
 
 	/**
+	 * 获取用户部门Ids
+	 */
+	public static List<Long> getDeptIds() {
+		String deptId = AuthUtil.getDeptId();
+		return toLongList(deptId);
+	}
+
+	/**
 	 * 获取用户部门
 	 */
 	public static Long getDeptId() {
 		String deptId = AuthUtil.getDeptId();
 		return firstLong(deptId);
+	}
+
+	public static Long getRoleId() {
+		List<Long> roleIds = toLongList(AuthUtil.getUser().getRoleId());
+		return roleIds.isEmpty() ? null : roleIds.get(0);
 	}
 
 	/**

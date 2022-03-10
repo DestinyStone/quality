@@ -195,7 +195,8 @@ public class OutBuyQprController {
 	@ApiOperation("分页")
 	public R<IPage<OutBuyQprVO>> page(OutBuyQprVO qprVO, Query query) {
 		LambdaQueryWrapper<OutBuyQpr> wrapper = new LambdaQueryWrapper<>();
-		wrapper.eq(OutBuyQpr::getProcessLowFlag, 0);
+//		wrapper.eq(OutBuyQpr::getProcessLowFlag, 0)
+		wrapper.in(OutBuyQpr::getCreateDept, CommonUtil.getDeptIds());
 		wrapper.and(StrUtil.isNotBlank(qprVO.getSearchKey()), item -> {
 			item.like(OutBuyQpr::getTitle, qprVO.getSearchKey())
 				.or()
@@ -240,6 +241,7 @@ public class OutBuyQprController {
 	@ApiOperation("统计接口")
 	public R<OutBuyQprQualityVO> quality() {
 		LambdaQueryWrapper<OutBuyQpr> wrapper = new LambdaQueryWrapper<>();
+		wrapper.in(OutBuyQpr::getCreateDept, CommonUtil.getDeptIds());
 		wrapper.eq(OutBuyQpr::getProcessLowFlag, 0);
 		List<OutBuyQpr> list = qprService.list(wrapper);
 

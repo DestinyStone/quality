@@ -59,6 +59,9 @@ public class ProcessLowApproveVO {
 	@ApiModelProperty("责任部门/厂家")
 	private String dutyDept;
 
+	@ApiModelProperty("责任部门/厂家名称")
+	private String dutyDeptName;
+
 	@ApiModelProperty("拜托内容")
 	private String pleaseContent;
 

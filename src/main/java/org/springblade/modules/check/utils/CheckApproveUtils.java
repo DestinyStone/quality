@@ -28,7 +28,7 @@ public class CheckApproveUtils {
 		// 第二个节点 担当 审批
 		ProcessContainer downLoadResourceApprove = new ProcessContainer();
 		downLoadResourceApprove.setBusId(busId);
-		downLoadResourceApprove.setAccessDept(CommonUtil.getDeptId());
+		downLoadResourceApprove.setAccessDept(CommonUtil.getDeptId() + "");
 		downLoadResourceApprove.setRemark("担当审批");
 		downLoadResourceApprove.setSort(1);
 		downLoadResourceApprove.setFlag("downloadResourceFile");
@@ -38,7 +38,7 @@ public class CheckApproveUtils {
 		// 第三个节点 领导审批
 		ProcessContainer bossProcess = new ProcessContainer();
 		bossProcess.setBusId(busId);
-		bossProcess.setAccessDept(CommonUtil.getDeptId());
+		bossProcess.setAccessDept(CommonUtil.getDeptId() + "");
 		bossProcess.setRemark("调查结果录入");
 		bossProcess.setFlag("boosProcess");
 		bossProcess.setSort(2);

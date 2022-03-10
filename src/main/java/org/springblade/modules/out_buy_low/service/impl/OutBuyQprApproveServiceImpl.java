@@ -19,7 +19,7 @@ public class OutBuyQprApproveServiceImpl implements OutBuyQprApproveService {
 	private OutBuyQprApproveMapper approveMapper;
 
 	@Override
-	public IPage<OutBuyQprApproveVO> page(OutBuyQprApproveVO approveVO, Long deptId, IPage<OutBuyQprApproveVO> page) {
-		return page.setRecords(approveMapper.page(approveVO, deptId, page));
+	public IPage<OutBuyQprApproveVO> page(OutBuyQprApproveVO approveVO, IPage<OutBuyQprApproveVO> page) {
+		return page.setRecords(approveMapper.page(approveVO, page));
 	}
 }

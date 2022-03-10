@@ -202,4 +202,7 @@ public class ProcessLow {
 
 	@ApiModelProperty("业务通知书文件名称")
 	private String businessAdviceFileName;
+
+	@ApiModelProperty("是否隐藏审批 0 不隐藏 1隐藏")
+	private Integer isHideApprove;
 }

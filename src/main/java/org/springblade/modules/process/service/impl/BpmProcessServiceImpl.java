@@ -15,9 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * @Author: DestinyStone
@@ -50,6 +48,7 @@ public class BpmProcessServiceImpl extends ServiceImpl<BpmProcessMapper, BpmProc
 			bpmProcess.setBpmServerFlag(item.getServerFlag());
 			// TODO 允许的部门， 后续需要增进接口
 			bpmProcess.setAccessDept(item.getAccessDept());
+			bpmProcess.setAccessRole(item.getAccessRole());
 			bpmProcess.setBpmBingId(CommonUtil.getCode() + "");
 			bpmProcess.setIsCastoff(0);
 			// 对已完成的任务设置基本属性
@@ -77,7 +76,7 @@ public class BpmProcessServiceImpl extends ServiceImpl<BpmProcessMapper, BpmProc
 
 	@Override
 	@Transactional(rollbackFor = Exception.class)
-	public void pass(Long bpmId) {
+	public void pass(Long bpmId, Map<String, String> map) {
 		BpmProcess process = getByIdOrException(bpmId);
 		if (process.getEndTime() != null && System.currentTimeMillis() > process.getEndTime().getTime()) {
 			throw new ServiceException("审批已截止");
@@ -94,23 +93,40 @@ public class BpmProcessServiceImpl extends ServiceImpl<BpmProcessMapper, BpmProc
 		setCommonOperator(currentUpdate);
 		updateById(currentUpdate);
 
-		// 开启下一个节点审批
-		Date createTime = new Date();
-		LambdaUpdateWrapper<BpmProcess> nextProcessUpdate = new LambdaUpdateWrapper<>();
-		nextProcessUpdate.eq(BpmProcess::getBusId, process.getBusId())
-			.ne(BpmProcess::getBpmStatus, 0)
-			.eq(BpmProcess::getBpmSort, process.getBpmSort() + 1)
-			.eq(BpmProcess::getIsCastoff, 0)
-			.set(BpmProcess::getBpmStatus, ApproveNodeStatusEnum.ACTIVE.getCode())
-			.set(BpmProcess::getCreateTime, createTime)
-			.set(BpmProcess::getEndTime, new Date(createTime.getTime() + OVER_TIME))
-			.set(BpmProcess::getBpmPushStatus, 0);
-		update(nextProcessUpdate);
-
 		// 记录日志
 		process.setBpmStatus(ApproveNodeStatusEnum.SUCCESS.getCode());
 		setCommonOperator(process);
 		logService.convertAndSave(process);
+
+		// 开启下一个节点审批
+		// 获取下一个节点
+		LambdaQueryWrapper<BpmProcess> wrapper = new LambdaQueryWrapper<>();
+		wrapper.eq(BpmProcess::getBusId, process.getBusId())
+			.ne(BpmProcess::getBpmStatus, 0)
+			.eq(BpmProcess::getBpmSort, process.getBpmSort() + 1)
+			.eq(BpmProcess::getIsCastoff, 0);
+		BpmProcess one = getOne(wrapper);
+		if (one != null) {
+			Date createTime = new Date();
+			LambdaUpdateWrapper<BpmProcess> nextProcessUpdate = new LambdaUpdateWrapper<>();
+			nextProcessUpdate.eq(BpmProcess::getBusId, process.getBusId())
+				.ne(BpmProcess::getBpmStatus, 0)
+				.eq(BpmProcess::getBpmSort, process.getBpmSort() + 1)
+				.eq(BpmProcess::getIsCastoff, 0)
+				.set(BpmProcess::getBpmStatus, ApproveNodeStatusEnum.ACTIVE.getCode())
+				.set(BpmProcess::getAccessRole, CommonUtil.placeHolderReplace(one.getAccessRole(), map))
+				.set(BpmProcess::getAccessDept, CommonUtil.placeHolderReplace(one.getAccessDept(), map))
+				.set(BpmProcess::getCreateTime, createTime)
+				.set(BpmProcess::getEndTime, new Date(createTime.getTime() + OVER_TIME))
+				.set(BpmProcess::getBpmPushStatus, 0);
+			update(nextProcessUpdate);
+		}
+	}
+
+	@Override
+	@Transactional(rollbackFor = Exception.class)
+	public void pass(Long bpmId) {
+		pass(bpmId, new HashMap<>());
 	}
 
 	@Override

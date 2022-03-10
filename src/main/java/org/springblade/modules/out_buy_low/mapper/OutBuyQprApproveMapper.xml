@@ -20,6 +20,7 @@
                 process.create_time AS start_time,
                 process.end_time AS end_time,
                 process.access_dept,
+                process.access_role,
                 process.operator_time,
                 process.bpm_flag,
                 process.bpm_remark,
@@ -28,7 +29,6 @@
             FROM bus_out_buy_qpr qpr
             LEFT JOIN bpm_process process
             ON process.bus_id = qpr.id
-            where qpr.process_low_flag = 0
             union
             SELECT
                 low.id,
@@ -46,6 +46,7 @@
                 process.create_time AS start_time,
                 process.end_time AS end_time,
                 process.access_dept,
+                process.access_role,
                 process.operator_time,
                 process.bpm_flag,
                 process.bpm_remark,
@@ -54,6 +55,7 @@
             FROM bus_process_low low
             LEFT JOIN bpm_process process
             ON process.bus_id = low.id
+            where low.is_hide_approve = 0
         ) as temp
         <where>
             <if test="vo.searchKey != null and vo.searchKey != ''">
@@ -63,14 +65,14 @@
                 )
             </if>
             <if test="vo.tagFlag == 0">
-                and temp.process_bpm_status = 2 and temp.access_dept = #{deptId}
+                and temp.process_bpm_status = 2 and (temp.access_dept = #{vo.deptId} or temp.access_dept = 0) and (temp.access_role = #{vo.roleId} or temp.access_role = 0)
             </if>
 
             <if test="vo.tagFlag == 1">
-                and (temp.process_bpm_status = 3 or temp.process_bpm_status = 4) and temp.access_dept = #{deptId}
+                and (temp.process_bpm_status = 3 or temp.process_bpm_status = 4) and (temp.access_dept = #{vo.deptId} or temp.access_dept = 0) and (temp.access_role = #{vo.roleId} or temp.access_role = 0)
             </if>
             <if test="vo.tagFlag == 2">
-                and temp.bpm_push_status = 1 and temp.create_dept = #{deptId}
+                and temp.bpm_push_status = 1 and temp.create_dept = #{vo.deptId}
             </if>
         </where>
     </select>

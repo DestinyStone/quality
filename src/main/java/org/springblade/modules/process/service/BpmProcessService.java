@@ -5,6 +5,7 @@ import org.springblade.modules.process.core.ProcessContainer;
 import org.springblade.modules.process.entity.bean.BpmProcess;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Author: DestinyStone
@@ -22,6 +23,13 @@ public interface BpmProcessService extends IService<BpmProcess> {
 	 * 审批通过
 	 */
 	void pass(Long bpmId);
+
+	/**
+	 * 审批通过
+	 * @param bpmId
+	 * @param map
+	 */
+	void pass(Long bpmId, Map<String, String> map);
 
 	/**
 	 * 审批拒绝
