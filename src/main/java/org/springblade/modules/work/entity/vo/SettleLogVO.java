@@ -1,4 +1,4 @@
-package org.springblade.modules.work.entity.bean;
+package org.springblade.modules.work.entity.vo;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -17,7 +17,7 @@ import java.util.Date;
 @Data
 @Api("已办结日志")
 @TableName("bus_settle_log")
-public class SettleLog {
+public class SettleLogVO {
 
 	@TableId(value = "id", type = IdType.ASSIGN_ID)
 	@ApiModelProperty("主键")

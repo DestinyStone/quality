@@ -1,6 +1,7 @@
 package org.springblade.modules.di.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import org.springblade.modules.di.bean.vo.DiApproveQualityVO;
 import org.springblade.modules.di.bean.vo.DiReportApproveVO;
 
 /**
@@ -23,4 +24,10 @@ public interface DiReportApproveService {
 	 * @return
 	 */
 	IPage<DiReportApproveVO> page(DiReportApproveVO vo, Long deptId, IPage<DiReportApproveVO> page);
+
+	/**
+	 * 统计
+	 * @return
+	 */
+	DiApproveQualityVO quality();
 }

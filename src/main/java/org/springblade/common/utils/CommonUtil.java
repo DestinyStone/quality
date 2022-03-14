@@ -18,12 +18,15 @@ package org.springblade.common.utils;
 
 import cn.hutool.core.lang.Snowflake;
 import cn.hutool.core.util.IdUtil;
+import org.springblade.common.cache.RoleCache;
 import org.springblade.common.cache.SysCache;
 import org.springblade.core.secure.BladeUser;
 import org.springblade.core.secure.utils.AuthUtil;
 import org.springblade.core.tool.utils.BeanUtil;
 import org.springblade.core.tool.utils.Func;
+import org.springblade.core.tool.utils.StringUtil;
 import org.springblade.modules.system.entity.Dept;
+import org.springblade.modules.system.entity.Role;
 import org.springframework.lang.Nullable;
 import org.springframework.util.PropertyPlaceholderHelper;
 
@@ -116,7 +119,19 @@ public class CommonUtil {
 	public static String getDeptPath() {
 		Long deptId = getDeptId();
 		Dept dept = SysCache.getDept(deptId);
-		return dept == null ? "" : dept.getDeptName();
+		return dept == null ? "" : dept.getFullName();
+	}
+
+	/**
+	 * 获取角色别名
+	 */
+	public static String getRoleAlias() {
+		if (StringUtil.isBlank(AuthUtil.getUser().getRoleId())) {
+			return "";
+		}
+		Long roleIds = firstLong(AuthUtil.getUser().getRoleId());
+		Role role = RoleCache.getRole(roleIds);
+		return role == null ? "" : role.getRoleAlias();
 	}
 
 	/**

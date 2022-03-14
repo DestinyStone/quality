@@ -2,6 +2,7 @@ package org.springblade.modules.work.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import org.springblade.modules.work.entity.bean.SettleLog;
+import org.springblade.modules.work.enums.SettleBusType;
 
 /**
  * @Author: xiaoxia
@@ -9,4 +10,21 @@ import org.springblade.modules.work.entity.bean.SettleLog;
  * @Description:
  */
 public interface SettleLogService extends IService<SettleLog> {
+
+	/**
+	 * 提交日志
+	 * @param title
+	 * @param type
+	 */
+	void submitLog(String title, SettleBusType type);
+
+	/**
+	 * 结案日志
+	 */
+	void finishLog(String title, SettleBusType type, Long userId);
+
+	/**
+	 * 审批日志
+	 */
+	void processLog(String title, SettleBusType type);
 }

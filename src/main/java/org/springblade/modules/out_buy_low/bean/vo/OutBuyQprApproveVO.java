@@ -133,4 +133,6 @@ public class OutBuyQprApproveVO {
 	private Long deptId;
 
 	private Long roleId;
+
+	private Long userId;
 }

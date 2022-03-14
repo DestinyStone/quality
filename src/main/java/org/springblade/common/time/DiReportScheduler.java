@@ -15,7 +15,9 @@ public class DiReportScheduler {
 
 	private static DiConfigService diConfigService;
 
-	// 每天凌晨执行
+	/**
+	 * 每天凌晨执行
+	 */
 	@Scheduled(cron = "0 0 0 ? * *")
 	public void task() {
 		diConfigService.triggerAll();

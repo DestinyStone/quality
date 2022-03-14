@@ -1,13 +1,11 @@
 package org.springblade.modules.process_low.controller;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springblade.common.constant.RootMappingConstant;
 import org.springblade.common.enums.ApproveStatusEnum;
-import org.springblade.common.utils.ApproveUtils;
 import org.springblade.common.utils.CommonUtil;
 import org.springblade.core.log.exception.ServiceException;
 import org.springblade.core.mp.support.Condition;
@@ -32,7 +30,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.Date;
-import java.util.List;
 
 /**
  * @Author: DestinyStone
@@ -96,15 +93,16 @@ public class ProcessLowApproveController {
 
 	@GetMapping("/pass")
 	@ApiOperation("审批通过")
-	public R pass(@RequestParam("id") Long id) {
-		LambdaQueryWrapper<BpmProcess> wrapper = new LambdaQueryWrapper<>();
-		wrapper.eq(BpmProcess::getBpmStatus, ApproveNodeStatusEnum.ACTIVE.getCode())
-			.eq(BpmProcess::getBusId, id);
-		BpmProcess process = processService.getOne(wrapper);
-
-		if(process == null) {
-			throw new ServiceException("当前审批节点不存在");
+	public R passAndValidate(@RequestParam("id") Long id, @RequestParam("bpmId") Long bpmId) {
+		BpmProcess process = processService.getById(bpmId);
+		if (process.getEndTime() != null && System.currentTimeMillis() > process.getEndTime().getTime()) {
+			throw new ServiceException("审批已截止");
 		}
+
+		if (process.getBpmStatus().equals(ApproveNodeStatusEnum.SUCCESS.getCode())) {
+			throw new ServiceException("当前节点已审批通过");
+		}
+
 		processService.pass(process.getBpmId());
 		ProcessLow before = lowService.getById(id);
 		ProcessLow processLow = new ProcessLow();
@@ -156,36 +154,7 @@ public class ProcessLowApproveController {
 	@GetMapping("/quality")
 	@ApiOperation("统计")
 	public R<ProcessLowApproveQualityVO> quality() {
-		LambdaQueryWrapper<BpmProcess> wrapper = new LambdaQueryWrapper<>();
-		wrapper.and(item -> {
-			item.eq(BpmProcess::getAccessDept, CommonUtil.getDeptId())
-				.or()
-				.eq(BpmProcess::getAccessDept, 0);
-		}).and(item -> {
-			item.eq(BpmProcess::getAccessRole, CommonUtil.getRoleId())
-			.or().eq(BpmProcess::getAccessRole, 0);
-		}).eq(BpmProcess::getBpmServerFlag, ApproveUtils.ServerFlagEnum.LOW_APPROVE.getMessage());
-
-		List<BpmProcess> list = processService.list(wrapper);
-
-		ProcessLowApproveQualityVO result = new ProcessLowApproveQualityVO();
-		result.setAwait(0);
-		result.setFinish(0);
-		result.setStaleDated(0);
-		for (BpmProcess process : list) {
-			if (new Integer(2).equals(process.getBpmStatus())) {
-				result.setAwait(result.getAwait() + 1);
-			}
-
-			if (new Integer(3).equals(process.getBpmStatus()) || new Integer(4).equals(process.getBpmStatus())) {
-				result.setFinish(result.getFinish() + 1);
-			}
-
-			if (new Integer(1).equals(process.getBpmPushStatus())) {
-				result.setStaleDated(result.getStaleDated() + 1);
-			}
-
-		}
-		return R.data(result);
+		ProcessLowApproveQualityVO qualityVO = lowService.quality();
+		return R.data(qualityVO);
 	}
 }

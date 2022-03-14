@@ -33,7 +33,7 @@ public class OutBuyQprApproveUtils {
 		ProcessContainer qprApprove = new ProcessContainer(
 			busId,
 			ParamCache.getValue(ParamConstant.QC_SECTION_OUT_BUY),
-			ParamCache.getValue(ParamConstant.QC_SECTION_OUT_BUY_DEPT),
+			Arrays.asList(ParamCache.getValue(ParamConstant.QC_SECTION_OUT_BUY_DEPT), ParamCache.getValue(ParamConstant.QC_SECTION_OUT_BUY_QUANTITY_CHIEF)),
 			"不良联络书发行审批",
 			1,
 			"qprApprove",

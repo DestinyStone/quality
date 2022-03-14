@@ -8,7 +8,7 @@ import io.swagger.annotations.Api;
  * @Description:
  */
 @Api("键值")
-public class ParamConstant {
+public interface ParamConstant {
 
 	/**
 	 * 供应商ID
@@ -56,8 +56,15 @@ public class ParamConstant {
 	public static final String QC_SECTION_OUT_BUY_DEPT = "QC_SECTION_OUT_BUY_DEPT";
 
 	/**
+	 * 品保科外购件品质系科长
+	 */
+	public static final String QC_SECTION_OUT_BUY_QUANTITY_CHIEF = "QC_SECTION_OUT_BUY_QUANTITY_CHIEF";
+
+	/**
 	 * 供应商 占位
 	 */
 	public static final String PROVIDER_REPLACE = "${providerId}";
+
+
 
 }

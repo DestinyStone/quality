@@ -3,6 +3,7 @@ package org.springblade.modules.process_low.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import org.springblade.modules.process.entity.dto.RejectDTO;
 import org.springblade.modules.process_low.bean.entity.ProcessLow;
+import org.springblade.modules.process_low.bean.vo.ProcessLowApproveQualityVO;
 
 import java.util.List;
 
@@ -31,4 +32,10 @@ public interface ProcessLowService extends IService<ProcessLow> {
 	 * @param rejectDTO
 	 */
 	void handlerQprReject(RejectDTO rejectDTO);
+
+	/**
+	 * 统计
+	 * @return
+	 */
+	ProcessLowApproveQualityVO quality();
 }

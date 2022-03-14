@@ -2,7 +2,6 @@ package org.springblade.modules.process.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.github.xiaoymin.knife4j.core.util.StrUtil;
 import org.springblade.common.enums.ApproveNodeEnum;
 import org.springblade.common.utils.CommonUtil;
 import org.springblade.modules.process.entity.bean.BpmProcess;
@@ -28,7 +27,7 @@ public class BpmProcessLogServiceImpl extends ServiceImpl<BpmProcessLogMapper, B
 		log.setOperatorUserName(CommonUtil.getUserName());
 		log.setOperatorDept(CommonUtil.getDeptId());
 		log.setOperatorDeptPath(CommonUtil.getDeptPath());
-		log.setOperatorRole(CommonUtil.getRoleName());
+		log.setOperatorRole(CommonUtil.getRoleAlias());
 		log.setStartTime(process.getCreateTime());
 		log.setEndTime(process.getEndTime());
 		log.setOperatorTime(process.getOperatorTime());
@@ -37,8 +36,14 @@ public class BpmProcessLogServiceImpl extends ServiceImpl<BpmProcessLogMapper, B
 
 		if (ApproveNodeStatusEnum.BACK.getCode().equals(process.getBpmStatus())) {
 			log.setOperatorResult(process.getBackCause());
-			log.setOperatorStatus("已回答");
+			log.setOperatorStatus("已驳回");
 		}else {
+			if (ApproveNodeStatusEnum.RE.getCode().equals(process.getBpmStatus())) {
+				log.setOperatorStatus("重新提交");
+			}
+			if (ApproveNodeStatusEnum.SUCCESS.getCode().equals(process.getBpmStatus())) {
+				log.setOperatorStatus("审批通过");
+			}
 			log.setOperatorStatus(convertNode(process.getBpmFlag()));
 		}
 

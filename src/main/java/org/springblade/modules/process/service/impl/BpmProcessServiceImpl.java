@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springblade.common.utils.CommonUtil;
 import org.springblade.core.log.exception.ServiceException;
+import org.springblade.modules.out_buy_low.enums.RejectEnumType;
 import org.springblade.modules.process.core.ProcessContainer;
 import org.springblade.modules.process.entity.bean.BpmProcess;
 import org.springblade.modules.process.enums.ApproveNodeStatusEnum;
@@ -118,7 +119,11 @@ public class BpmProcessServiceImpl extends ServiceImpl<BpmProcessMapper, BpmProc
 				.set(BpmProcess::getAccessDept, CommonUtil.placeHolderReplace(one.getAccessDept(), map))
 				.set(BpmProcess::getCreateTime, createTime)
 				.set(BpmProcess::getEndTime, new Date(createTime.getTime() + OVER_TIME))
-				.set(BpmProcess::getBpmPushStatus, 0);
+				.set(BpmProcess::getBpmPushStatus, 0)
+				.set(BpmProcess::getOperatorUser, null)
+				.set(BpmProcess::getOperatorDept, null)
+				.set(BpmProcess::getOperatorTime, null)
+				.set(BpmProcess::getBackCause, null);
 			update(nextProcessUpdate);
 		}
 	}
@@ -132,6 +137,11 @@ public class BpmProcessServiceImpl extends ServiceImpl<BpmProcessMapper, BpmProc
 	@Override
 	@Transactional(rollbackFor = Exception.class)
 	public void reject(Long bpmId, String cause) {
+		reject(bpmId, cause, RejectEnumType.NORMAL);
+	}
+
+	@Override
+	public void reject(Long bpmId, String cause, RejectEnumType rejectType) {
 		BpmProcess process = getByIdOrException(bpmId);
 
 		// 更新当前节点状态
@@ -140,8 +150,17 @@ public class BpmProcessServiceImpl extends ServiceImpl<BpmProcessMapper, BpmProc
 		currentUpdate.setBpmStatus(ApproveNodeStatusEnum.BACK.getCode());
 		currentUpdate.setBackCause(cause);
 		setCommonOperator(currentUpdate);
-
 		updateById(currentUpdate);
+
+		if (RejectEnumType.PROVIDER.equals(rejectType) || RejectEnumType.CHECK_CONFIRM.equals(rejectType)) {
+			//  更新上一个节点
+			LambdaUpdateWrapper<BpmProcess> wrapper = new LambdaUpdateWrapper<>();
+			wrapper.eq(BpmProcess::getBusId, process.getBusId())
+				.eq(BpmProcess::getIsCastoff, 0)
+				.eq(BpmProcess::getBpmSort, process.getBpmSort() - 1)
+				.set(BpmProcess::getBpmStatus, ApproveNodeStatusEnum.ACTIVE.getCode());
+			update(wrapper);
+		}
 
 		// 记录日志
 		process.setBpmStatus(ApproveNodeStatusEnum.BACK.getCode());

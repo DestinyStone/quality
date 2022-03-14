@@ -149,29 +149,7 @@ public class CheckApproveController {
 	@GetMapping("/quality")
 	@ApiOperation("统计")
 	public R<CheckApproveQualityVO> quality() {
-		LambdaQueryWrapper<BpmProcess> wrapper = new LambdaQueryWrapper<>();
-		wrapper.eq(BpmProcess::getAccessDept, CommonUtil.getDeptId())
-			.eq(BpmProcess::getBpmServerFlag, ApproveUtils.ServerFlagEnum.CHECK_APPROVE.getMessage());
-
-		List<BpmProcess> list = processService.list(wrapper);
-
-		CheckApproveQualityVO result = new CheckApproveQualityVO();
-		result.setAwait(0);
-		result.setFinish(0);
-		result.setStaleDated(0);
-		for (BpmProcess process : list) {
-			if (new Integer(2).equals(process.getBpmStatus())) {
-				result.setAwait(result.getAwait() + 1);
-			}
-
-			if (new Integer(3).equals(process.getBpmStatus()) || new Integer(4).equals(process.getBpmStatus())) {
-				result.setFinish(result.getFinish() + 1);
-			}
-
-			if (new Integer(1).equals(process.getBpmPushStatus())) {
-				result.setStaleDated(result.getStaleDated() + 1);
-			}
-		}
+		CheckApproveQualityVO result = checkService.quality();
 		return R.data(result);
 	}
 

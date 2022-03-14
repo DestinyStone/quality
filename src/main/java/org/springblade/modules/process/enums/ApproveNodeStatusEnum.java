@@ -30,7 +30,12 @@ public enum  ApproveNodeStatusEnum {
 	/**
 	 * 已退回
 	 */
-	BACK(4, "已退回")
+	BACK(4, "已退回"),
+
+	/**
+	 * 重新提交
+	 */
+	RE(5, "重新提交")
 	;
 	Integer code;
 	String message;

@@ -37,4 +37,7 @@ public class Message {
 
 	@ApiModelProperty("属于部门")
 	private Long belongToDept;
+
+	@ApiModelProperty("属于用户")
+	private Long belongToUser;
 }

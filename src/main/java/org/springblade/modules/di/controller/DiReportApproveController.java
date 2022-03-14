@@ -1,6 +1,5 @@
 package org.springblade.modules.di.controller;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import io.swagger.annotations.Api;
@@ -8,7 +7,6 @@ import io.swagger.annotations.ApiOperation;
 import org.springblade.common.cache.RoleCache;
 import org.springblade.common.constant.RootMappingConstant;
 import org.springblade.common.enums.ApproveStatusEnum;
-import org.springblade.common.utils.ApproveUtils;
 import org.springblade.common.utils.CommonUtil;
 import org.springblade.core.mp.support.Condition;
 import org.springblade.core.mp.support.Query;
@@ -140,29 +138,7 @@ public class DiReportApproveController {
 	@GetMapping("/quality")
 	@ApiOperation("统计")
 	public R<DiApproveQualityVO> quality() {
-		LambdaQueryWrapper<BpmProcess> wrapper = new LambdaQueryWrapper<>();
-		wrapper.eq(BpmProcess::getAccessDept, CommonUtil.getDeptId())
-			.eq(BpmProcess::getBpmServerFlag, ApproveUtils.ServerFlagEnum.DI_APPROVE.getMessage());
-
-		List<BpmProcess> list = processService.list(wrapper);
-
-		DiApproveQualityVO result = new DiApproveQualityVO();
-		result.setAwait(0);
-		result.setFinish(0);
-		result.setStaleDated(0);
-		for (BpmProcess process : list) {
-			if (new Integer(2).equals(process.getBpmStatus())) {
-				result.setAwait(result.getAwait() + 1);
-			}
-
-			if (new Integer(3).equals(process.getBpmStatus()) || new Integer(4).equals(process.getBpmStatus())) {
-				result.setFinish(result.getFinish() + 1);
-			}
-
-			if (new Integer(1).equals(process.getBpmPushStatus())) {
-				result.setStaleDated(result.getStaleDated() + 1);
-			}
-		}
+		DiApproveQualityVO result = diApproveService.quality();
 		return R.data(result);
 	}
 

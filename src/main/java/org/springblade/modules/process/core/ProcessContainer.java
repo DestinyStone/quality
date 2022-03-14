@@ -2,6 +2,10 @@ package org.springblade.modules.process.core;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import org.springblade.core.tool.utils.Func;
+
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * @Author: DestinyStone
@@ -38,14 +42,26 @@ public class ProcessContainer {
 	public ProcessContainer() {
 	}
 
-	public ProcessContainer(String busId, String accessDept, String accessRole, String remark, Integer sort, String flag, String serverFlag, Integer status) {
+	public ProcessContainer(String busId, List<String> accessDept, List<String> accessRole, String remark, Integer sort, String flag, String serverFlag, Integer status) {
 		this.busId = busId;
 		this.remark = remark;
 		this.sort = sort;
-		this.accessDept = accessDept;
-		this.accessRole = accessRole;
+		this.accessDept = Func.join(accessDept);
+		this.accessRole = Func.join(accessRole);
 		this.status = status;
 		this.flag = flag;
 		this.serverFlag = serverFlag;
+	}
+
+	public ProcessContainer(String busId, String accessDept, List<String> accessRole, String remark, Integer sort, String flag, String serverFlag, Integer status) {
+		this(busId, Arrays.asList(accessDept), accessRole, remark, sort, flag, serverFlag, status);
+	}
+
+	public ProcessContainer(String busId, List<String> accessDept, String accessRole, String remark, Integer sort, String flag, String serverFlag, Integer status) {
+		this(busId, accessDept, Arrays.asList(accessRole), remark, sort, flag, serverFlag, status);
+	}
+
+	public ProcessContainer(String busId, String accessDept, String accessRole, String remark, Integer sort, String flag, String serverFlag, Integer status) {
+		this(busId,  Arrays.asList(accessDept), Arrays.asList(accessRole), remark, sort, flag, serverFlag, status);
 	}
 }

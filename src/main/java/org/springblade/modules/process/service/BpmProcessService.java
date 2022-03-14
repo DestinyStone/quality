@@ -1,6 +1,7 @@
 package org.springblade.modules.process.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import org.springblade.modules.out_buy_low.enums.RejectEnumType;
 import org.springblade.modules.process.core.ProcessContainer;
 import org.springblade.modules.process.entity.bean.BpmProcess;
 
@@ -37,6 +38,11 @@ public interface BpmProcessService extends IService<BpmProcess> {
 	void reject(Long bpmId, String cause);
 
 	/**
+	 * 审批拒绝
+	 */
+	void reject(Long bpmId, String backCause, RejectEnumType provider);
+
+	/**
 	 * 审批是否已完成
 	 * @param bpmId
 	 * @return false 未结束 true 已结束
@@ -55,4 +61,5 @@ public interface BpmProcessService extends IService<BpmProcess> {
 	 * @return
 	 */
 	BpmProcess getByBusId(Long id);
+
 }

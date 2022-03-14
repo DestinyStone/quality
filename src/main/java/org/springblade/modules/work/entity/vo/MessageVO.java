@@ -1,8 +1,5 @@
 package org.springblade.modules.work.entity.vo;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -33,6 +30,15 @@ public class MessageVO {
 	@ApiModelProperty("类型 0 站内消息")
 	private Integer type;
 
-	@ApiModelProperty("属于部门")
+	@ApiModelProperty("归属部门")
 	private Long belongToDept;
+
+	@ApiModelProperty("归属部门名称")
+	private Long belongToDeptName;
+
+	@ApiModelProperty("属于用户")
+	private Long belongToUser;
+
+	@ApiModelProperty("归属用户名称")
+	private Long belongToUserName;
 }

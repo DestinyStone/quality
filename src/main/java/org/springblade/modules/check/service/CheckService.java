@@ -4,8 +4,8 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 import org.springblade.modules.check.bean.entity.Check;
 import org.springblade.modules.check.bean.vo.AccessSaveCheckVO;
+import org.springblade.modules.check.bean.vo.CheckApproveQualityVO;
 import org.springblade.modules.check.bean.vo.CheckVO;
-import org.springblade.modules.out_buy_low.bean.vo.OutBuyQprApproveVO;
 
 import java.util.List;
 
@@ -44,4 +44,10 @@ public interface CheckService extends IService<Check> {
 	 * @return
 	 */
 	Boolean saveAndActiveTask(Check check);
+
+	/**
+	 * 统计
+	 * @return
+	 */
+	CheckApproveQualityVO quality();
 }

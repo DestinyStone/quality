@@ -12,6 +12,7 @@ import org.springblade.modules.process.enums.ApproveNodeStatusEnum;
 import org.springblade.modules.process.service.BpmProcessLogService;
 import org.springblade.modules.process.service.BpmProcessService;
 import org.springblade.modules.process_low.bean.entity.ProcessLow;
+import org.springblade.modules.process_low.bean.vo.ProcessLowApproveQualityVO;
 import org.springblade.modules.process_low.mapper.ProcessLowMapper;
 import org.springblade.modules.process_low.service.ProcessLowService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -86,6 +87,45 @@ public class ProcessLowServiceImpl extends ServiceImpl<ProcessLowMapper, Process
 		processService.remove(deleteWrapper);
 		// 重新开启流程
 		ApproveUtils.createTask(rejectDTO.getBusId() + "", ApproveUtils.ApproveLinkEnum.PROCESS_LOW);
+	}
+
+	@Override
+	public ProcessLowApproveQualityVO quality() {
+		LambdaQueryWrapper<BpmProcess> wrapper = new LambdaQueryWrapper<>();
+		wrapper.and(item -> {
+			item.like(BpmProcess::getAccessDept, CommonUtil.getDeptId())
+				.or()
+				.eq(BpmProcess::getAccessDept, 0);
+		}).and(item -> {
+			item.like(BpmProcess::getAccessRole, CommonUtil.getRoleId())
+				.or().eq(BpmProcess::getAccessRole, 0);
+		}).ne(BpmProcess::getBpmFlag, "commit")
+			.eq(BpmProcess::getBpmServerFlag, ApproveUtils.ServerFlagEnum.LOW_APPROVE.getMessage())
+			.eq(BpmProcess::getIsCastoff, 0);
+
+		List<BpmProcess> list = processService.list(wrapper);
+
+		ProcessLowApproveQualityVO result = new ProcessLowApproveQualityVO();
+		result.setAwait(0);
+		result.setFinish(0);
+		result.setStaleDated(0);
+		for (BpmProcess process : list) {
+			if (new Integer(2).equals(process.getBpmStatus())) {
+				result.setAwait(result.getAwait() + 1);
+			}
+
+			if (new Integer(3).equals(process.getBpmStatus()) || new Integer(4).equals(process.getBpmStatus())) {
+				if (CommonUtil.getUserId().equals(process.getOperatorUser())) {
+					result.setFinish(result.getFinish() + 1);
+				}
+			}
+
+			if (new Integer(1).equals(process.getBpmPushStatus())) {
+				result.setStaleDated(result.getStaleDated() + 1);
+			}
+
+		}
+		return result;
 	}
 
 	private void setCommonOperator(BpmProcess bpmProcess) {

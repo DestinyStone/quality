@@ -8,6 +8,7 @@ import org.springblade.common.cache.RoleCache;
 import org.springblade.common.constant.RootMappingConstant;
 import org.springblade.common.enums.ApproveStatusEnum;
 import org.springblade.common.utils.CommonUtil;
+import org.springblade.core.log.exception.ServiceException;
 import org.springblade.core.mp.support.Condition;
 import org.springblade.core.mp.support.Query;
 import org.springblade.core.tool.api.R;
@@ -15,6 +16,7 @@ import org.springblade.modules.out_buy_low.bean.dto.OutBuyQprFillDTO;
 import org.springblade.modules.out_buy_low.bean.dto.QprCheckSaveDTO;
 import org.springblade.modules.out_buy_low.bean.entity.OutBuyQpr;
 import org.springblade.modules.out_buy_low.bean.vo.OutBuyQprApproveVO;
+import org.springblade.modules.out_buy_low.enums.RejectEnumType;
 import org.springblade.modules.out_buy_low.service.OutBuyQprApproveService;
 import org.springblade.modules.out_buy_low.service.OutBuyQprService;
 import org.springblade.modules.process.entity.bean.BpmProcess;
@@ -101,8 +103,16 @@ public class OutBuyQprApproveController {
 
 	@GetMapping("/pass")
 	@ApiOperation("审批通过")
-	public R pass(@RequestParam("id") Long id) {
-		BpmProcess process = processService.getByBusId(id);
+	public R passAndValidate(@RequestParam("id") Long id, @RequestParam("bpmId") Long bpmId) {
+		BpmProcess process = processService.getById(bpmId);
+		if (process.getEndTime() != null && System.currentTimeMillis() > process.getEndTime().getTime()) {
+			throw new ServiceException("审批已截止");
+		}
+
+		if (process.getBpmStatus().equals(ApproveNodeStatusEnum.SUCCESS.getCode())) {
+			throw new ServiceException("当前节点已审批通过");
+		}
+
 		OutBuyQpr before = qprService.getById(id);
 		OutBuyQpr update = new OutBuyQpr();
 		update.setId(id);
@@ -123,11 +133,32 @@ public class OutBuyQprApproveController {
 	@ApiOperation("审批拒绝")
 	public R reject(@RequestBody @Valid RejectDTO rejectDTO) {
 		BpmProcess process = processService.getByBusId(rejectDTO.getBusId());
-		processService.reject(process.getBpmId(), rejectDTO.getBackCause());
+
+		// 如果当前节点是调查结果确认， 退回到供应商填写
+		Integer status = null;
+		if (process.getBpmFlag().equals("checkConfirm")) {
+			processService.reject(process.getBpmId(), rejectDTO.getBackCause(), RejectEnumType.CHECK_CONFIRM);
+		}else if (process.getBpmFlag().equals("checkApprove")) {
+			processService.reject(process.getBpmId(), rejectDTO.getBackCause(), RejectEnumType.PROVIDER);
+		}else {
+			processService.reject(process.getBpmId(), rejectDTO.getBackCause());
+			status = ApproveStatusEnum.BACK.getCode();
+			// 判断是否需要删除qpr记录
+//			ProcessLow processLow = lowService.getById(rejectDTO.getBusId());
+//			if (processLow != null) {
+//				OutBuyQpr outBuyQpr = new OutBuyQpr();
+//				outBuyQpr.setId(rejectDTO.getBusId());
+//				outBuyQpr.setBpmStatus(ApproveStatusEnum.BACK.getCode());
+//				qprService.updateById(outBuyQpr);
+////				qprService.removeById(rejectDTO.getBusId());
+////				processLow.setBpmStatus(ApproveStatusEnum.BACK.getCode());
+//				lowService.updateById(processLow);
+//			}
+		}
 
 		OutBuyQpr outBuyQpr = new OutBuyQpr();
 		outBuyQpr.setId(new Long(process.getBusId()));
-		outBuyQpr.setBpmStatus(ApproveStatusEnum.BACK.getCode());
+		outBuyQpr.setBpmStatus(status);
 		outBuyQpr.setBpmNode(-1);
 		qprService.updateById(outBuyQpr);
 		return R.status(true);
@@ -150,6 +181,7 @@ public class OutBuyQprApproveController {
 		}
 		approveVO.setDeptId(CommonUtil.getDeptId());
 		approveVO.setRoleId(CommonUtil.getRoleId());
+		approveVO.setUserId(CommonUtil.getUserId());
 		IPage<OutBuyQprApproveVO> page = outBuyQprApproveService.page(approveVO, Condition.getPage(query));
 
 		List<OutBuyQprApproveVO> records = page.getRecords();
