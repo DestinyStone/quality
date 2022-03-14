@@ -8,6 +8,9 @@ import org.springblade.common.utils.CommonUtil;
 import org.springblade.modules.out_buy_low.bean.entity.OutBuyQpr;
 import org.springblade.modules.out_buy_low.mapper.OutBuyQprMapper;
 import org.springblade.modules.out_buy_low.service.OutBuyQprService;
+import org.springblade.modules.work.enums.SettleBusType;
+import org.springblade.modules.work.service.SettleLogService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,12 +27,17 @@ public class OutBuyQprServiceImpl extends ServiceImpl<OutBuyQprMapper, OutBuyQpr
 
 	private static final String CODE_FLAG = "LOW";
 
+	@Autowired
+	private SettleLogService settleLogService;
+
 	@Override
+	@Transactional
 	public Boolean saveAndActiveTask(OutBuyQpr qpr) {
 		commonSet(qpr);
 		qpr.setProcessLowFlag(0);
 		boolean status = save(qpr);
 		ApproveUtils.createTask(qpr.getId() + "", ApproveUtils.ApproveLinkEnum.OUT_BUY_LOW);
+		settleLogService.submitLog(qpr.getTitle(), SettleBusType.OUT_LOW);
 		return status;
 	}
 

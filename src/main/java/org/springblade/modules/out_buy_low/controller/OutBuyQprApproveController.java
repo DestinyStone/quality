@@ -29,6 +29,8 @@ import org.springblade.modules.process_low.bean.entity.ProcessLow;
 import org.springblade.modules.process_low.enums.LowBpmNodeEnum;
 import org.springblade.modules.process_low.service.ProcessLowService;
 import org.springblade.modules.system.entity.Role;
+import org.springblade.modules.work.enums.SettleBusType;
+import org.springblade.modules.work.service.SettleLogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -61,6 +63,9 @@ public class OutBuyQprApproveController {
 	@Autowired
 	private ProcessLowService lowService;
 
+	@Autowired
+	private SettleLogService settleLogService;
+
 	@PostMapping("/handler/check/confirm/{id}")
 	@ApiOperation("处理调查结果确认流程")
 	public R fill(@PathVariable("id") Long id, @Valid @RequestBody OutBuyQprFillDTO fillDTO) {
@@ -78,7 +83,7 @@ public class OutBuyQprApproveController {
 		lowService.updateById(processLow);
 
 		BpmProcess process = processService.getByBusId(id);
-		pass(id, process.getBpmId());
+		pass(id, process.getBpmId(), outBuyQpr);
 		return R.status(true);
 	}
 
@@ -97,7 +102,7 @@ public class OutBuyQprApproveController {
 		lowService.updateById(processLow);
 
 		BpmProcess process = processService.getByBusId(id);
-		pass(id, process.getBpmId());
+		pass(id, process.getBpmId(), outBuyQpr);
 		return R.status(true);
 	}
 
@@ -121,9 +126,9 @@ public class OutBuyQprApproveController {
 		if (process.getBpmFlag().equals("qprApprove")) {
 			HashMap<String, String> map = new HashMap<>();
 			map.put("providerId", before.getDutyDept());
-			pass(id, process.getBpmId(), map);
+			pass(id, process.getBpmId(), map, before);
 		}else {
-			pass(id, process.getBpmId());
+			pass(id, process.getBpmId(), before);
 		}
 
 		return R.status(true);
@@ -207,7 +212,7 @@ public class OutBuyQprApproveController {
 		return R.data(page);
 	}
 
-	private void pass(Long id, Long bpmId, Map<String, String> map) {
+	private void pass(Long id, Long bpmId, Map<String, String> map, OutBuyQpr data) {
 		processService.pass(bpmId, map);
 		OutBuyQpr outBuyQpr = new OutBuyQpr();
 		outBuyQpr.setId(id);
@@ -215,13 +220,15 @@ public class OutBuyQprApproveController {
 			outBuyQpr.setCompleteTime(new Date());
 			outBuyQpr.setBpmStatus(ApproveStatusEnum.FINISN.getCode());
 			qprService.updateById(outBuyQpr);
+			settleLogService.finishLog(data.getTitle(), SettleBusType.OUT_LOW, data.getCreateUser());
 		}else {
 			outBuyQpr.setBpmStatus(ApproveStatusEnum.PROCEED.getCode());
 			qprService.updateById(outBuyQpr);
+			settleLogService.processLog(data.getTitle(), SettleBusType.OUT_LOW);
 		}
 	}
 
-	private void pass(Long id, Long bpmId) {
-		pass(id, bpmId, new HashMap<>());
+	private void pass(Long id, Long bpmId, OutBuyQpr outBuyQpr) {
+		pass(id, bpmId, new HashMap<>(), outBuyQpr);
 	}
 }
