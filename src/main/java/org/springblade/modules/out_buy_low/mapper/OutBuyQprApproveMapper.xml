@@ -72,7 +72,7 @@
 
             <if test="vo.tagFlag == 1">
                 and (temp.process_bpm_status = 3 or temp.process_bpm_status = 4)
-                and temp.operator_user = #{vo.userId}
+                and temp.operator_user = CONCAT(#{vo.userId})
                 and temp.access_dept != -1 and temp.access_role != -1
             </if>
             <if test="vo.tagFlag == 2">

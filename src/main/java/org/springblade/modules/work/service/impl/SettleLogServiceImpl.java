@@ -1,6 +1,7 @@
 package org.springblade.modules.work.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.github.xiaoymin.knife4j.core.util.StrUtil;
 import org.springblade.common.cache.UserCache;
 import org.springblade.common.utils.CommonUtil;
 import org.springblade.modules.work.entity.bean.SettleLog;
@@ -35,7 +36,10 @@ public class SettleLogServiceImpl extends ServiceImpl<SettleLogMapper, SettleLog
 		SettleLog settleLog = new SettleLog();
 		settleLog.setTitle(title);
 		settleLog.setServiceType(type.getCode());
-		settleLog.setBelongToDept(CommonUtil.firstLong(UserCache.getUser(userId).getDeptId()));
+
+		if (StrUtil.isNotBlank(UserCache.getUser(userId).getDeptId())) {
+			settleLog.setBelongToDept(CommonUtil.firstLong(UserCache.getUser(userId).getDeptId()));
+		}
 		settleLog.setBelongToUser(userId);
 		settleLog.setCreateTime(new Date());
 		settleLog.setStatus(2);
@@ -44,13 +48,25 @@ public class SettleLogServiceImpl extends ServiceImpl<SettleLogMapper, SettleLog
 
 	@Override
 	public void processLog(String title, SettleBusType type) {
+		SettleLog settleLog = getCommonApproval(title, type);
+		settleLog.setStatus(1);
+		save(settleLog);
+	}
+
+	@Override
+	public void rejectLog(String title, SettleBusType type) {
+		SettleLog settleLog = getCommonApproval(title, type);
+		settleLog.setStatus(3);
+		save(settleLog);
+	}
+
+	private SettleLog getCommonApproval(String title, SettleBusType type) {
 		SettleLog settleLog = new SettleLog();
 		settleLog.setTitle(title);
 		settleLog.setServiceType(type.getCode());
 		settleLog.setBelongToDept(CommonUtil.getDeptId());
 		settleLog.setBelongToUser(CommonUtil.getUserId());
 		settleLog.setCreateTime(new Date());
-		settleLog.setStatus(1);
-		save(settleLog);
+		return settleLog;
 	}
 }

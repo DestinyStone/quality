@@ -27,4 +27,9 @@ public interface SettleLogService extends IService<SettleLog> {
 	 * 审批日志
 	 */
 	void processLog(String title, SettleBusType type);
+
+	/**
+	 * 拒绝日志
+	 */
+	void rejectLog(String title,  SettleBusType type);
 }

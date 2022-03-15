@@ -15,6 +15,8 @@ import org.springblade.modules.process_low.bean.entity.ProcessLow;
 import org.springblade.modules.process_low.bean.vo.ProcessLowApproveQualityVO;
 import org.springblade.modules.process_low.mapper.ProcessLowMapper;
 import org.springblade.modules.process_low.service.ProcessLowService;
+import org.springblade.modules.work.enums.SettleBusType;
+import org.springblade.modules.work.service.SettleLogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,6 +41,9 @@ public class ProcessLowServiceImpl extends ServiceImpl<ProcessLowMapper, Process
 	@Autowired
 	private BpmProcessLogService logService;
 
+	@Autowired
+	private SettleLogService settleLogService;
+
 	@Override
 	public Boolean saveAndActiveTask(ProcessLow processLow) {
 		boolean status = save(processLow);
@@ -58,8 +63,7 @@ public class ProcessLowServiceImpl extends ServiceImpl<ProcessLowMapper, Process
 			// 开启 工序内不良 审批
 			ApproveUtils.createTask(processLow.getId() + "", ApproveUtils.ApproveLinkEnum.PROCESS_LOW);
 		}
-
-
+		settleLogService.submitLog(processLow.getTitle(), SettleBusType.LOW);
 		return status;
 	}
 

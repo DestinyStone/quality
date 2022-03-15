@@ -86,10 +86,9 @@ public class WorkController {
 		// 获取前30天时间
 		Date date = new Date(System.currentTimeMillis() - 1000 * 60 * 60 * 24 * 30L);
 		LambdaQueryWrapper<SettleLog> wrapper = new LambdaQueryWrapper<>();
-		wrapper.ge(SettleLog::getCreateTime, date);
-		if (!CommonUtil.isAdmin()) {
-			wrapper.eq(SettleLog::getBelongToUser, CommonUtil.getUserId());
-		}
+		wrapper.ge(SettleLog::getCreateTime, date)
+			.orderByDesc(SettleLog::getCreateTime);
+		wrapper.eq(SettleLog::getBelongToUser, CommonUtil.getUserId());
 
 		IPage<SettleLog> page = settleLogService.page(Condition.getPage(query), wrapper);
 		return R.data(SettleLogWrapper.build().pageVO(page));
@@ -99,7 +98,7 @@ public class WorkController {
 	public R<IPage<MessageVO>> page(MessageVO messageVO,  Query query) {
 		LambdaQueryWrapper<Message> wrapper = new LambdaQueryWrapper<>();
 		wrapper.orderByDesc(Message::getCreateTime);
-		IPage<Message> page = messageService.page	(Condition.getPage(query), wrapper);
+		IPage<Message> page = messageService.page(Condition.getPage(query), wrapper);
 		return R.data(MessageWrapper.build().pageVO(page));
 	}
 }

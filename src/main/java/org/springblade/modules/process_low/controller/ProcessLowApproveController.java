@@ -25,7 +25,10 @@ import org.springblade.modules.process_low.bean.vo.ProcessLowApproveVO;
 import org.springblade.modules.process_low.enums.LowBpmNodeEnum;
 import org.springblade.modules.process_low.service.ProcessLowApproveService;
 import org.springblade.modules.process_low.service.ProcessLowService;
+import org.springblade.modules.work.enums.SettleBusType;
+import org.springblade.modules.work.service.SettleLogService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -53,16 +56,20 @@ public class ProcessLowApproveController {
 	@Autowired
 	private OutBuyQprService qprService;
 
+	@Autowired
+	private SettleLogService settleLogService;
+
 	@PostMapping("/handler/qpr/reject")
 	@ApiOperation("处理qpr录入审批")
+	@Transactional
 	public R handlerQprReject(@RequestBody @Valid RejectDTO rejectDTO) {
 		lowService.handlerQprReject(rejectDTO);
-
 		return R.data(true);
 	}
 
 	@PostMapping("/handler/qpr/save/{id}")
 	@ApiOperation("处理qpr录入审批")
+	@Transactional
 	public R handlerQprSave(@PathVariable("id") Long id,
 							@RequestBody @Valid OutBuyQprDTO qprDTO) {
 		qprDTO.validate();
@@ -93,6 +100,7 @@ public class ProcessLowApproveController {
 
 	@GetMapping("/pass")
 	@ApiOperation("审批通过")
+	@Transactional
 	public R passAndValidate(@RequestParam("id") Long id, @RequestParam("bpmId") Long bpmId) {
 		BpmProcess process = processService.getById(bpmId);
 		if (process.getEndTime() != null && System.currentTimeMillis() > process.getEndTime().getTime()) {
@@ -108,10 +116,11 @@ public class ProcessLowApproveController {
 		ProcessLow processLow = new ProcessLow();
 		processLow.setId(id);
 		processLow.setBpmNode(before.getBpmNode() + 1);
+		settleLogService.processLog(processLow.getTitle(), SettleBusType.LOW);
 		if (processService.isProcessEnd(process.getBpmId())) {
 			processLow.setBpmStatus(ApproveStatusEnum.FINISN.getCode());
-			processLow.setBpmStatus(ApproveStatusEnum.FINISN.getCode());
 			lowService.updateById(processLow);
+			settleLogService.finishLog(before.getTitle(), SettleBusType.LOW, before.getCreateUser());
 		}else {
 			processLow.setBpmStatus(ApproveStatusEnum.PROCEED.getCode());
 			lowService.updateById(processLow);
@@ -130,6 +139,9 @@ public class ProcessLowApproveController {
 		processLow.setBpmStatus(ApproveStatusEnum.BACK.getCode());
 		processLow.setBpmNode(-1);
 		lowService.updateById(processLow);
+
+		ProcessLow current = lowService.getById(rejectDTO.getBusId());
+		settleLogService.rejectLog(current.getTitle(), SettleBusType.LOW);
 		return R.status(true);
 	}
 

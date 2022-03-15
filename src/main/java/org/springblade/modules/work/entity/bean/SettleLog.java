@@ -32,7 +32,7 @@ public class SettleLog {
 	@ApiModelProperty("创建时间")
 	private Date createTime;
 
-	@ApiModelProperty("状态 0已发布 1已完成 2已结案")
+	@ApiModelProperty("状态 0已发布 1已完成 2已结案 3已拒绝")
 	private Integer status;
 
 	@ApiModelProperty("归属部门")

@@ -36,6 +36,8 @@ import org.springblade.modules.process_low.enums.LowBpmNodeEnum;
 import org.springblade.modules.process_low.service.ProcessLowService;
 import org.springblade.modules.process_low.utils.ProcessLowExcelUtil;
 import org.springblade.modules.process_low.wrapper.ProcessLowWrapper;
+import org.springblade.modules.work.enums.SettleBusType;
+import org.springblade.modules.work.service.SettleLogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -69,6 +71,9 @@ public class ProcessLowController {
 
 	@Autowired
 	private BpmProcessService processService;
+
+	@Autowired
+	private SettleLogService settleLogService;
 
 	@PostMapping("/account/upload/advice/{id}")
 	public R uploadAdvice(@PathVariable("id") Long id, @Valid @RequestBody ProcessLowAdviceUploadDTO uploadDTO) {
@@ -196,6 +201,7 @@ public class ProcessLowController {
 
 	@PostMapping("/edit/check/{id}")
 	@ApiOperation("提交调查结果")
+	@Transactional
 	public R editCheck(@PathVariable("id") Long id,
 					   @Valid @RequestBody ProcessLowCheckDTO checkDTO) {
 		BpmProcess process = processService.getByBusId(id);
@@ -205,21 +211,26 @@ public class ProcessLowController {
 		processLow.setBpmStatus(ApproveStatusEnum.FINISN.getCode());
 		processLow.setCheckReplyTime(new Date());
 		Boolean status = lowService.updateById(processLow);
+
+		ProcessLow current = lowService.getById(id);
 		processService.pass(process.getBpmId());
 		if (processService.isProcessEnd(process.getBpmId())) {
 			processLow.setBpmStatus(ApproveStatusEnum.FINISN.getCode());
 			processLow.setCompleteTime(new Date());
 			lowService.updateById(processLow);
+
+			settleLogService.finishLog(current.getTitle(), SettleBusType.LOW, current.getCreateUser());
 		}else {
 			processLow.setBpmStatus(ApproveStatusEnum.PROCEED.getCode());
 			lowService.updateById(processLow);
 		}
-
+		settleLogService.processLog(current.getTitle(), SettleBusType.LOW);
 		return R.status(status);
 	}
 
 	@GetMapping("/self/back")
 	@ApiOperation("自撤回接口")
+	@Transactional
 	public R selfBack(@RequestParam("id") Long id) {
 		ProcessLow processLow = lowService.getById(id);
 

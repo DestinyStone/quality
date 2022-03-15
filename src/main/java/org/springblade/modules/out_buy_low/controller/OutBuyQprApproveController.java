@@ -32,6 +32,7 @@ import org.springblade.modules.system.entity.Role;
 import org.springblade.modules.work.enums.SettleBusType;
 import org.springblade.modules.work.service.SettleLogService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -68,6 +69,7 @@ public class OutBuyQprApproveController {
 
 	@PostMapping("/handler/check/confirm/{id}")
 	@ApiOperation("处理调查结果确认流程")
+	@Transactional
 	public R fill(@PathVariable("id") Long id, @Valid @RequestBody OutBuyQprFillDTO fillDTO) {
 		OutBuyQpr outBuyQpr = CommonUtil.copy(fillDTO, OutBuyQpr.class);
 		outBuyQpr.setId(id);
@@ -89,6 +91,7 @@ public class OutBuyQprApproveController {
 
 	@PostMapping("/handler/check/save/{id}")
 	@ApiOperation("处理调查结果录入审批")
+	@Transactional
 	public R handlerCheckSave(@PathVariable("id") Long id, @Valid @RequestBody QprCheckSaveDTO saveDTO) {
 		OutBuyQpr outBuyQpr = CommonUtil.copy(saveDTO, OutBuyQpr.class);
 		outBuyQpr.setId(id);
@@ -108,6 +111,7 @@ public class OutBuyQprApproveController {
 
 	@GetMapping("/pass")
 	@ApiOperation("审批通过")
+	@Transactional
 	public R passAndValidate(@RequestParam("id") Long id, @RequestParam("bpmId") Long bpmId) {
 		BpmProcess process = processService.getById(bpmId);
 		if (process.getEndTime() != null && System.currentTimeMillis() > process.getEndTime().getTime()) {
@@ -136,6 +140,7 @@ public class OutBuyQprApproveController {
 
 	@PostMapping("/reject")
 	@ApiOperation("审批拒绝")
+	@Transactional
 	public R reject(@RequestBody @Valid RejectDTO rejectDTO) {
 		BpmProcess process = processService.getByBusId(rejectDTO.getBusId());
 

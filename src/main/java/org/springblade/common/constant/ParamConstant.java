@@ -65,6 +65,10 @@ public interface ParamConstant {
 	 */
 	public static final String PROVIDER_REPLACE = "${providerId}";
 
+	/**
+	 * 上级领导
+	 */
+	public static final String BOOS = "${boos}";
 
 
 }
