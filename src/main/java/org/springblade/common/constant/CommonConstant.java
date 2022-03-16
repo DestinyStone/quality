@@ -80,5 +80,9 @@ public interface CommonConstant {
 	 */
 	Integer API_SCOPE_CATEGORY = 2;
 
+	Integer YES = 1;
+
+	Integer NO = 0;
+
 
 }

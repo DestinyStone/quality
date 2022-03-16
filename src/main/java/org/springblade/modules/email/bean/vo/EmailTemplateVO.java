@@ -1,4 +1,4 @@
-package org.springblade.modules.email.bean.dto;
+package org.springblade.modules.email.bean.vo;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -15,7 +15,13 @@ import java.util.List;
  */
 @Data
 @ApiModel(value = "邮件模板", description = "邮件模板")
-public class EmailTemplateDTO{
+public class EmailTemplateVO {
+
+	/**
+	 * 主键
+	 */
+	@ApiModelProperty(value = "主键")
+	private Long id;
 
     /**
      * 邮件标题
@@ -44,7 +50,10 @@ public class EmailTemplateDTO{
     @ApiModelProperty(value = "备注")
     private String remark;
 
+	@ApiModelProperty("业务状态")
+	private Integer status;
+
 	@ApiModelProperty(value = "邮件参数")
 	@Valid
-    private List<EmailTemplateParamsDTO> params;
+    private List<EmailTemplateParamVO> params;
 }
