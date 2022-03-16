@@ -11,13 +11,16 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.AllArgsConstructor;
 import org.springblade.common.constant.RootMappingConstant;
+import org.springblade.common.enums.EmailType;
 import org.springblade.common.utils.CommonUtil;
+import org.springblade.common.utils.EmailUtils;
 import org.springblade.core.log.exception.ServiceException;
 import org.springblade.core.mp.support.Condition;
 import org.springblade.core.mp.support.Query;
 import org.springblade.core.tool.api.R;
 import org.springblade.core.tool.utils.Func;
 import org.springblade.modules.email.bean.dto.EmailTemplateDTO;
+import org.springblade.modules.email.bean.dto.EmailTemplateTestDTO;
 import org.springblade.modules.email.bean.entity.EmailTemplate;
 import org.springblade.modules.email.bean.entity.EmailTemplateParam;
 import org.springblade.modules.email.bean.vo.EmailTemplateVO;
@@ -27,6 +30,7 @@ import org.springblade.modules.email.wrapper.EmailTemplateParamsWrapper;
 import org.springblade.modules.email.wrapper.EmailTemplateWrapper;
 import org.springframework.web.bind.annotation.*;
 
+import javax.mail.MessagingException;
 import javax.validation.Valid;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -45,6 +49,23 @@ public class EmailTemplateController {
 	private IEmailTemplateService emailTemplateService;
 
 	private IEmailTemplateParamService emailTemplateParamService;
+
+	/**
+	 * 测试
+	 */
+	@PostMapping("/test")
+	@ApiOperationSupport(order = 1)
+	@ApiOperation(value = "测试")
+	public R detail(@RequestParam("id") Long id, @RequestBody @Valid EmailTemplateTestDTO testDTO) throws MessagingException {
+		EmailTemplate detail = emailTemplateService.getById(id);
+		if (detail == null) {
+			throw new ServiceException("邮件模板不存在");
+		}
+		testDTO.setContent(Base64.decodeStr(testDTO.getContent()));
+		testDTO.setTo(testDTO.getTo() + "@qq.com");
+		EmailUtils.send(detail.getTitle(), testDTO.getContent(), testDTO.getTo(), EmailType.QQ);
+		return R.status(true);
+	}
 
 	/**
 	 * 详情

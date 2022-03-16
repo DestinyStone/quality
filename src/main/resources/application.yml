@@ -56,7 +56,21 @@ spring:
     password: 123456
     database: 0
     ssl: false
-
+  mail:
+    username: 2777679537@qq.com
+    password: rgpbyqgcbjpedcfe
+    host: smtp.qq.com
+    port: 465
+    default-encoding: UTF-8
+    properties:
+      mail:
+        smtp:
+          ssl:
+            enable: true
+          auth: true
+          starttls:
+            enable: true
+            required: true
 # mybatis
 mybatis-plus:
   mapper-locations: classpath:org/springblade/**/mapper/*Mapper.xml,classpath:/META-INF/modeler-mybatis-mappings/*.xml
@@ -263,7 +277,7 @@ file:
   upload:
     server: "http://localhost:7777"
     root:
-       path: D:\application\tomcat\apache-tomcat-8.5.75\webapps\ROOT
+       path: D:\Tomcat\apache-tomcat-8.5.41\webapps\ROOT
 #      path: /usr/local/apache-tomcat-8.5.75/webapps/ROOT
 
 
