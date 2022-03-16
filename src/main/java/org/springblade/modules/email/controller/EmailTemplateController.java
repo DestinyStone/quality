@@ -56,14 +56,19 @@ public class EmailTemplateController {
 	@PostMapping("/test")
 	@ApiOperationSupport(order = 1)
 	@ApiOperation(value = "测试")
-	public R detail(@RequestParam("id") Long id, @RequestBody @Valid EmailTemplateTestDTO testDTO) throws MessagingException {
+	public R detail(@RequestParam("id") Long id, @RequestBody @Valid EmailTemplateTestDTO testDTO){
 		EmailTemplate detail = emailTemplateService.getById(id);
 		if (detail == null) {
 			throw new ServiceException("邮件模板不存在");
 		}
 		testDTO.setContent(Base64.decodeStr(testDTO.getContent()));
 		testDTO.setTo(testDTO.getTo() + "@qq.com");
-		EmailUtils.send(detail.getTitle(), testDTO.getContent(), testDTO.getTo(), EmailType.QQ);
+		try {
+			EmailUtils.send(detail.getTitle(), testDTO.getContent(), testDTO.getTo(), EmailType.QQ);
+		} catch (MessagingException e) {
+			e.printStackTrace();
+			return R.status(false);
+		}
 		return R.status(true);
 	}
 

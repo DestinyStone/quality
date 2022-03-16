@@ -44,6 +44,14 @@ public class CommonUtil {
 	private static final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	private static PropertyPlaceholderHelper helper = new PropertyPlaceholderHelper("${", "}",":", false);
 
+	public static Properties mapToProperties(Map<String, String> map) {
+		Properties properties = new Properties();
+		map.forEach((key, value) -> {
+			properties.setProperty(key, value);
+		});
+		return properties;
+	}
+
 	public static Boolean isAdmin() {
 		return AuthUtil.getUser().getUserName().equals("admin");
 	}
