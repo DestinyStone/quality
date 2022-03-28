@@ -1,6 +1,5 @@
 package org.springblade.modules.check.controller;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import io.swagger.annotations.Api;
@@ -8,7 +7,6 @@ import io.swagger.annotations.ApiOperation;
 import org.springblade.common.cache.RoleCache;
 import org.springblade.common.constant.RootMappingConstant;
 import org.springblade.common.enums.ApproveStatusEnum;
-import org.springblade.common.utils.ApproveUtils;
 import org.springblade.common.utils.CommonUtil;
 import org.springblade.core.mp.support.Condition;
 import org.springblade.core.mp.support.Query;
@@ -121,6 +119,9 @@ public class CheckApproveController {
 		if (approveVO.getTagFlag() == null) {
 			approveVO.setTagFlag(0);
 		}
+		approveVO.setDeptId(CommonUtil.getDeptId());
+		approveVO.setRoleId(CommonUtil.getRoleId());
+		approveVO.setUserId(CommonUtil.getUserId());
 		IPage<CheckApproveVO> page = checkApproveService.page(approveVO, CommonUtil.getDeptId(), Condition.getPage(query));
 
 		List<CheckApproveVO> records = page.getRecords();

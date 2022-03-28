@@ -65,8 +65,16 @@ public class CheckServiceImpl extends ServiceImpl<CheckMapper, Check> implements
 	@Override
 	public CheckApproveQualityVO quality() {
 		LambdaQueryWrapper<BpmProcess> wrapper = new LambdaQueryWrapper<>();
-		wrapper.eq(BpmProcess::getAccessDept, CommonUtil.getDeptId())
-			.eq(BpmProcess::getBpmServerFlag, ApproveUtils.ServerFlagEnum.CHECK_APPROVE.getMessage());
+		wrapper.and(item -> {
+			item.like(BpmProcess::getAccessDept, CommonUtil.getDeptId())
+				.or()
+				.eq(BpmProcess::getAccessDept, 0);
+		}).and(item -> {
+			item.like(BpmProcess::getAccessRole, CommonUtil.getRoleId())
+				.or().eq(BpmProcess::getAccessRole, 0);
+		}).ne(BpmProcess::getBpmFlag, "commit")
+			.eq(BpmProcess::getBpmServerFlag, ApproveUtils.ServerFlagEnum.CHECK_APPROVE.getMessage())
+			.eq(BpmProcess::getIsCastoff, 0);
 
 		List<BpmProcess> list = processService.list(wrapper);
 
@@ -80,7 +88,9 @@ public class CheckServiceImpl extends ServiceImpl<CheckMapper, Check> implements
 			}
 
 			if (new Integer(3).equals(process.getBpmStatus()) || new Integer(4).equals(process.getBpmStatus())) {
-				result.setFinish(result.getFinish() + 1);
+				if (CommonUtil.getUserId().equals(process.getOperatorUser())) {
+					result.setFinish(result.getFinish() + 1);
+				}
 			}
 
 			if (new Integer(1).equals(process.getBpmPushStatus())) {

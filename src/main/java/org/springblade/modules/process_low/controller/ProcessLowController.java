@@ -93,8 +93,6 @@ public class ProcessLowController {
 		if (uploadDTO.getBusinessAdviceFileId() != null) {
 			upload.setBusinessAdviceFileId(uploadDTO.getBusinessAdviceFileId());
 			upload.setBusinessAdviceFileName(uploadDTO.getBusinessAdviceFileName());
-			upload.setPassAdviceFileId(uploadDTO.getPassAdviceFileId());
-			upload.setPassAdviceFileName(uploadDTO.getPassAdviceFileName());
 		}
 
 		if (uploadDTO.getPassAdviceFileId() != null) {

@@ -110,6 +110,10 @@ public class DiReportApproveController {
 		if (vo.getTagFlag() == null) {
 			vo.setTagFlag(0);
 		}
+
+		vo.setDeptId(CommonUtil.getDeptId());
+		vo.setRoleId(CommonUtil.getRoleId());
+		vo.setUserId(CommonUtil.getUserId());
 		IPage<DiReportApproveVO> page = diApproveService.page(vo, CommonUtil.getDeptId(), Condition.getPage(query));
 
 		List<DiReportApproveVO> records = page.getRecords();

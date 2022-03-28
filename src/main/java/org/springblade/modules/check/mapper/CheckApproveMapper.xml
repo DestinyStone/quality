@@ -29,11 +29,15 @@
                 )
             </if>
             <if test="vo.tagFlag == 0">
-                and process.bpm_status = 2 and process.access_dept = #{deptId}
+                and process.bpm_status = 2
+                 and (process.access_dept like CONCAT('%', #{vo.deptId}, '%') or process.access_dept = 0)
+                and (process.access_role like CONCAT('%', #{vo.roleId}, '%') or process.access_role = 0)
             </if>
 
             <if test="vo.tagFlag == 1">
-                and (process.bpm_status = 3 or process.bpm_status = 4) and process.access_dept = #{deptId}
+                and (process.bpm_status = 3 or process.bpm_status = 4)
+                and process.operator_user = CONCAT(#{vo.userId})
+                and process.access_dept != -1 and process.access_role != -1
             </if>
             <if test="vo.tagFlag == 2">
                 and process.bpm_push_status = 1 and bus_check.create_dept = #{deptId}

@@ -277,7 +277,7 @@ file:
   upload:
     server: "http://localhost:7777"
     root:
-       path: D:\Tomcat\apache-tomcat-8.5.41\webapps\ROOT
+       path: D:\application\tomcat\apache-tomcat-8.5.75\webapps\ROOT
 #      path: /usr/local/apache-tomcat-8.5.75/webapps/ROOT
 
 

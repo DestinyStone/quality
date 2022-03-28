@@ -79,4 +79,14 @@ public interface ParamConstant {
 	 * QQ发送者授权码
 	 */
 	public static final String QQ_PASSWORD = "email.qq.password";
+
+	/**
+	 * 系长
+	 */
+	public static final String CHIEF = "CHIEF";
+
+	/**
+	 * 科长
+	 */
+	public static final String DEPT = "DEPT";
 }
