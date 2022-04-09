@@ -44,6 +44,9 @@
         <if test="user.userType!=null and user.userType != ''">
             and user_type = #{user.userType}
         </if>
+        <if test="user.name!=null and user.name != ''">
+            and name like concat('%', #{user.name} , '%')
+        </if>
         <if test="deptIdList!=null and deptIdList.size>0">
             and id in (
                 SELECT

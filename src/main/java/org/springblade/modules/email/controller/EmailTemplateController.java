@@ -11,6 +11,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.AllArgsConstructor;
 import org.springblade.common.constant.RootMappingConstant;
+import org.springblade.common.core.anon.Idempotence;
 import org.springblade.common.enums.EmailType;
 import org.springblade.common.utils.CommonUtil;
 import org.springblade.common.utils.EmailUtils;
@@ -56,6 +57,7 @@ public class EmailTemplateController {
 	@PostMapping("/test")
 	@ApiOperationSupport(order = 1)
 	@ApiOperation(value = "测试")
+	@Idempotence
 	public R detail(@RequestParam("id") Long id, @RequestBody @Valid EmailTemplateTestDTO testDTO){
 		EmailTemplate detail = emailTemplateService.getById(id);
 		if (detail == null) {
