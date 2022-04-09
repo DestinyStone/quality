@@ -17,12 +17,14 @@
 package org.springblade.modules.auth.endpoint;
 
 import com.github.xiaoymin.knife4j.annotations.ApiSort;
+import com.github.xiaoymin.knife4j.core.util.StrUtil;
 import com.wf.captcha.SpecCaptcha;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.AllArgsConstructor;
 import org.springblade.common.cache.CacheNames;
+import org.springblade.common.constant.PhoneConstant;
 import org.springblade.core.cache.utils.CacheUtil;
 import org.springblade.core.jwt.JwtUtil;
 import org.springblade.core.jwt.props.JwtProperties;
@@ -40,11 +42,13 @@ import org.springblade.modules.auth.provider.ITokenGranter;
 import org.springblade.modules.auth.provider.TokenGranterBuilder;
 import org.springblade.modules.auth.provider.TokenParameter;
 import org.springblade.modules.auth.utils.TokenUtil;
+import org.springblade.modules.phone.utils.PhoneTemplateUtils;
 import org.springblade.modules.system.entity.UserInfo;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 import java.time.Duration;
+import java.util.HashMap;
 import java.util.UUID;
 
 import static org.springblade.core.cache.constant.CacheConstant.*;
@@ -93,7 +97,15 @@ public class BladeTokenEndPoint {
 			return authInfo.set("error_code", HttpServletResponse.SC_BAD_REQUEST).set("error_description", "未获得用户的角色信息");
 		}
 
-		return TokenUtil.createAuthInfo(userInfo);
+		Kv result = TokenUtil.createAuthInfo(userInfo);
+
+		if (StrUtil.isNotBlank(userInfo.getUser().getPhone())) {
+			HashMap<String, String> map = new HashMap<>();
+			map.put("userName", userInfo.getUser().getName());
+			PhoneTemplateUtils.sendEmailSync(PhoneConstant.LOGIN, userInfo.getUser().getPhone(), map);
+		}
+
+		return result;
 	}
 
 

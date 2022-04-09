@@ -18,6 +18,7 @@ package org.springblade.common.utils;
 
 import cn.hutool.core.lang.Snowflake;
 import cn.hutool.core.util.IdUtil;
+import com.alibaba.fastjson.JSONObject;
 import org.springblade.common.cache.RoleCache;
 import org.springblade.common.cache.SysCache;
 import org.springblade.core.secure.BladeUser;
@@ -29,7 +30,10 @@ import org.springblade.modules.system.entity.Dept;
 import org.springblade.modules.system.entity.Role;
 import org.springframework.lang.Nullable;
 import org.springframework.util.PropertyPlaceholderHelper;
+import org.springframework.web.context.request.RequestAttributes;
+import org.springframework.web.context.request.RequestContextHolder;
 
+import javax.servlet.http.HttpServletRequest;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -43,6 +47,20 @@ public class CommonUtil {
 	private static final Snowflake snowflake = IdUtil.createSnowflake(1, 1);
 	private static final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	private static PropertyPlaceholderHelper helper = new PropertyPlaceholderHelper("${", "}",":", false);
+
+	public static String getHost() {
+		RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
+		HttpServletRequest request = (HttpServletRequest) requestAttributes.resolveReference(RequestAttributes.REFERENCE_REQUEST);
+		return request.getRemoteHost();
+	}
+
+	public static JSONObject mapToJson(Map<String, String> map) {
+		JSONObject json = new JSONObject();
+		map.forEach((key, value) -> {
+			json.put(key, value);
+		});
+		return json;
+	}
 
 	public static Properties mapToProperties(Map<String, String> map) {
 		Properties properties = new Properties();

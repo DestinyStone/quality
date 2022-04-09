@@ -17,15 +17,20 @@
 package org.springblade.modules.system.controller;
 
 
+import cn.hutool.core.codec.Base64Decoder;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.github.xiaoymin.knife4j.annotations.ApiOperationSupport;
+import com.github.xiaoymin.knife4j.core.util.StrUtil;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.AllArgsConstructor;
 import org.springblade.common.cache.SysCache;
+import org.springblade.common.cache.UserCache;
+import org.springblade.common.constant.CommonConstant;
+import org.springblade.common.constant.PhoneConstant;
 import org.springblade.core.cache.utils.CacheUtil;
 import org.springblade.core.excel.util.ExcelUtil;
 import org.springblade.core.launch.constant.AppConstant;
@@ -42,6 +47,7 @@ import org.springblade.core.tool.constant.RoleConstant;
 import org.springblade.core.tool.utils.DateUtil;
 import org.springblade.core.tool.utils.Func;
 import org.springblade.core.tool.utils.StringPool;
+import org.springblade.modules.phone.utils.PhoneTemplateUtils;
 import org.springblade.modules.system.entity.User;
 import org.springblade.modules.system.excel.UserExcel;
 import org.springblade.modules.system.excel.UserImporter;
@@ -55,6 +61,7 @@ import springfox.documentation.annotations.ApiIgnore;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -187,6 +194,19 @@ public class UserController {
 	@PreAuth(AuthConstant.PERMISSION_ALL)
 	public R resetPassword(@ApiParam(value = "userId集合", required = true) @RequestParam String userIds) {
 		boolean temp = userService.resetPassword(userIds);
+		if (temp) {
+			List<Long> ids = Func.toLongList(userIds);
+			for (Long id : ids) {
+				User user = UserCache.getUser(id);
+				if (StrUtil.isNotBlank(user.getPhone())) {
+					HashMap<String, String> map = new HashMap<>();
+					map.put("userName", user.getName());
+					map.put("password", CommonConstant.DEFAULT_PASSWORD);
+					PhoneTemplateUtils.sendEmailSync(PhoneConstant.INIT_PASSWORD, user.getPhone(), map);
+				}
+			}
+
+		}
 		return R.status(temp);
 	}
 
@@ -198,8 +218,17 @@ public class UserController {
 	@ApiOperation(value = "修改密码", notes = "传入密码")
 	public R updatePassword(BladeUser user, @ApiParam(value = "旧密码", required = true) @RequestParam String oldPassword,
 							@ApiParam(value = "新密码", required = true) @RequestParam String newPassword,
-							@ApiParam(value = "新密码", required = true) @RequestParam String newPassword1) {
+							@ApiParam(value = "新密码", required = true) @RequestParam String newPassword1,
+							@RequestParam String newPasswordFuzzy) {
 		boolean temp = userService.updatePassword(user.getUserId(), oldPassword, newPassword, newPassword1);
+		User currentUser = UserCache.getUser(user.getUserId());
+		if (temp && StrUtil.isNotBlank(currentUser.getPhone())) {
+			String decode = Base64Decoder.decodeStr(newPasswordFuzzy);
+			HashMap<String, String> map = new HashMap<>();
+			map.put("userName", currentUser.getName());
+			map.put("pdEncry", decode + "*******");
+			PhoneTemplateUtils.sendEmailSync(PhoneConstant.SET_PASSWORD, currentUser.getPhone(), map);
+		}
 		return R.status(temp);
 	}
 
