@@ -19,6 +19,7 @@ import org.springblade.modules.out_buy_low.bean.vo.OutBuyQprApproveVO;
 import org.springblade.modules.out_buy_low.enums.RejectEnumType;
 import org.springblade.modules.out_buy_low.service.OutBuyQprApproveService;
 import org.springblade.modules.out_buy_low.service.OutBuyQprService;
+import org.springblade.modules.out_buy_low.utils.OutBuyQprEmailUtils;
 import org.springblade.modules.process.entity.bean.BpmProcess;
 import org.springblade.modules.process.entity.bean.BpmProcessUrge;
 import org.springblade.modules.process.entity.dto.RejectDTO;
@@ -28,6 +29,7 @@ import org.springblade.modules.process.service.ProcessUrgeService;
 import org.springblade.modules.process_low.bean.entity.ProcessLow;
 import org.springblade.modules.process_low.enums.LowBpmNodeEnum;
 import org.springblade.modules.process_low.service.ProcessLowService;
+import org.springblade.modules.process_low.utils.ProcessLowEmailUtils;
 import org.springblade.modules.system.entity.Role;
 import org.springblade.modules.work.enums.SettleBusType;
 import org.springblade.modules.work.service.SettleLogService;
@@ -225,7 +227,17 @@ public class OutBuyQprApproveController {
 			outBuyQpr.setCompleteTime(new Date());
 			outBuyQpr.setBpmStatus(ApproveStatusEnum.FINISN.getCode());
 			qprService.updateById(outBuyQpr);
+			OutBuyQprEmailUtils.sendCompleteWarning(data);
 			settleLogService.finishLog(data.getTitle(), SettleBusType.OUT_LOW, data.getCreateUser());
+
+			ProcessLow processLow = lowService.getById(id);
+			if (processLow != null) {
+				processLow.setBpmStatus(ApproveStatusEnum.FINISN.getCode());
+				lowService.updateById(processLow);
+				ProcessLowEmailUtils.sendCompleteWarningEmail(processLow);
+				settleLogService.finishLog(processLow.getTitle(), SettleBusType.LOW, processLow.getCreateUser());
+			}
+
 		}else {
 			outBuyQpr.setBpmStatus(ApproveStatusEnum.PROCEED.getCode());
 			qprService.updateById(outBuyQpr);

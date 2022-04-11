@@ -29,7 +29,10 @@ import org.springblade.modules.process.enums.ApproveNodeStatusEnum;
 import org.springblade.modules.process.service.BpmProcessService;
 import org.springblade.modules.process.service.ProcessUrgeService;
 import org.springblade.modules.system.entity.Role;
+import org.springblade.modules.work.enums.SettleBusType;
+import org.springblade.modules.work.service.SettleLogService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -64,6 +67,10 @@ public class CheckApproveController {
 	@Autowired
 	private AccountService accountService;
 
+
+	@Autowired
+	private SettleLogService settleLogService;
+
 	@PostMapping("/warning")
 	@ApiOperation("检查制作提醒")
 	public R warning(@RequestBody @Valid List<ResourceDTO> resourceDtoList) {
@@ -89,6 +96,7 @@ public class CheckApproveController {
 
 	@PostMapping("/reject")
 	@ApiOperation("审批拒绝")
+	@Transactional
 	public R reject(@RequestBody @Valid RejectDTO rejectDTO) {
 		BpmProcess process = processService.getByBusId(rejectDTO.getBusId());
 		processService.reject(process.getBpmId(), rejectDTO.getBackCause());
@@ -104,6 +112,7 @@ public class CheckApproveController {
 
 	@PostMapping("/download/pass")
 	@ApiOperation("下载源文件审批 通过")
+	@Transactional
 	public R downloadPass(@RequestParam("id") Long id, @Valid @RequestBody BusFileDTO fileDTO) {
 		BpmProcess process = processService.getByBusId(id);
 
@@ -123,6 +132,7 @@ public class CheckApproveController {
 
 	@GetMapping("/pass")
 	@ApiOperation("审批通过")
+	@Transactional
 	public R pass(@RequestParam("id") Long id) {
 		BpmProcess process = processService.getByBusId(id);
 		// 审批通过
@@ -191,6 +201,8 @@ public class CheckApproveController {
 			check.setOldToyotaExcelFileId(current.getToyotaExcelFileId());
 			check.setOldToyotaExcelFileName(current.getToyotaExcelFileName());
 			checkService.updateById(check);
+			CheckEmailUtils.sendCompleteEmail(current);
+			settleLogService.finishLog("检查法编号:"+ current.getCode(), SettleBusType.CHECK, current.getCreateUser());
 			AccountUtils.record(check.getId(), AccountUtils.Bus.CHECK, current);
 		}else {
 			check.setBpmStatus(ApproveStatusEnum.PROCEED.getCode());

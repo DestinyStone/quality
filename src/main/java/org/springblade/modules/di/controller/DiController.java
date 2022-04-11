@@ -27,6 +27,7 @@ import org.springblade.modules.di.service.DiConfigService;
 import org.springblade.modules.di.service.DiReportApproveService;
 import org.springblade.modules.di.service.DiReportService;
 import org.springblade.modules.di.service.DiService;
+import org.springblade.modules.di.utils.DiEmailUtils;
 import org.springblade.modules.di.wrapper.DiConfigWrapper;
 import org.springblade.modules.di.wrapper.DiReportWrapper;
 import org.springblade.modules.out_buy_low.bean.dto.ResourceDTO;
@@ -34,6 +35,8 @@ import org.springblade.modules.out_buy_low.utils.ResourceConvertUtil;
 import org.springblade.modules.process.entity.bean.BpmProcess;
 import org.springblade.modules.process.service.BpmProcessService;
 import org.springblade.modules.system.entity.Role;
+import org.springblade.modules.work.enums.SettleBusType;
+import org.springblade.modules.work.service.SettleLogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -67,6 +70,9 @@ public class DiController {
 
 	@Autowired
 	private BpmProcessService processService;
+
+	@Autowired
+	private SettleLogService logService;
 
 	@GetMapping("/version/page")
 	@ApiOperation("Di数据版本")
@@ -216,6 +222,8 @@ public class DiController {
 
 		reportService.report(id, submitDTO);
 		diApproveService.create(id);
+		DiEmailUtils.sendEmail(report);
+		logService.submitLog("DI数据编号:" + report.getCode(), SettleBusType.DI);
 		return R.status(true);
 	}
 

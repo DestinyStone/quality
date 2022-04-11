@@ -26,14 +26,27 @@ public class DiEmailUtils {
 		userService = SpringUtil.getBean(IUserService.class);
 	}
 
+	public static void sendCompleteEmail(DiReport diReport) {
+		sendCommonEmail(diReport, EmailConstant.DI_DATA_COMPLETE);
+	}
+
 	public static void sendEmail(DiReport diReport) {
+		sendCommonEmail(diReport, EmailConstant.SUBMIT_DI_DATA);
+	}
+
+	public static void sendOverEmail(DiReport diReport) {
+		sendCommonEmail(diReport, EmailConstant.DI_DATA_OVER);
+	}
+
+	public static void sendCommonEmail(DiReport diReport, String constant) {
 		Long createUser = diReport.getReportUser();
 		User user = UserCache.getUser(createUser);
 		if (StrUtil.isNotBlank(user.getEmail())) {
 			try {
 				HashMap<String, String> map = new HashMap<>();
 				map.put("userName", user.getName());
-				EmailTemplateUtils.send(EmailConstant.SUBMIT_DI_DATA, user.getEmail(), EmailType.QQ, map);
+				map.put("code", diReport.getCode());
+				EmailTemplateUtils.send(constant, user.getEmail(), EmailType.QQ, map);
 			} catch (MessagingException e) {
 				e.printStackTrace();
 			}

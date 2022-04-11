@@ -14,6 +14,8 @@ import org.springblade.modules.check.service.CheckService;
 import org.springblade.modules.check.utils.CheckEmailUtils;
 import org.springblade.modules.process.entity.bean.BpmProcess;
 import org.springblade.modules.process.service.BpmProcessService;
+import org.springblade.modules.work.enums.SettleBusType;
+import org.springblade.modules.work.service.SettleLogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,6 +36,9 @@ public class CheckServiceImpl extends ServiceImpl<CheckMapper, Check> implements
 	@Autowired
 	private BpmProcessService processService;
 
+	@Autowired
+	private SettleLogService logService;
+
 	@Override
 	public IPage<AccessSaveCheckVO> accessSavePage(AccessSaveCheckVO approveVO, IPage<AccessSaveCheckVO> page) {
 		return page.setRecords(checkMapper.accessSavePage(approveVO, page));
@@ -52,7 +57,8 @@ public class CheckServiceImpl extends ServiceImpl<CheckMapper, Check> implements
 		}
 		for (Check check : collect) {
 			saveAndActiveTask(check);
-			CheckEmailUtils.sendEmail(check);
+			CheckEmailUtils.sendSubmitEmail(check);
+			logService.submitLog("检查法编号:" + check.getCode(), SettleBusType.CHECK);
 		}
 		return true;
 	}

@@ -25,7 +25,15 @@ public class ProcessLowEmailUtils {
 		userService = SpringUtil.getBean(IUserService.class);
 	}
 
+	public static void sendCompleteWarningEmail(ProcessLow processLow) {
+		sendWarning(processLow, EmailConstant.PROCESS_LOW_COMPLETE);
+	}
+
 	public static void sendWarningEmail(ProcessLow processLow) {
+		sendWarning(processLow, EmailConstant.SUBMIT_PROCESS_LOW);
+	}
+
+	private static void sendWarning(ProcessLow processLow, String constant) {
 		Long createUser = processLow.getCreateUser();
 		User user = UserCache.getUser(createUser);
 		if (StrUtil.isNotBlank(user.getEmail())) {
@@ -33,7 +41,7 @@ public class ProcessLowEmailUtils {
 				HashMap<String, String> map = new HashMap<>();
 				map.put("userName", user.getName());
 				map.put("title", processLow.getTitle());
-				EmailTemplateUtils.send(EmailConstant.SUBMIT_PROCESS_LOW, user.getEmail(), EmailType.QQ, map);
+				EmailTemplateUtils.send(constant, user.getEmail(), EmailType.QQ, map);
 			} catch (MessagingException e) {
 				e.printStackTrace();
 			}

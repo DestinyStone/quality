@@ -25,6 +25,7 @@ import org.springblade.modules.process_low.bean.vo.ProcessLowApproveVO;
 import org.springblade.modules.process_low.enums.LowBpmNodeEnum;
 import org.springblade.modules.process_low.service.ProcessLowApproveService;
 import org.springblade.modules.process_low.service.ProcessLowService;
+import org.springblade.modules.process_low.utils.ProcessLowEmailUtils;
 import org.springblade.modules.work.enums.SettleBusType;
 import org.springblade.modules.work.service.SettleLogService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -120,6 +121,7 @@ public class ProcessLowApproveController {
 		if (processService.isProcessEnd(process.getBpmId())) {
 			processLow.setBpmStatus(ApproveStatusEnum.FINISN.getCode());
 			lowService.updateById(processLow);
+			ProcessLowEmailUtils.sendCompleteWarningEmail(processLow);
 			settleLogService.finishLog(before.getTitle(), SettleBusType.LOW, before.getCreateUser());
 		}else {
 			processLow.setBpmStatus(ApproveStatusEnum.PROCEED.getCode());

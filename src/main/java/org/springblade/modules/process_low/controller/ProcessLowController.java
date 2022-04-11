@@ -34,6 +34,7 @@ import org.springblade.modules.process_low.bean.vo.ProcessLowQualityVO;
 import org.springblade.modules.process_low.bean.vo.ProcessLowVO;
 import org.springblade.modules.process_low.enums.LowBpmNodeEnum;
 import org.springblade.modules.process_low.service.ProcessLowService;
+import org.springblade.modules.process_low.utils.ProcessLowEmailUtils;
 import org.springblade.modules.process_low.utils.ProcessLowExcelUtil;
 import org.springblade.modules.process_low.wrapper.ProcessLowWrapper;
 import org.springblade.modules.work.enums.SettleBusType;
@@ -216,7 +217,7 @@ public class ProcessLowController {
 			processLow.setBpmStatus(ApproveStatusEnum.FINISN.getCode());
 			processLow.setCompleteTime(new Date());
 			lowService.updateById(processLow);
-
+			ProcessLowEmailUtils.sendCompleteWarningEmail(current);
 			settleLogService.finishLog(current.getTitle(), SettleBusType.LOW, current.getCreateUser());
 		}else {
 			processLow.setBpmStatus(ApproveStatusEnum.PROCEED.getCode());
@@ -332,6 +333,7 @@ public class ProcessLowController {
 		wrapper.eq(processLowVO.getType() != null, ProcessLow::getType, processLowVO.getType())
 			.eq(processLowVO.getApparatusType() != null, ProcessLow::getApparatusType, processLowVO.getApparatusType())
 			.eq(processLowVO.getTriggerAddress() != null, ProcessLow::getTriggerAddress, processLowVO.getTriggerAddress());
+		wrapper.orderByDesc(ProcessLow::getCreateTime);
 		if (!CommonUtil.isAdmin()) {
 			wrapper.in(ProcessLow::getCreateDept, CommonUtil.getDeptIds());
 		}
