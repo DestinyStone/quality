@@ -8,6 +8,7 @@ import org.springblade.common.utils.CommonUtil;
 import org.springblade.modules.out_buy_low.bean.entity.OutBuyQpr;
 import org.springblade.modules.out_buy_low.mapper.OutBuyQprMapper;
 import org.springblade.modules.out_buy_low.service.OutBuyQprService;
+import org.springblade.modules.out_buy_low.utils.OutBuyQprEmailUtils;
 import org.springblade.modules.work.enums.SettleBusType;
 import org.springblade.modules.work.service.SettleLogService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +39,7 @@ public class OutBuyQprServiceImpl extends ServiceImpl<OutBuyQprMapper, OutBuyQpr
 		boolean status = save(qpr);
 		ApproveUtils.createTask(qpr.getId() + "", ApproveUtils.ApproveLinkEnum.OUT_BUY_LOW);
 		settleLogService.submitLog(qpr.getTitle(), SettleBusType.OUT_LOW);
+		OutBuyQprEmailUtils.sendWarningEmail(qpr);
 		return status;
 	}
 

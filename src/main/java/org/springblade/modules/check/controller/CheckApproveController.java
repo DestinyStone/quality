@@ -1,6 +1,5 @@
 package org.springblade.modules.check.controller;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import io.swagger.annotations.Api;
@@ -8,7 +7,6 @@ import io.swagger.annotations.ApiOperation;
 import org.springblade.common.cache.RoleCache;
 import org.springblade.common.constant.RootMappingConstant;
 import org.springblade.common.enums.ApproveStatusEnum;
-import org.springblade.common.utils.ApproveUtils;
 import org.springblade.common.utils.CommonUtil;
 import org.springblade.core.mp.support.Condition;
 import org.springblade.core.mp.support.Query;
@@ -20,7 +18,10 @@ import org.springblade.modules.check.bean.vo.CheckApproveQualityVO;
 import org.springblade.modules.check.bean.vo.CheckApproveVO;
 import org.springblade.modules.check.service.CheckApproveService;
 import org.springblade.modules.check.service.CheckService;
+import org.springblade.modules.check.utils.CheckEmailUtils;
 import org.springblade.modules.file.bean.dto.BusFileDTO;
+import org.springblade.modules.out_buy_low.bean.dto.ResourceDTO;
+import org.springblade.modules.out_buy_low.utils.ResourceConvertUtil;
 import org.springblade.modules.process.entity.bean.BpmProcess;
 import org.springblade.modules.process.entity.bean.BpmProcessUrge;
 import org.springblade.modules.process.entity.dto.RejectDTO;
@@ -62,6 +63,29 @@ public class CheckApproveController {
 
 	@Autowired
 	private AccountService accountService;
+
+	@PostMapping("/warning")
+	@ApiOperation("检查制作提醒")
+	public R warning(@RequestBody @Valid List<ResourceDTO> resourceDtoList) {
+
+		List<ResourceDTO.Encumbrance> resourceList = ResourceConvertUtil.convert(resourceDtoList);
+		Map<Long, ResourceDTO.Encumbrance> encumbranceMap = ResourceConvertUtil.convertMap(resourceList);
+
+		List<Check> list = resourceList.stream().map(item -> {
+			Check copy = new Check();
+			copy.setResourceId(item.getResourceId());
+			ResourceDTO.Encumbrance encumbrance = encumbranceMap.getOrDefault(item.getResourceId(),  new ResourceDTO.Encumbrance());
+			copy.setName(encumbrance.getName());
+			copy.setDesignation(encumbrance.getDesignation());
+			copy.setDutyDept(encumbrance.getDutyDept());
+			return copy;
+		}).collect(Collectors.toList());
+
+		for (Check check : list) {
+			CheckEmailUtils.sendWarningEmail(check);
+		}
+		return R.status(true);
+	}
 
 	@PostMapping("/reject")
 	@ApiOperation("审批拒绝")

@@ -15,6 +15,7 @@ import org.springblade.modules.process_low.bean.entity.ProcessLow;
 import org.springblade.modules.process_low.bean.vo.ProcessLowApproveQualityVO;
 import org.springblade.modules.process_low.mapper.ProcessLowMapper;
 import org.springblade.modules.process_low.service.ProcessLowService;
+import org.springblade.modules.process_low.utils.ProcessLowEmailUtils;
 import org.springblade.modules.work.enums.SettleBusType;
 import org.springblade.modules.work.service.SettleLogService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,6 +65,7 @@ public class ProcessLowServiceImpl extends ServiceImpl<ProcessLowMapper, Process
 			ApproveUtils.createTask(processLow.getId() + "", ApproveUtils.ApproveLinkEnum.PROCESS_LOW);
 		}
 		settleLogService.submitLog(processLow.getTitle(), SettleBusType.LOW);
+		ProcessLowEmailUtils.sendWarningEmail(processLow);
 		return status;
 	}
 

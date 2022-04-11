@@ -26,7 +26,14 @@ public class EmailUtils {
 			helper.setTo(to);
 			helper.setFrom(type.getFrom());
 			helper.setText(content, true);
-			mailsender.send(mimeMessage);
+
+			/**
+			 * TODO 后续可更换为线程池
+			 */
+			new Thread(() -> {
+				mailsender.send(mimeMessage);
+			}).start();
+
 		}
 	}
 

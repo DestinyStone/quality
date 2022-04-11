@@ -1,6 +1,7 @@
 package org.springblade.modules.email.service.impl;
 
 import cn.hutool.core.util.ReUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import org.springblade.core.log.exception.ServiceException;
 import org.springblade.core.mp.base.BaseServiceImpl;
@@ -99,4 +100,11 @@ public class EmailTemplateServiceImpl extends BaseServiceImpl<EmailTemplateMappe
         }
         return content;
     }
+
+	@Override
+	public EmailTemplate getByCode(String code) {
+		LambdaQueryWrapper<EmailTemplate> wrapper = new LambdaQueryWrapper<>();
+		wrapper.eq(EmailTemplate::getCode, code);
+		return getOne(wrapper);
+	}
 }

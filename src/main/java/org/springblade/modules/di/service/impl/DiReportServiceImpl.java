@@ -9,6 +9,7 @@ import org.springblade.modules.di.bean.entity.DiReport;
 import org.springblade.modules.di.mapper.DiReportMapper;
 import org.springblade.modules.di.service.DiConfigService;
 import org.springblade.modules.di.service.DiReportService;
+import org.springblade.modules.di.utils.DiEmailUtils;
 import org.springblade.modules.system.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -38,7 +39,11 @@ public class DiReportServiceImpl extends ServiceImpl<DiReportMapper, DiReport> i
 			common.setCode(CodeUtil.getCode(CODE_FLAG));
 			return common;
 		}).collect(Collectors.toList());
-		return saveBatch(collect);
+		Boolean status = saveBatch(collect);
+		for (DiReport diReport : collect) {
+			DiEmailUtils.sendEmail(diReport);
+		}
+		return status;
 	}
 
 	@Override

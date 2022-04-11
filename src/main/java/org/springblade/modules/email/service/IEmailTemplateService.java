@@ -75,4 +75,10 @@ public interface IEmailTemplateService extends BaseService<EmailTemplate> {
      */
     String buildContent(EmailTemplate template, Map<String, Object> values);
 
+	/**
+	 * 获取邮件 根据code编码
+	 * @param code
+	 * @return
+	 */
+	EmailTemplate getByCode(String code);
 }

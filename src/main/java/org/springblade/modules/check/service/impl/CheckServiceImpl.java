@@ -11,6 +11,7 @@ import org.springblade.modules.check.bean.vo.CheckApproveQualityVO;
 import org.springblade.modules.check.bean.vo.CheckVO;
 import org.springblade.modules.check.mapper.CheckMapper;
 import org.springblade.modules.check.service.CheckService;
+import org.springblade.modules.check.utils.CheckEmailUtils;
 import org.springblade.modules.process.entity.bean.BpmProcess;
 import org.springblade.modules.process.service.BpmProcessService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,6 +52,7 @@ public class CheckServiceImpl extends ServiceImpl<CheckMapper, Check> implements
 		}
 		for (Check check : collect) {
 			saveAndActiveTask(check);
+			CheckEmailUtils.sendEmail(check);
 		}
 		return true;
 	}
