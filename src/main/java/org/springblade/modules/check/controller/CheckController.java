@@ -29,12 +29,10 @@ import org.springblade.modules.file.bean.vo.BusFileVO;
 import org.springblade.modules.file.service.BusFileService;
 import org.springblade.modules.file.wrapper.BusFileWrapper;
 import org.springblade.modules.out_buy_low.bean.dto.ResourceDTO;
-import org.springblade.modules.out_buy_low.bean.entity.OutBuyQpr;
 import org.springblade.modules.out_buy_low.service.OutBuyQprService;
 import org.springblade.modules.out_buy_low.utils.ResourceConvertUtil;
 import org.springblade.modules.process.entity.bean.BpmProcess;
 import org.springblade.modules.process.service.BpmProcessService;
-import org.springblade.modules.process_low.bean.entity.ProcessLow;
 import org.springblade.modules.process_low.service.ProcessLowService;
 import org.springblade.modules.system.entity.Role;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -90,7 +88,7 @@ public class CheckController {
 				.or()
 				.like(Check::getDutyDept, vo.getSearchKey());
 		});
-		wrapper.eq(Check::getIsAccessAccount, 1);
+//		wrapper.eq(Check::getIsAccessAccount, 1);
 
 		IPage<Check> page = checkService.page(Condition.getPage(query), wrapper);
 
@@ -229,21 +227,25 @@ public class CheckController {
 		List<ResourceDTO.Encumbrance> resourceList = ResourceConvertUtil.convert(checkDTO.getResourceList());
 		Map<Long, ResourceDTO.Encumbrance> encumbranceMap = ResourceConvertUtil.convertMap(resourceList);
 
-		List<Long> qprIds = ResourceConvertUtil.getQprIds(checkDTO.getResourceList());
-		if (!qprIds.isEmpty()) {
-			LambdaUpdateWrapper<OutBuyQpr> wrapper = new LambdaUpdateWrapper<>();
-			wrapper.in(OutBuyQpr::getId, qprIds)
-				.set(OutBuyQpr::getIsAccessCheck, 0);
-			qprService.update(wrapper);
-		}
+		// 判断是否存在科长
 
-		List<Long> lowIds = ResourceConvertUtil.getLowIds(checkDTO.getResourceList());
-		if (!lowIds.isEmpty()) {
-			LambdaUpdateWrapper<ProcessLow> wrapper = new LambdaUpdateWrapper<>();
-			wrapper.in(ProcessLow::getId, lowIds)
-				.set(ProcessLow::getIsAccessCheck, 0);
-			lowService.update(wrapper);
-		}
+
+		// 取消检查法消减
+//		List<Long> qprIds = ResourceConvertUtil.getQprIds(checkDTO.getResourceList());
+//		if (!qprIds.isEmpty()) {
+//			LambdaUpdateWrapper<OutBuyQpr> wrapper = new LambdaUpdateWrapper<>();
+//			wrapper.in(OutBuyQpr::getId, qprIds)
+//				.set(OutBuyQpr::getIsAccessCheck, 1);
+//			qprService.update(wrapper);
+//		}
+//
+//		List<Long> lowIds = ResourceConvertUtil.getLowIds(checkDTO.getResourceList());
+//		if (!lowIds.isEmpty()) {
+//			LambdaUpdateWrapper<ProcessLow> wrapper = new LambdaUpdateWrapper<>();
+//			wrapper.in(ProcessLow::getId, lowIds)
+//				.set(ProcessLow::getIsAccessCheck, 1);
+//			lowService.update(wrapper);
+//		}
 
 
 		List<Check> collect = resourceList.stream().map(item -> {

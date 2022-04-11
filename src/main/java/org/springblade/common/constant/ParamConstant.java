@@ -70,5 +70,23 @@ public interface ParamConstant {
 	 */
 	public static final String BOOS = "${boos}";
 
+	/**
+	 * QQ发送者邮箱
+	 */
+	public static final String QQ_USERNAME = "email.qq.username";
 
+	/**
+	 * QQ发送者授权码
+	 */
+	public static final String QQ_PASSWORD = "email.qq.password";
+
+	/**
+	 * 系长
+	 */
+	public static final String CHIEF = "CHIEF";
+
+	/**
+	 * 科长
+	 */
+	public static final String DEPT = "DEPT";
 }

@@ -3,7 +3,6 @@ package org.springblade.modules.check.bean.vo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Date;
 
@@ -69,4 +68,10 @@ public class CheckApproveVO {
 
 	@ApiModelProperty("查询key")
 	private String searchKey;
+
+	private Long deptId;
+
+	private Long roleId;
+
+	private Long userId;
 }

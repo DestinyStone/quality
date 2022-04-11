@@ -145,6 +145,9 @@ public class CheckApproveController {
 		if (approveVO.getTagFlag() == null) {
 			approveVO.setTagFlag(0);
 		}
+		approveVO.setDeptId(CommonUtil.getDeptId());
+		approveVO.setRoleId(CommonUtil.getRoleId());
+		approveVO.setUserId(CommonUtil.getUserId());
 		IPage<CheckApproveVO> page = checkApproveService.page(approveVO, CommonUtil.getDeptId(), Condition.getPage(query));
 
 		List<CheckApproveVO> records = page.getRecords();

@@ -103,4 +103,10 @@ public class DiReportApproveVO {
 
 	@ApiModelProperty("查询key")
 	private String searchKey;
+
+	private Long deptId;
+
+	private Long roleId;
+
+	private Long userId;
 }

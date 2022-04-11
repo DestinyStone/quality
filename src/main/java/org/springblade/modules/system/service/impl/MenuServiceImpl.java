@@ -142,7 +142,8 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements IM
 
 	@Override
 	public List<MenuVO> buttons(String roleId) {
-		List<Menu> buttons = (AuthUtil.isAdministrator()) ? baseMapper.allButtons() : baseMapper.buttons(Func.toLongList(roleId));
+//		List<Menu> buttons = (AuthUtil.isAdministrator()) ? baseMapper.allButtons() : baseMapper.buttons(Func.toLongList(roleId));
+		List<Menu> buttons = baseMapper.buttons(Func.toLongList(roleId));
 		MenuWrapper menuWrapper = new MenuWrapper();
 		return menuWrapper.listNodeVO(buttons);
 	}

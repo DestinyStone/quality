@@ -148,7 +148,8 @@ public class DiController {
 	@ApiOperation("查看详情")
 	public R<IPage<DiReportVO>> reportPage(DiReportVO reportVO, Query query) {
 		LambdaQueryWrapper<DiReport> wrapper = getCommonWrapper(reportVO);
-		wrapper.eq(DiReport::getStatus, 1);
+		wrapper.eq(DiReport::getStatus, 1)
+			.eq(DiReport::getReportUser, CommonUtil.getUserId());
 		if (reportVO.getTag() == null) {
 			reportVO.setTag(0);
 		}
@@ -180,7 +181,8 @@ public class DiController {
 	@ApiOperation("查看详情")
 	public  R<IPage<DiReportVO>> awaitReportPage(DiReportVO reportVO, Query query) {
 		LambdaQueryWrapper<DiReport> wrapper = getCommonWrapper(reportVO);
-		wrapper.eq(DiReport::getStatus, 0);
+		wrapper.eq(DiReport::getStatus, 0)
+			.eq(DiReport::getReportUser, CommonUtil.getUserId());
 		return R.data(DiReportWrapper.build().pageVO(reportService.page(Condition.getPage(query), wrapper)));
 	}
 
@@ -207,6 +209,7 @@ public class DiController {
 	@ApiOperation("上报")
 	public R report(@PathVariable("id") Long id, @RequestBody @Valid DiReportSubmitDTO submitDTO) {
 		DiReport report = reportService.getById(id);
+
 		if (new Integer(1).equals(report.getStatus())) {
 			throw new ServiceException("已上报, 不可重复上报");
 		}
