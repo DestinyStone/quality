@@ -2,8 +2,8 @@ package org.springblade.modules.out_buy_low.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import org.springblade.modules.out_buy_low.bean.entity.OutBuyQpr;
+import org.springblade.modules.out_buy_low.bean.vo.OutBuyQprVO;
 
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -30,4 +30,11 @@ public interface OutBuyQprService extends IService<OutBuyQpr> {
 	 * @return
 	 */
 	List<OutBuyQpr> getByIds(List<Long> qprIds);
+
+	/**
+	 * 获取详情
+	 * @param id
+	 * @return
+	 */
+	OutBuyQprVO getDetail(Long id);
 }
