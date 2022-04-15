@@ -124,6 +124,21 @@ public class MenuController extends BladeController {
 	}
 
 	/**
+	 * 菜单列表
+	 */
+	@GetMapping("/menu-list-line")
+	@ApiImplicitParams({
+		@ApiImplicitParam(name = "codeing", value = "菜单编号", paramType = "query", dataType = "string"),
+		@ApiImplicitParam(name = "name", value = "菜单名称", paramType = "query", dataType = "string")
+	})
+	@ApiOperationSupport(order = 4)
+	@ApiOperation(value = "菜单列表", notes = "传入menu")
+	public R<List<MenuVO>> menuListLine(@ApiIgnore @RequestParam Map<String, Object> menu) {
+		List<Menu> list = menuService.list(Condition.getQueryWrapper(menu, Menu.class).lambda().eq(Menu::getCategory, 1).orderByAsc(Menu::getSort));
+		return R.data(MenuWrapper.build().listVO(list));
+	}
+
+	/**
 	 * 懒加载菜单列表
 	 */
 	@GetMapping("/lazy-menu-list")

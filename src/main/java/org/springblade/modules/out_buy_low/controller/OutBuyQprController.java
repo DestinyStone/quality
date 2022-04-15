@@ -234,7 +234,7 @@ public class OutBuyQprController {
 		}
 
 		wrapper.eq(qprVO.getTriggerAddress() != null, OutBuyQpr::getTriggerAddress, qprVO.getTriggerAddress());
-
+		wrapper.orderByDesc(OutBuyQpr::getCreateTime);
 		IPage<OutBuyQpr> page = qprService.page(Condition.getPage(query), wrapper);
 		return R.data(OutBuyQprWrapper.build().pageVO(page));
 	}

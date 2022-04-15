@@ -9,4 +9,9 @@ import org.springblade.modules.work.entity.bean.Message;
  * @Description:
  */
 public interface MessageService extends IService<Message> {
+	/**
+	 * 保存
+	 * @param placeHolderReplace
+	 */
+	void save(String placeHolderReplace);
 }

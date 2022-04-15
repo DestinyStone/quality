@@ -31,7 +31,9 @@ public class EmailUtils {
 		helper.setTo(to);
 		helper.setFrom(type.getFrom());
 		helper.setText(content, true);
-		currentMailSender.send(mimeMessage);
+		new Thread(() -> {
+			currentMailSender.send(mimeMessage);
+		}).start();
 	}
 
 	private static AbstractMailSender getMailSender(EmailType type) {

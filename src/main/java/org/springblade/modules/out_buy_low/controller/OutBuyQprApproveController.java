@@ -85,7 +85,7 @@ public class OutBuyQprApproveController {
 		lowService.updateById(processLow);
 
 		BpmProcess process = processService.getByBusId(id);
-		pass(id, process.getBpmId(), outBuyQpr);
+		pass(id, process.getBpmId(), qprService.getById(id));
 		return R.status(true);
 	}
 
@@ -105,7 +105,7 @@ public class OutBuyQprApproveController {
 		lowService.updateById(processLow);
 
 		BpmProcess process = processService.getByBusId(id);
-		pass(id, process.getBpmId(), outBuyQpr);
+		pass(id, process.getBpmId(), qprService.getById(id));
 		return R.status(true);
 	}
 

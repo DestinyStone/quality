@@ -29,14 +29,12 @@ import org.springblade.modules.process.enums.ApproveNodeStatusEnum;
 import org.springblade.modules.process.service.BpmProcessService;
 import org.springblade.modules.process.service.ProcessUrgeService;
 import org.springblade.modules.system.entity.Role;
+import org.springblade.modules.work.service.MessageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -64,6 +62,11 @@ public class CheckApproveController {
 	@Autowired
 	private AccountService accountService;
 
+	@Autowired
+	private MessageService messageService;
+
+	private static final String messageTemp = "用户${userName} 催促品番号:${designation},品番名:${name}进行检查法制作";
+
 	@PostMapping("/warning")
 	@ApiOperation("检查制作提醒")
 	public R warning(@RequestBody @Valid List<ResourceDTO> resourceDtoList) {
@@ -83,6 +86,11 @@ public class CheckApproveController {
 
 		for (Check check : list) {
 			CheckEmailUtils.sendWarningEmail(check);
+			HashMap<String, String> map = new HashMap<>();
+			map.put("userName", CommonUtil.getUserName());
+			map.put("designation", check.getDesignation());
+			map.put("name", check.getName());
+			messageService.save(CommonUtil.placeHolderReplace(messageTemp, map));
 		}
 		return R.status(true);
 	}
