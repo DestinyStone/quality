@@ -17,6 +17,7 @@ import org.springblade.modules.di.bean.vo.DiApproveQualityVO;
 import org.springblade.modules.di.bean.vo.DiReportApproveVO;
 import org.springblade.modules.di.service.DiReportApproveService;
 import org.springblade.modules.di.service.DiReportService;
+import org.springblade.modules.di.utils.DiEmailUtils;
 import org.springblade.modules.process.entity.bean.BpmProcess;
 import org.springblade.modules.process.entity.bean.BpmProcessUrge;
 import org.springblade.modules.process.entity.dto.RejectDTO;
@@ -24,6 +25,8 @@ import org.springblade.modules.process.enums.ApproveNodeStatusEnum;
 import org.springblade.modules.process.service.BpmProcessService;
 import org.springblade.modules.process.service.ProcessUrgeService;
 import org.springblade.modules.system.entity.Role;
+import org.springblade.modules.work.enums.SettleBusType;
+import org.springblade.modules.work.service.SettleLogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -55,6 +58,9 @@ public class DiReportApproveController {
 
 	@Autowired
 	private DiReportService reportService;
+
+	@Autowired
+	private SettleLogService logService;
 
 	@PostMapping("/reject")
 	@ApiOperation("审批拒绝")
@@ -154,6 +160,14 @@ public class DiReportApproveController {
 			report.setBpmStatus(ApproveStatusEnum.FINISN.getCode());
 			reportService.updateById(report);
 			reportService.updateConfig(id);
+
+			DiReport current = reportService.getById(id);
+
+			logService.submitLog("DI数据编号:" + report.getCode(), SettleBusType.DI);
+			DiEmailUtils.sendCompleteEmail(current);
+		}else {
+			report.setBpmStatus(ApproveStatusEnum.PROCEED.getCode());
+			reportService.updateById(report);
 		}
 	}
 }

@@ -61,7 +61,7 @@ public class DiApproveUtils {
 			ParamCache.getValue(ParamConstant.CHIEF),
 			"系长审批",
 			1,
-			"unReportProcess",
+			"takeApprove",
 			ApproveUtils.ServerFlagEnum.DI_APPROVE.getMessage(),
 			ApproveNodeStatusEnum.ACTIVE.getCode());
 

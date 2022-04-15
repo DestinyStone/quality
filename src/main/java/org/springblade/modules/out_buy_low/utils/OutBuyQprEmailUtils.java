@@ -25,7 +25,15 @@ public class OutBuyQprEmailUtils {
 		userService = SpringUtil.getBean(IUserService.class);
 	}
 
+	public static void sendCompleteWarning(OutBuyQpr outBuyQpr) {
+		sendWarning(outBuyQpr, EmailConstant.OUT_BUY_LOW_COMPLETE);
+	}
+
 	public static void sendWarningEmail(OutBuyQpr outBuyQpr) {
+		sendWarning(outBuyQpr, EmailConstant.SUBMIT_OUT_BUY_LOW);
+	}
+
+	private static void sendWarning(OutBuyQpr outBuyQpr, String constant) {
 		Long createUser = outBuyQpr.getCreateUser();
 		User user = UserCache.getUser(createUser);
 		if (StrUtil.isNotBlank(user.getEmail())) {
@@ -33,7 +41,7 @@ public class OutBuyQprEmailUtils {
 				HashMap<String, String> map = new HashMap<>();
 				map.put("userName", user.getName());
 				map.put("title", outBuyQpr.getTitle());
-				EmailTemplateUtils.send(EmailConstant.SUBMIT_OUT_BUY_LOW, user.getEmail(), EmailType.QQ, map);
+				EmailTemplateUtils.send(constant, user.getEmail(), EmailType.QQ, map);
 			} catch (MessagingException e) {
 				e.printStackTrace();
 			}

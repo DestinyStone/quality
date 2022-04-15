@@ -1,6 +1,5 @@
 package org.springblade.modules.email.util;
 
-import cn.hutool.core.util.StrUtil;
 import org.springblade.common.enums.EmailType;
 import org.springblade.common.utils.CommonUtil;
 import org.springblade.common.utils.EmailUtils;
@@ -39,10 +38,16 @@ public class EmailTemplateUtils {
 		}
 
 		if (!new Integer(1).equals(detail.getStatus())) {
-			throw new ServiceException(StrUtil.format(EXCEPTION_WARNING_TEMPLATE, detail.getTitle(), detail.getCode()));
+			return;
 		}
 
-		EmailUtils.send(detail.getTitle(), handlerContent(detail.getContent(), map), to, type);
+		new Thread(() -> {
+			try {
+				EmailUtils.send(detail.getTitle(), handlerContent(detail.getContent(), map), to, type);
+			} catch (MessagingException e) {
+				e.printStackTrace();
+			}
+		}).start();
 	}
 
 	private static String handlerContent(String template, Map<String ,String> map) {

@@ -16,9 +16,12 @@ import org.springblade.modules.out_buy_low.bean.dto.OutBuyQprFillDTO;
 import org.springblade.modules.out_buy_low.bean.dto.QprCheckSaveDTO;
 import org.springblade.modules.out_buy_low.bean.entity.OutBuyQpr;
 import org.springblade.modules.out_buy_low.bean.vo.OutBuyQprApproveVO;
+import org.springblade.modules.out_buy_low.bean.vo.OutBuyQprVO;
 import org.springblade.modules.out_buy_low.enums.RejectEnumType;
 import org.springblade.modules.out_buy_low.service.OutBuyQprApproveService;
 import org.springblade.modules.out_buy_low.service.OutBuyQprService;
+import org.springblade.modules.out_buy_low.utils.OutBuyQprEmailUtils;
+import org.springblade.modules.out_buy_low.utils.QprDownLoadUtils;
 import org.springblade.modules.process.entity.bean.BpmProcess;
 import org.springblade.modules.process.entity.bean.BpmProcessUrge;
 import org.springblade.modules.process.entity.dto.RejectDTO;
@@ -28,6 +31,7 @@ import org.springblade.modules.process.service.ProcessUrgeService;
 import org.springblade.modules.process_low.bean.entity.ProcessLow;
 import org.springblade.modules.process_low.enums.LowBpmNodeEnum;
 import org.springblade.modules.process_low.service.ProcessLowService;
+import org.springblade.modules.process_low.utils.ProcessLowEmailUtils;
 import org.springblade.modules.system.entity.Role;
 import org.springblade.modules.work.enums.SettleBusType;
 import org.springblade.modules.work.service.SettleLogService;
@@ -35,7 +39,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -174,6 +180,15 @@ public class OutBuyQprApproveController {
 		return R.status(true);
 	}
 
+	@GetMapping("/download/qpr/{id}")
+	@ApiOperation("不良调查")
+	@Transactional
+	public void downLoadQpr(@PathVariable("id") Long id, HttpServletResponse response) throws IOException {
+		OutBuyQprVO outBuyQpr = qprService.getDetail(id);
+		QprDownLoadUtils.downLoad(outBuyQpr, response);
+	}
+
+
 	@GetMapping("/page")
 	@ApiOperation("分页")
 	public R<IPage<OutBuyQprApproveVO>> page(OutBuyQprApproveVO approveVO, Query query) {
@@ -225,7 +240,17 @@ public class OutBuyQprApproveController {
 			outBuyQpr.setCompleteTime(new Date());
 			outBuyQpr.setBpmStatus(ApproveStatusEnum.FINISN.getCode());
 			qprService.updateById(outBuyQpr);
+			OutBuyQprEmailUtils.sendCompleteWarning(data);
 			settleLogService.finishLog(data.getTitle(), SettleBusType.OUT_LOW, data.getCreateUser());
+
+			ProcessLow processLow = lowService.getById(id);
+			if (processLow != null) {
+				processLow.setBpmStatus(ApproveStatusEnum.FINISN.getCode());
+				lowService.updateById(processLow);
+				ProcessLowEmailUtils.sendCompleteWarningEmail(processLow);
+				settleLogService.finishLog(processLow.getTitle(), SettleBusType.LOW, processLow.getCreateUser());
+			}
+
 		}else {
 			outBuyQpr.setBpmStatus(ApproveStatusEnum.PROCEED.getCode());
 			qprService.updateById(outBuyQpr);

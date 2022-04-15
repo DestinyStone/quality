@@ -15,10 +15,8 @@ import org.springblade.core.mp.support.Condition;
 import org.springblade.core.mp.support.Query;
 import org.springblade.core.tool.api.R;
 import org.springblade.core.tool.utils.BeanUtil;
-import org.springblade.modules.file.bean.entity.BusFile;
 import org.springblade.modules.file.bean.vo.BusFileVO;
 import org.springblade.modules.file.service.BusFileService;
-import org.springblade.modules.file.wrapper.BusFileWrapper;
 import org.springblade.modules.out_buy_low.bean.dto.OutBuyQprDTO;
 import org.springblade.modules.out_buy_low.bean.entity.OutBuyQpr;
 import org.springblade.modules.out_buy_low.bean.vo.OutBuyQprQualityVO;
@@ -146,37 +144,7 @@ public class OutBuyQprController {
 	@GetMapping("/detail")
 	@ApiOperation("详情")
 	public R<OutBuyQprVO> detail(@RequestParam("id") Long id) {
-		OutBuyQpr outBuyQpr = qprService.getById(id);
-		OutBuyQprVO outBuyQprVO = OutBuyQprWrapper.build().entityVO(outBuyQpr);
-
-		ArrayList<Long> fileIds = new ArrayList<>();
-		List<Long> extendsFileIds = CommonUtil.toLongList(outBuyQpr.getAnalyseExtendsFileIds());
-		List<Long> imgReportIds = CommonUtil.toLongList(outBuyQpr.getImgReportIds());
-
-		fileIds.addAll(extendsFileIds);
-		fileIds.addAll(imgReportIds);
-
-		if (fileIds.isEmpty()) {
-			return R.data(outBuyQprVO);
-		}
-
-		LambdaQueryWrapper<BusFile> fileWrapper = new LambdaQueryWrapper<>();
-		fileWrapper.in(BusFile::getId, fileIds);
-		List<BusFileVO> list = BusFileWrapper.build().listVO(fileService.list(fileWrapper));
-
-		outBuyQprVO.setAnalyseExtendsFileList(new ArrayList<>());
-		outBuyQprVO.setImgReportFiles(new ArrayList<>());
-
-		for (BusFileVO item : list) {
-			if(extendsFileIds.contains(item.getId())) {
-				outBuyQprVO.getAnalyseExtendsFileList().add(item);
-			}
-
-			if(imgReportIds.contains(item.getId())) {
-				outBuyQprVO.getImgReportFiles().add(item);
-			}
-		}
-
+		OutBuyQprVO outBuyQprVO = qprService.getDetail(id);
 		return R.data(outBuyQprVO);
 	}
 

@@ -28,21 +28,34 @@ public class CheckEmailUtils {
 		userService = SpringUtil.getBean(IUserService.class);
 	}
 
-	public static void sendEmail(Check check) {
+	public static void sendCommonEmail(Check check, String constant) {
 		Long createUser = check.getCreateUser();
 		User user = UserCache.getUser(createUser);
 		if (StrUtil.isNotBlank(user.getEmail())) {
 			try {
 				HashMap<String, String> map = new HashMap<>();
 				map.put("userName", user.getName());
-				EmailTemplateUtils.send(EmailConstant.SUBMIT_OUT_BUY_LOW, user.getEmail(), EmailType.QQ, map);
+				map.put("code", check.getCode());
+				EmailTemplateUtils.send(constant, user.getEmail(), EmailType.QQ, map);
 			} catch (MessagingException e) {
 				e.printStackTrace();
 			}
 		}
 	}
 
+	public static void sendCompleteEmail(Check check) {
+		sendCommonEmail(check, EmailConstant.INSPECTION_COMPLETE);
+	}
+
+	public static void sendSubmitEmail(Check check) {
+		sendCommonEmail(check, EmailConstant.SUBMIT_INSPECTION);
+	}
+
 	public static void sendWarningEmail(Check check) {
+		sendEmail(check);
+	}
+
+	public static void sendEmail(Check check) {
 		String dutyDept = check.getDutyDept();
 		if (StrUtil.isBlank(dutyDept)) {
 			throw new ServiceException("供应商不存在");
@@ -51,7 +64,9 @@ public class CheckEmailUtils {
 		for (User item : user) {
 			if (StrUtil.isNotBlank(item.getEmail())) {
 				try {
-					EmailTemplateUtils.send(EmailConstant.INSPECTION_MAKE_REMIND, item.getEmail(), EmailType.QQ);
+					HashMap<String, String> map = new HashMap<>();
+					map.put("userName", item.getName());
+					EmailTemplateUtils.send(EmailConstant.INSPECTION_MAKE_REMIND, item.getEmail(), EmailType.QQ, map);
 				} catch (MessagingException e) {
 					e.printStackTrace();
 				}

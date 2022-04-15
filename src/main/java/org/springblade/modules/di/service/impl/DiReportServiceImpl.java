@@ -41,7 +41,9 @@ public class DiReportServiceImpl extends ServiceImpl<DiReportMapper, DiReport> i
 		}).collect(Collectors.toList());
 		Boolean status = saveBatch(collect);
 		for (DiReport diReport : collect) {
-			DiEmailUtils.sendEmail(diReport);
+			if (diConfig.getPastType() == 0) {
+				DiEmailUtils.sendOverEmail(diReport);
+			}
 		}
 		return status;
 	}

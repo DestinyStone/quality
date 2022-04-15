@@ -28,7 +28,7 @@ public enum SettleBusType {
 	/**
 	 * 检查法
 	 */
-	DI(3, "检查法"),
+	DI(3, "DI数据"),
 	;
 
 	Integer code;
